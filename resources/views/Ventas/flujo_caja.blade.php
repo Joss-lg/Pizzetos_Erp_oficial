@@ -14,7 +14,6 @@
 @if(session('download_pdf'))
 <script>
     window.addEventListener('DOMContentLoaded', function() {
-        // Abre el PDF en una pestaña nueva automáticamente
         window.open("{{ route('flujo.caja.pdf', session('download_pdf')) }}", "_blank");
     });
 </script>
@@ -26,7 +25,13 @@
         <div class="flex flex-col items-center justify-center mt-12">
             <h2 class="text-[28px] font-bold text-[#1e293b] tracking-tight mb-8">Gestión de Caja</h2>
             <div class="bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 p-8 w-full max-w-md">
-                <h3 class="text-xl font-bold text-[#1e293b] mb-6">Apertura de Caja</h3>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-[#1e293b]">Apertura de Caja</h3>
+                    <a href="{{ route('flujo.caja.historial') }}" class="text-amber-600 hover:text-amber-700 text-xs font-bold underline flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Ver Historial
+                    </a>
+                </div>
                 <form action="{{ route('flujo.caja.abrir') }}" method="POST" class="space-y-5">
                     @csrf
                     <div>
@@ -60,8 +65,11 @@
                         <p class="text-sm text-gray-500 mt-1">Apertura: {{ \Carbon\Carbon::parse($cajaAbierta->fecha_apertura)->locale('es')->translatedFormat('d \d\e F \d\e Y, h:i a') }}</p>
                         <p class="text-sm text-gray-500">Cajero: <span class="font-medium text-gray-700">{{ $cajaAbierta->cajero_nombre ?? 'Administrador' }}</span></p>
                     </div>
-                    <div class="bg-green-100 text-green-700 border border-green-200 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Activa
+                    <div class="flex flex-col items-end gap-2">
+                        <div class="bg-green-100 text-green-700 border border-green-200 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Activa
+                        </div>
+                        <a href="{{ route('flujo.caja.historial') }}" class="text-amber-600 hover:text-amber-700 text-xs font-bold underline italic">Consultar historial de cajas</a>
                     </div>
                 </div>
 
@@ -142,7 +150,7 @@
                     <div x-show="open" x-collapse>
                         <div class="p-5 border-t border-gray-100 bg-gray-50/50 min-h-[80px] flex items-center justify-center">
                             @if($ventas_detalle->isEmpty())
-                                <p class="text-sm text-gray-500 font-medium">No hay ventas registradas en esta sesión.</p>
+                                <p class="text-sm text-gray-500 font-medium text-center">No hay ventas registradas.</p>
                             @else
                                 <div class="w-full text-sm">
                                     @foreach($ventas_detalle as $v)
@@ -165,7 +173,7 @@
                     <div x-show="open" x-collapse>
                         <div class="p-5 border-t border-gray-100 bg-gray-50/50 min-h-[80px] flex items-center justify-center">
                             @if($gastos_detalle->isEmpty())
-                                <p class="text-sm text-gray-500 font-medium">No hay gastos registrados en esta sesión.</p>
+                                <p class="text-sm text-gray-500 font-medium text-center">No hay gastos registrados.</p>
                             @else
                                 <div class="w-full text-sm">
                                     @foreach($gastos_detalle as $g)
@@ -208,7 +216,7 @@
                     </div>
 
                     <form id="formCerrarCaja" action="{{ route('flujo.caja.cerrar', $cajaAbierta->id_caja) }}" method="POST" class="space-y-5">
-                        @csrf @method('POST')
+                        @csrf
                         
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1.5">Monto Final en Caja (Recuento Físico) <span class="text-red-500">*</span></label>
@@ -237,9 +245,6 @@
                             </div>
                         </div>
 
-                        <div x-show="montoContado !== '' && diferencia > 0" class="bg-[#d1fae5] text-green-800 p-3 rounded text-xs font-semibold">Hay un sobrante. Verifica que no falte registrar algún gasto.</div>
-                        <div x-show="montoContado !== '' && diferencia < 0" class="bg-red-100 text-red-800 p-3 rounded text-xs font-semibold">Hay un faltante. Revisa el conteo físico nuevamente.</div>
-
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1.5">Observaciones de Cierre</label>
                             <textarea name="observaciones_cierre" placeholder="Opcional: Notas sobre el cierre, incidencias, etc." rows="3" class="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 text-sm resize-none"></textarea>
@@ -250,7 +255,7 @@
                                 Confirmar Cierre de Caja
                             </button>
                             
-                            <a href="{{ route('flujo.caja.pdf', $cajaAbierta->id_caja) }}" target="_blank" class="w-full bg-[#eab308] hover:bg-[#ca8a04] text-white font-bold py-3 rounded-md transition-colors text-[14px] flex items-center justify-center gap-2">
+                            <a href="{{ route('flujo.caja.pdf', $cajaAbierta->id_caja) }}" target="_blank" class="w-full bg-[#eab308] hover:bg-[#ca8a04] text-white font-bold py-3 rounded-md transition-colors text-[14px] flex items-center justify-center gap-2 text-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Descargar Reporte PDF
                             </a>
                         </div>
@@ -264,7 +269,7 @@
                                 <p class="text-gray-500 text-sm mb-6 mt-2">¿Estás seguro que deseas cerrar la caja? Al cerrar la caja, se guardará el balance final y no podrá registrar más ventas en esta sesión.</p>
                                 <div class="flex gap-3 mt-6">
                                     <button @click="modalCerrar = false" type="button" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2.5 rounded-lg transition-colors text-sm">Cancelar</button>
-                                    <button type="submit" class="flex-1 bg-[#ef4444] hover:bg-red-600 text-white font-bold py-2.5 rounded-lg transition-colors text-sm shadow-sm">Sí, cerrar caja</button>
+                                    <button type="button" @click="document.getElementById('formCerrarCaja').submit()" class="flex-1 bg-[#ef4444] hover:bg-red-600 text-white font-bold py-2.5 rounded-lg transition-colors text-sm shadow-sm">Sí, cerrar caja</button>
                                 </div>
                             </div>
                         </div>

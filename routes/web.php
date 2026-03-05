@@ -64,7 +64,6 @@ Route::middleware(['auth'])->group(function () {
 
     // --- MÓDULO DE CORTE MENSUAL ---
     Route::get('/corte-mensual', [CorteController::class, 'index'])->name('corte.index');
-    //Actualizar
     Route::get('/corte-mensual/dia/{fecha}', [CorteController::class, 'getDetalleDia'])->name('corte.dia');
 
    // --- MÓDULO DE PRODUCTOS: PIZZAS ---
@@ -205,6 +204,7 @@ Route::middleware(['auth'])->group(function () {
 
     // --- FLUJO DE CAJA ---
     Route::get('/venta/flujo-caja', [FlujoCajaController::class, 'index'])->name('flujo.caja.index');
+    Route::get('/venta/flujo-caja/historial', [FlujoCajaController::class, 'historial'])->name('flujo.caja.historial');
     Route::post('/venta/flujo-caja/abrir', [FlujoCajaController::class, 'abrirCaja'])->name('flujo.caja.abrir');
     Route::post('/venta/flujo-caja/cerrar/{id}', [FlujoCajaController::class, 'cerrarCaja'])->name('flujo.caja.cerrar');
     Route::get('/venta/flujo-caja/pdf/{id}', [FlujoCajaController::class, 'descargarPdf'])->name('flujo.caja.pdf');
