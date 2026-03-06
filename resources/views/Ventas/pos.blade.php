@@ -1075,7 +1075,6 @@
 
                 // MAGNO
                 abrirMagnoGeneral() {
-                    // Magno fija a 230 por indicacion, si bd lo tiene a 115 se ignora
                     let precioMagno = dbMagnoPrice && dbMagnoPrice > 150 ? parseFloat(dbMagnoPrice) : 230.00; 
                     
                     this.magnoItem = { id: null, col: 'id_pizza', nombre: 'Magno', precio: precioMagno };
