@@ -1389,10 +1389,10 @@
 
                     let pagosToSend = [];
                     if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
-                        pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto }); // ID 2 = Efectivo en BD
+                        pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto }); 
                     }
                     if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
-                        pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); // ID 1 = Tarjeta
+                        pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
                     }
                     if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
                         pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
