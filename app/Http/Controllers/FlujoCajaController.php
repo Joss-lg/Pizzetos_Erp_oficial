@@ -28,22 +28,27 @@ class FlujoCajaController extends Controller
             return view('Ventas.flujo_caja', ['cajaAbierta' => null]);
         }
 
+        // Estadísticas iniciales
         $stats = [
             'num_ventas' => 0, 
             'total_gastos' => 0, 
             'venta_total' => 0, 
-            'efectivo' => 0, 
-            'tarjeta' => 0, 
-            'transferencia' => 0
+            'efectivo' => 0,      // Solo ventas en efectivo
+            'tarjeta' => 0,       // Solo ventas en tarjeta
+            'transferencia' => 0,  // Solo ventas en transferencia
+            'monto_esperado_cajon' => 0 // Fondo + Efectivo - Gastos
         ];
 
+        // 1. Obtener Gastos de esta caja
         $gastos_detalle = DB::table('Gastos')->where('id_caja', $cajaAbierta->id_caja)->get();
         $stats['total_gastos'] = $gastos_detalle->sum('precio');
 
+        // 2. Obtener Ventas de esta caja
         $ventas_detalle = DB::table('Venta')->where('id_caja', $cajaAbierta->id_caja)->get();
         $stats['num_ventas'] = $ventas_detalle->count();
         $stats['venta_total'] = $ventas_detalle->sum('total');
 
+        // 3. Desglose preciso por método de pago
         $pagos = DB::table('Pago')
             ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
             ->join('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
@@ -56,11 +61,14 @@ class FlujoCajaController extends Controller
         $stats['tarjeta'] = $pagos['Tarjeta'] ?? 0;
         $stats['transferencia'] = $pagos['Transferencia'] ?? 0;
 
+        // 4. Lógica de "Dinero en Cajón" (Fondo + Ventas Efectivo - Gastos)
+        $stats['monto_esperado_cajon'] = ($cajaAbierta->monto_inicial + $stats['efectivo']) - $stats['total_gastos'];
+
         return view('Ventas.flujo_caja', compact('cajaAbierta', 'stats', 'ventas_detalle', 'gastos_detalle'));
     }
 
     /**
-     * Muestra el historial de cajas cerradas de la sucursal para reimpresión.
+     * Muestra el historial de cajas cerradas.
      */
     public function historial()
     {
@@ -70,7 +78,7 @@ class FlujoCajaController extends Controller
             ->leftJoin('Empleados', 'Caja.id_emp', '=', 'Empleados.id_emp')
             ->select('Caja.*', 'Empleados.nickName as cajero_nombre')
             ->where('Caja.id_suc', $id_sucursal)
-            ->where('Caja.status', 0) // Solo cajas cerradas
+            ->where('Caja.status', 0)
             ->orderBy('Caja.fecha_cierre', 'desc')
             ->paginate(15);
 
@@ -78,7 +86,7 @@ class FlujoCajaController extends Controller
     }
 
     /**
-     * Procesa la apertura de una nueva caja.
+     * Procesa la apertura de una nueva caja con el fondo inicial.
      */
     public function abrirCaja(Request $request)
     {
@@ -87,25 +95,29 @@ class FlujoCajaController extends Controller
             'observaciones' => 'nullable|string|max:255'
         ]);
 
+        // Evitar doble apertura
+        $existe = DB::table('Caja')->where('status', 1)->where('id_suc', Auth::user()->id_suc)->exists();
+        if($existe) return redirect()->back()->with('error', 'Ya existe una caja abierta.');
+
         DB::table('Caja')->insert([
             'id_suc' => Auth::user()->id_suc,
             'id_emp' => Auth::user()->id_emp,
             'fecha_apertura' => Carbon::now(),
             'monto_inicial' => $request->monto_inicial,
             'status' => 1,
-            'observaciones_apertura' => $request->observaciones ?? ''
+            'observaciones_apertura' => $request->observaciones ?? 'Apertura de turno'
         ]);
 
-        return redirect()->route('flujo.caja.index')->with('success', 'Caja abierta exitosamente.');
+        return redirect()->route('flujo.caja.index')->with('success', 'Caja abierta con $' . number_format($request->monto_inicial, 2));
     }
 
     /**
-     * Procesa el cierre de la caja actual.
+     * Procesa el cierre de la caja calculando diferencias.
      */
     public function cerrarCaja(Request $request, $id)
     {
         $request->validate([
-            'monto_final' => 'required|numeric|min:0',
+            'monto_final' => 'required|numeric|min:0', // Esto es el conteo físico del cajero
             'observaciones_cierre' => 'nullable|string'
         ]);
 
@@ -117,12 +129,12 @@ class FlujoCajaController extends Controller
         ]);
 
         return redirect()->route('flujo.caja.index')
-            ->with('success', 'Caja cerrada correctamente.')
+            ->with('success', 'Caja cerrada correctamente. Se ha generado el reporte.')
             ->with('download_pdf', $id);
     }
 
     /**
-     * Genera y transmite el PDF del reporte de cierre.
+     * Genera el PDF detallando fondo, efectivo, tarjetas y gastos.
      */
     public function descargarPdf($id)
     {
@@ -150,9 +162,13 @@ class FlujoCajaController extends Controller
             'efectivo' => $pagos['Efectivo'] ?? 0,
             'tarjeta' => $pagos['Tarjeta'] ?? 0,
             'transferencia' => $pagos['Transferencia'] ?? 0,
+            'fondo_inicial' => $caja->monto_inicial,
+            'monto_esperado' => ($caja->monto_inicial + ($pagos['Efectivo'] ?? 0)) - $gastos,
+            'monto_real' => $caja->monto_final,
+            'diferencia' => $caja->monto_final - (($caja->monto_inicial + ($pagos['Efectivo'] ?? 0)) - $gastos)
         ];
 
         $pdf = Pdf::loadView('Ventas.pdf_caja', compact('caja', 'stats'));
-        return $pdf->stream('Reporte_Caja_'.$id.'.pdf');
+        return $pdf->stream('Corte_Caja_'.$caja->fecha_cierre.'.pdf');
     }
 }
