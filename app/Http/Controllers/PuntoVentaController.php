@@ -106,15 +106,17 @@ class PuntoVentaController extends Controller
                 ]);
             }
 
+            $estado_venta = ($request->has('pagos') && count($request->pagos) > 0) ? 1 : 0;
+
             $id_venta = DB::table('Venta')->insertGetId([
                 'id_suc' => $id_sucursal, 'id_caja' => $cajaAbierta->id_caja,
                 'total' => $request->total, 'tipo_servicio' => $request->tipo_servicio,
                 'mesa' => $request->mesa, 'comentarios' => $request->comentarios,
-                'status' => 0, 'fecha_hora' => Carbon::now()
+                'status' => $estado_venta, 'fecha_hora' => Carbon::now()
             ]);
 
             foreach($request->carrito as $item) {
-                $qtyOrillas = $item['orillas_qty'] ?? ((isset($item['orilla_queso']) && $item['orilla_queso']) ? 1 : 0);
+                $qtyOrillas = $item['orillas_qty'] ?? ((isset($item['orilla_queso']) && $item['orilla_queso']) ? $item['qty'] : 0);
 
                 $datosInsert = [
                     'id_venta' => $id_venta, 'cantidad' => $item['qty'], 'precio_unitario' => $item['precioFinal'],
@@ -123,6 +125,11 @@ class PuntoVentaController extends Controller
                 ];
 
                 $extraData = [];
+                // Guardamos los precios crudos para desglosarlos en el ticket
+                $extraData['p_base'] = $item['precioBase'] ?? ($item['precioFinal'] ?? 0);
+                $extraData['p_orilla'] = $item['precio_orilla'] ?? 0;
+                $extraData['desc'] = $item['descuentoPromo'] ?? 0;
+
                 if(!empty($item['comentario'])) $extraData['nota'] = $item['comentario'];
                 if(!empty($item['ingredientes_extra'])) $extraData['extras'] = $item['ingredientes_extra'];
                 
@@ -133,7 +140,6 @@ class PuntoVentaController extends Controller
                 } elseif ($item['tipo'] == 'piz_mitad') {
                     $datosInsert['pizza_mitad'] = json_encode(['mitad1' => $item['mitad1'], 'mitad2' => $item['mitad2'], 'tamano' => $item['tamano']]);
                 } elseif ($item['tipo'] == 'piz_ing') {
-                    // Para evitar errores de llave foranea en Pizzas, la por ingrediente se guarda en el json
                     $datosInsert['id_pizza'] = null; 
                     $extraData['piz_ing_tamano'] = $item['nombre_base']; 
                 } elseif ($col === 'id_rec') {
@@ -154,11 +160,8 @@ class PuntoVentaController extends Controller
             if ($request->has('pagos')) {
                 foreach($request->pagos as $pago) {
                     $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];
-                    
-                    // Si trae referencia (transferencia) o "entregado" (efectivo), lo guardamos en la columna de referencia.
                     if (isset($pago['referencia'])) $datosPago['referencia'] = $pago['referencia'];
                     if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado'];
-                    
                     DB::table('Pago')->insert($datosPago);
                 }
             }
@@ -182,18 +185,22 @@ class PuntoVentaController extends Controller
         if(!$venta) abort(404);
         $detalles = DB::table('DetalleVenta')->where('id_venta', $id)->get();
         
-        // Enriquecer el ticket traduciendo IDs a texto
+        // Formateador super detallado para el Ticket
         foreach($detalles as $det) {
             $nombre = "Producto";
-            $sub = "";
+            $sub = [];
 
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
+            $p_base = $ing->p_base ?? $det->precio_unitario;
+            $p_orilla = $ing->p_orilla ?? 0;
+            $desc = $ing->desc ?? 0;
+
             if($ing && isset($ing->piz_ing_tamano)) {
                 $nombre = $ing->piz_ing_tamano;
             }
             elseif($det->id_pizza) {
                 $p = DB::table('Pizzas')->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')->join('TamanosPizza', 'Pizzas.id_tamano', '=', 'TamanosPizza.id_tamañop')->where('Pizzas.id_pizza', $det->id_pizza)->first();
-                if($p) { $nombre = "Pizzas " . $p->tamano; $sub = "1 " . $p->nombre; }
+                if($p) { $nombre = "Pizza " . $p->tamano . " " . $p->nombre; }
             }
             elseif($det->id_hamb) { $nombre = DB::table('Hamburguesas')->where('id_hamb', $det->id_hamb)->value('paquete'); }
             elseif($det->id_cos) { $nombre = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
@@ -202,7 +209,7 @@ class PuntoVentaController extends Controller
             elseif($det->id_papa) { $nombre = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden'); }
             elseif($det->id_maris) {
                 $m = DB::table('PizzasMariscos')->join('TamanosPizza', 'PizzasMariscos.id_tamañop', '=', 'TamanosPizza.id_tamañop')->where('PizzasMariscos.id_maris', $det->id_maris)->first();
-                if($m) { $nombre = "Mariscos " . $m->tamano; $sub = "1 " . $m->nombre; }
+                if($m) { $nombre = "Pizza Mariscos " . $m->tamano . " " . $m->nombre; }
             }
             elseif($det->id_refresco) {
                 $r = DB::table('Refrescos')->join('TamanosRefrescos', 'Refrescos.id_tamano', '=', 'TamanosRefrescos.id_tamano')->where('Refrescos.id_refresco', $det->id_refresco)->first();
@@ -214,7 +221,7 @@ class PuntoVentaController extends Controller
                 if(isset($j->cuartos)) {
                     $counts = array_count_values($j->cuartos);
                     $parts = []; foreach($counts as $k => $v) { $parts[] = "$v/4 $k"; }
-                    $sub = implode(", ", $parts);
+                    $sub[] = ['text' => '• ' . implode(", ", $parts), 'price' => 0];
                 }
             }
             elseif($det->id_barr) {
@@ -223,7 +230,7 @@ class PuntoVentaController extends Controller
                 if(isset($j->medios)) {
                     $counts = array_count_values($j->medios);
                     $parts = []; foreach($counts as $k => $v) { $parts[] = "$v/2 $k"; }
-                    $sub = implode(", ", $parts);
+                    $sub[] = ['text' => '• ' . implode(", ", $parts), 'price' => 0];
                 }
             }
             elseif($det->id_magno) {
@@ -232,31 +239,41 @@ class PuntoVentaController extends Controller
                 if(isset($j->medios)) {
                     $counts = array_count_values($j->medios);
                     $parts = []; foreach($counts as $k => $v) { $parts[] = "$v/2 $k"; }
-                    $sub = implode(" / ", $parts) . "\n+ 1 Refresco de 2L";
+                    $sub[] = ['text' => '• ' . implode(" / ", $parts), 'price' => 0];
+                    $sub[] = ['text' => '• 1 Refresco de 2L', 'price' => 0];
                 }
             }
             elseif($det->id_paquete) {
                 $j = json_decode($det->id_paquete);
                 $nombre = "Paquete " . ($j->id ?? '');
-                $sub = str_replace(" / ", "\n", ($j->variante ?? ''));
+                if(isset($j->variante)) {
+                    $vars = explode("\n", str_replace(" / ", "\n", $j->variante));
+                    foreach($vars as $v) {
+                        $sub[] = ['text' => '• ' . $v, 'price' => 0];
+                    }
+                }
             }
             elseif($det->pizza_mitad) {
                 $j = json_decode($det->pizza_mitad);
                 $nombre = "Mitades " . ($j->tamano ?? '');
-                $sub = "1/2 " . ($j->mitad1 ?? '') . ", 1/2 " . ($j->mitad2 ?? '');
+                $sub[] = ['text' => '• 1/2 ' . ($j->mitad1 ?? '') . ', 1/2 ' . ($j->mitad2 ?? ''), 'price' => 0];
             }
 
+            // Inyectamos los costos extra y descuentos en la lista de Sub Items
             if ($det->queso && $det->queso > 0) {
-                $sub .= "\n+ " . $det->queso . " Orilla(s) Rellena(s)";
+                $sub[] = ['text' => '• ' . $det->queso . ' Orilla(s) Rellena(s)', 'price' => ($p_orilla * $det->queso)];
             }
-            if ($ing) {
-                if (isset($ing->extras) && count($ing->extras) > 0) {
-                    $sub .= "\n+ Ings: " . implode(", ", $ing->extras);
-                }
+            if ($ing && isset($ing->extras) && count($ing->extras) > 0) {
+                $sub[] = ['text' => '• Extras: ' . implode(", ", $ing->extras), 'price' => 0];
+            }
+            if ($desc > 0) {
+                $tipo_desc = ($desc == $p_base) ? '2x1' : '40%';
+                $sub[] = ['text' => '• Descuento Promo ' . $tipo_desc, 'price' => -$desc];
             }
 
             $det->prod_nombre = $nombre;
-            $det->prod_sub = $sub;
+            $det->p_base = $p_base; // Este es el precio que se imprimirá en grande
+            $det->sub_items = $sub;
         }
         
         $pagos = DB::table('Pago')

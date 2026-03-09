@@ -67,11 +67,11 @@
                         {{-- MENÚ EXTRAS --}}
                         <div class="relative" x-data="{ openExtras: false }">
                             <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-5 py-2 rounded-md text-[13px] font-bold transition-colors flex items-center gap-1">
-                                Extras <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                Extras 
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
                                 
-                                {{-- Categorías Dinámicas --}}
                                 <template x-for="catEx in dbCategoriasExtras" :key="catEx.id_cat">
                                     <button @click="
                                         cat = parseInt(catEx.id_cat); 
@@ -80,10 +80,7 @@
                                     " class="w-full text-left px-4 py-2.5 text-[13px] font-bold text-[#495057] hover:bg-gray-50" x-text="catEx.descripcion"></button>
                                 </template>
 
-                                {{-- Botón Refrescos Obligatorio --}}
                                 <button @click="cat = 1; view = 'bebidas'; openExtras = false;" class="w-full text-left px-4 py-2.5 text-[13px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Refrescos</button>
-                                
-                                {{-- Botón Exclusivo MAGNO --}}
                                 <button @click="abrirMagnoGeneral(); openExtras = false" class="w-full text-left px-4 py-2.5 text-[13px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Magno</button>
                             </div>
                         </div>
@@ -93,7 +90,7 @@
                         <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </span>
-                        <input type="text" x-model="search" placeholder="Buscar producto." class="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-md text-[13px] focus:outline-none focus:border-[#fd7e14]">
+                        <input type="text" x-model="search" placeholder="Buscar producto..." class="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-md text-[13px] focus:outline-none focus:border-[#fd7e14]">
                     </div>
                 </div>
 
@@ -105,7 +102,7 @@
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
                             <button @click="abrirOpciones(p)" class="bg-white rounded-[10px] shadow-sm border border-gray-100 border-l-[4px] border-l-[#ffc107] p-5 flex flex-col justify-between items-start text-left h-[105px] hover:shadow-md transition">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight" x-text="p.nombre"></span>
-                                <span class="text-[#fd7e14] text-[13px] font-bold">Ver opciones &rarr;</span>
+                                <span class="text-[#fd7e14] text-[13px] font-bold flex items-center gap-1">Ver opciones <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                             </button>
                         </template>
                     </div>
@@ -115,7 +112,7 @@
                         <template x-for="b in getListaBebidas()" :key="'beb_'+b.nombre">
                             <button @click="abrirBebida(b)" class="bg-white rounded-[10px] shadow-sm border border-gray-100 border-l-[4px] border-l-[#17a2b8] p-5 flex flex-col justify-between items-start text-left h-[105px] hover:shadow-md transition">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight" x-text="b.nombre"></span>
-                                <span class="text-[#17a2b8] text-[13px] font-bold">Elegir tamaño &rarr;</span>
+                                <span class="text-[#17a2b8] text-[13px] font-bold flex items-center gap-1">Elegir tamaño <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                             </button>
                         </template>
                     </div>
@@ -171,15 +168,15 @@
 
                                                 <div class="flex items-center justify-between mt-2 mb-2">
                                                     <div class="flex items-center bg-[#e9ecef] rounded border border-gray-200">
-                                                        <button @click="eliminarItemByUid(p.item.uid)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300">-</button>
+                                                        <button @click="eliminarItemByUid(p.item.uid)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">-</button>
                                                         <span class="w-8 h-7 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[13px]">1</span>
-                                                        <button @click="clonePizza(p.item)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300">+</button>
+                                                        <button @click="clonePizza(p.item)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
                                                     </div>
                                                     <span class="text-[12px] text-[#6c757d] font-medium" x-text="'Base: $' + parseFloat(p.price).toFixed(2)"></span>
                                                 </div>
 
                                                 <div class="flex justify-between items-end mt-2">
-                                                    <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer w-max bg-gray-50 px-2 py-1 rounded border border-gray-100">
+                                                    <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer w-max bg-gray-50 px-2 py-1 rounded border border-gray-100 hover:bg-gray-100">
                                                         <input type="checkbox" :checked="p.item.orilla_queso" @change="toggleOrilla(p.item.uid, $event.target.checked)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">
                                                         Orilla Queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + p.item.precio_orilla"></span>
                                                     </label>
@@ -195,7 +192,7 @@
                                 </div>
                             </template>
 
-                            {{-- TARJETAS PARA OTROS PRODUCTOS NORMALES (Incluyendo Magno y Paquetes) --}}
+                            {{-- TARJETAS PARA OTROS PRODUCTOS NORMALES --}}
                             <template x-if="group.type === 'normal'">
                                 <div class="border border-gray-200 rounded-[8px] p-4 bg-white shadow-sm mb-4 relative">
                                     <div class="flex justify-between items-start mb-2">
@@ -207,11 +204,11 @@
 
                                     <div class="flex items-center gap-3 mb-2">
                                         <div class="flex items-center bg-[#e9ecef] rounded border border-gray-200">
-                                            <button @click="group.item.qty > 1 ? updateNormalQty(group.item, -1) : null" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300">-</button>
+                                            <button @click="group.item.qty > 1 ? updateNormalQty(group.item, -1) : null" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">-</button>
                                             <span class="w-8 h-7 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[13px]" x-text="group.item.qty"></span>
-                                            <button @click="updateNormalQty(group.item, 1)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300">+</button>
+                                            <button @click="updateNormalQty(group.item, 1)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
                                         </div>
-                                        <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| Base: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
+                                        <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| c/u: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
                                     </div>
                                     
                                     <div x-show="group.item.variante" class="bg-[#f8f9fa] border border-gray-200 rounded-[6px] p-2 mt-2">
@@ -220,7 +217,7 @@
 
                                     {{-- Opcion de Orilla Queso exclusiva para la Magno --}}
                                     <template x-if="group.item.is_magno">
-                                        <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">
+                                        <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
                                             <input type="checkbox" x-model="group.item.orilla_queso" @change="recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">
                                             Orilla Queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + group.item.precio_orilla"></span>
                                         </label>
@@ -248,40 +245,55 @@
                     </template>
                 </div>
 
-                {{-- ZONA COBRO FINAL Y SELECTOR DE SERVICIO --}}
+                {{-- ZONA COBRO FINAL Y SELECTOR DE SERVICIO DINAMICO --}}
                 <div class="p-6 border-t border-gray-200 bg-white rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     <div class="flex justify-between items-center font-black text-[#212529] mb-4">
-                        <span class="text-[16px]">Total a cobrar:</span>
-                        <span x-text="'$' + getTotal().toFixed(2)" class="text-[26px] text-[#28a745]"></span>
+                        <span class="text-[16px]">Total:</span>
+                        <span x-text="'$' + getTotal().toFixed(2)" class="text-[26px]"></span>
                     </div>
 
-                    <button @click="modalComentarios = true" class="w-full bg-[#f8f9fa] border border-gray-200 hover:bg-[#e9ecef] text-[#495057] py-2.5 rounded-[6px] font-bold text-[14px] flex justify-center items-center gap-2 mb-4">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path></svg>
-                        Nota General del Pedido
+                    <button @click="modalComentarios = true" class="w-full bg-[#f8f9fa] border border-gray-200 hover:bg-[#e9ecef] text-[#212529] py-3 rounded-[6px] font-bold text-[15px] flex justify-center items-center gap-2 mb-4 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Agregar comentarios
                     </button>
 
-                    <div class="mb-4 h-10">
-                        <template x-if="servicio === 1">
-                            <input type="text" x-model="mesa" placeholder="MESA #" class="w-full h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14]">
-                        </template>
+                    <div class="mb-4 h-11" x-show="servicio === 1">
+                        <input type="text" x-model="mesa" placeholder="Ingresa el número de MESA..." class="w-full h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[15px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
                     </div>
 
-                    <div class="flex rounded-[6px] overflow-hidden shadow-sm h-[50px]">
-                        <div class="relative w-[45%]" x-data="{ open: false }">
-                            <button @click="open = !open" class="w-full h-full bg-[#fd7e14] text-white font-bold text-[13px] flex justify-center items-center gap-2 border-r border-[#e36b0c]">
+                    {{-- SPLIT BUTTON EXACTO SIN EMOJIS --}}
+                    <div class="flex h-[50px] relative" x-data="{ openServicio: false }">
+                        
+                        <button @click="openServicio = !openServicio" class="w-[45%] h-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold text-[15px] flex justify-between items-center px-4 rounded-l-[6px] border-r border-[#e36b0c] transition-colors shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <svg x-show="servicio === 3" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                <svg x-show="servicio === 1" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <svg x-show="servicio === 2" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                
                                 <span x-text="nomServicio()"></span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                            </button>
-                            <div x-show="open" @click.away="open = false" x-cloak class="absolute bottom-full left-0 w-[200px] bg-white border border-gray-200 rounded-lg shadow-xl z-50 mb-1 py-1">
-                                <button @click="servicio = 3; open = false" class="w-full text-left px-4 py-3 text-[14px] font-bold text-[#fd7e14] hover:bg-orange-50 border-b border-gray-100 flex items-center gap-2">🏍️ A Domicilio</button>
-                                <button @click="servicio = 1; open = false" class="w-full text-left px-4 py-3 text-[14px] font-bold text-[#495057] hover:bg-gray-50 border-b border-gray-100 flex items-center gap-2">🍽️ Comer Aqui</button>
-                                <button @click="servicio = 2; open = false" class="w-full text-left px-4 py-3 text-[14px] font-bold text-[#495057] hover:bg-gray-50 flex items-center gap-2">🛍️ Para Llevar</button>
                             </div>
+                            <svg class="w-4 h-4 transition-transform" :class="openServicio ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        
+                        <div x-show="openServicio" @click.away="openServicio = false" x-cloak class="absolute bottom-full left-0 w-[240px] mb-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 py-1">
+                            <button @click="servicio = 3; openServicio = false" class="w-full text-left px-5 py-4 text-[15px] flex items-center gap-3 transition-colors border-b border-gray-100" :class="servicio === 3 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                A Domicilio
+                            </button>
+                            <button @click="servicio = 1; openServicio = false" class="w-full text-left px-5 py-4 text-[15px] flex items-center gap-3 transition-colors border-b border-gray-100" :class="servicio === 1 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Comer Aqui
+                            </button>
+                            <button @click="servicio = 2; openServicio = false" class="w-full text-left px-5 py-4 text-[15px] flex items-center gap-3 transition-colors" :class="servicio === 2 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                Para Llevar
+                            </button>
                         </div>
 
-                        <button @click="procesarOrden()" :disabled="cart.length === 0" :class="cart.length === 0 ? 'bg-[#e9ecef] text-[#adb5bd] cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white'" class="flex-1 font-black text-[15px] transition-colors">
+                        <button @click="procesarOrden()" :disabled="cart.length === 0" :class="cart.length === 0 ? 'bg-[#fd7e14]/60 text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white'" class="flex-1 font-black text-[16px] rounded-r-[6px] transition-colors shadow-sm">
                             Enviar Orden
                         </button>
+
                     </div>
                 </div>
             </div>
@@ -291,7 +303,7 @@
         {{-- MODALES DE PRODUCTOS --}}
         {{-- ========================================================================= --}}
         
-        {{-- MODAL OPCIONES NORMAL (Catálogo Pizzas) --}}
+        {{-- MODAL OPCIONES NORMAL --}}
         <div x-show="modalOpc" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
                 <div class="p-5 border-b border-gray-100 flex justify-between items-center">
@@ -327,7 +339,7 @@
             </div>
         </div>
 
-        {{-- MAGNO --}}
+        {{-- MAGNO (Diseño Limpio Sin Emojis) --}}
         <div x-show="modalMagno" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMagno = false">
                 <div class="bg-[#212529] p-5 flex justify-between items-center text-white">
@@ -359,8 +371,9 @@
                         <div>
                             <h3 class="text-[18px] font-black text-black border-b border-gray-200 pb-3 mb-5">Resumen Magno</h3>
                             <div class="bg-gray-50 border border-gray-200 rounded-[8px] p-4 text-[13px] font-bold text-gray-700 whitespace-pre-wrap leading-relaxed" x-text="formatearMagnoPreview()"></div>
-                            <div class="mt-3 bg-gray-50 border border-gray-200 px-3 py-2 rounded font-bold text-[12px] text-gray-700">
-                                • Incluye 1 Refresco de 2L
+                            <div class="mt-3 bg-gray-50 border border-gray-200 px-3 py-2 rounded font-bold text-[12px] text-gray-700 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                Incluye 1 Refresco de 2L
                             </div>
                         </div>
                         <div class="mt-6 text-center">
@@ -628,128 +641,130 @@
             </div>
         </div>
 
-        {{-- MODAL DOMICILIO --}}
+        {{-- MODAL DOMICILIO (Búsqueda Reactiva Inteligente y Extra Grande) --}}
         <div x-show="modalCliente" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col max-h-[90vh] overflow-hidden">
-                <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-                    <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
-                        <svg class="w-6 h-6 text-[#fd7e14]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+            <div class="bg-white rounded-xl shadow-2xl w-[650px] flex flex-col max-h-[90vh] overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 class="text-2xl font-black text-gray-800 flex items-center gap-3">
+                        <svg class="w-7 h-7 text-[#fd7e14]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                         Dirección de Entrega
                     </h2>
-                    <button @click="modalCliente = false" class="text-gray-400 hover:text-black font-bold text-2xl leading-none">&times;</button>
+                    <button @click="modalCliente = false" class="text-gray-400 hover:text-black font-bold text-3xl leading-none">&times;</button>
                 </div>
                 
-                <div class="flex-1 overflow-y-auto p-6 bg-white space-y-6">
+                <div class="flex-1 overflow-y-auto p-8 bg-white space-y-8">
                     
+                    {{-- Seleccion de Cliente Inteligente (Lista visible al hacer click) --}}
                     <div class="relative">
-                        <label class="block text-[14px] font-bold text-gray-700 mb-2">Cliente *</label>
-                        <div class="flex gap-2">
+                        <label class="block text-[16px] font-bold text-gray-700 mb-3">Buscar Cliente *</label>
+                        <div class="flex gap-3">
                             <div class="relative flex-1" @click.away="showClientesList = false">
                                 <input type="text" 
                                        x-model="searchClienteText" 
+                                       @click="showClientesList = true"
                                        @input="showClientesList = true; clienteSeleccionado = null" 
                                        @focus="showClientesList = true" 
-                                       placeholder="Buscar por nombre o teléfono..." 
+                                       placeholder="Toca aquí para ver o buscar clientes..." 
                                        autocomplete="off"
-                                       class="w-full border border-gray-300 rounded-[8px] py-3.5 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none shadow-sm transition-colors">
+                                       class="w-full border-2 border-gray-300 rounded-[8px] py-4 px-5 text-[18px] font-medium focus:border-[#fd7e14] focus:ring-4 focus:ring-orange-100 focus:outline-none transition-all">
                                 
                                 <div x-show="showClientesList" 
                                      x-transition 
-                                     class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-2xl max-h-80 overflow-y-auto">
+                                     class="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-[8px] shadow-2xl max-h-80 overflow-y-auto">
                                     
-                                    <template x-if="clientesFiltrados.length === 0">
-                                        <div class="px-4 py-6 text-[15px] text-gray-500 italic text-center bg-gray-50">
-                                            No se encontraron clientes en la base de datos.<br>Haz clic en "Nuevo" para registrarlo.
+                                    <template x-if="getClientesFiltrados().length === 0">
+                                        <div class="px-5 py-8 text-[16px] text-gray-500 italic text-center bg-gray-50">
+                                            No se encontraron clientes.<br><span class="font-bold">Haz clic en "Nuevo" para registrarlo.</span>
                                         </div>
                                     </template>
 
-                                    <template x-for="cl in clientesFiltrados" :key="cl.id_cliente || cl.id || Math.random()">
-                                        <div @click="seleccionarCliente(cl)" class="px-5 py-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 flex justify-between items-center transition-colors">
-                                            <span class="font-bold text-[16px] text-gray-800" x-text="getClienteNombre(cl)"></span>
-                                            <span class="text-[14px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-3 py-1 rounded-md shadow-sm" x-text="getClienteTelefono(cl)"></span>
+                                    <template x-for="cl in getClientesFiltrados()" :key="cl.id_cliente || cl.id_clie || Math.random()">
+                                        <div @click="seleccionarCliente(cl)" class="px-6 py-5 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 flex justify-between items-center transition-colors">
+                                            <span class="font-bold text-[18px] text-gray-800" x-text="getClienteNombre(cl)"></span>
+                                            <span class="text-[15px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md shadow-sm" x-text="getClienteTelefono(cl)"></span>
                                         </div>
                                     </template>
                                 </div>
                             </div>
-                            <button @click="toggleFormNuevoCliente()" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-bold px-5 py-3 rounded-[8px] text-[14px] flex items-center gap-1 shadow-sm whitespace-nowrap transition-colors">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
+                            <button @click="toggleFormNuevoCliente()" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-black px-6 py-4 rounded-[8px] text-[16px] flex items-center gap-2 shadow-sm whitespace-nowrap transition-colors">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
                                 Nuevo
                             </button>
                         </div>
                         
-                        <div x-show="clienteSeleccionado && !clienteFormVisible" class="mt-3 bg-green-50 border border-green-200 p-4 rounded-[8px] flex justify-between items-center transition-all">
+                        <div x-show="clienteSeleccionado && !clienteFormVisible" class="mt-4 bg-green-50 border border-green-200 p-5 rounded-[8px] flex justify-between items-center transition-all">
                             <div>
-                                <span class="font-bold text-[16px] text-green-800 block" x-text="getClienteNombre(clienteSeleccionado)"></span>
-                                <span class="text-[14px] text-green-600 font-bold block mt-0.5" x-text="'Tel: ' + getClienteTelefono(clienteSeleccionado)"></span>
+                                <span class="font-black text-[20px] text-green-800 block" x-text="getClienteNombre(clienteSeleccionado)"></span>
+                                <span class="text-[16px] text-green-600 font-bold block mt-1" x-text="'Tel: ' + getClienteTelefono(clienteSeleccionado)"></span>
                             </div>
-                            <button @click="clienteSeleccionado = null; direccionesCliente = []; dirSeleccionada = null; searchClienteText='';" class="text-red-500 text-[14px] font-bold hover:underline">Cambiar Cliente</button>
+                            <button @click="clienteSeleccionado = null; direccionesCliente = []; dirSeleccionada = null; searchClienteText='';" class="text-red-500 bg-red-50 px-4 py-2 rounded font-bold hover:bg-red-100 transition-colors">Cambiar Cliente</button>
                         </div>
                     </div>
 
-                    <div x-show="clienteFormVisible" class="bg-gray-50 p-5 rounded-[8px] border border-gray-200 space-y-4">
-                        <h4 class="font-bold text-[15px] text-gray-800 border-b border-gray-200 pb-2">Registrar Nuevo Cliente</h4>
+                    <div x-show="clienteFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4">
+                        <h4 class="font-black text-[18px] text-gray-800 border-b border-gray-200 pb-3">Registrar Nuevo Cliente</h4>
                         <div>
-                            <label class="block text-[14px] font-bold text-gray-600 mb-1.5">Nombre *</label>
-                            <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[6px] py-2.5 px-3 text-[15px] focus:border-[#fd7e14] focus:outline-none">
+                            <label class="block text-[15px] font-bold text-gray-600 mb-2">Nombre *</label>
+                            <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-[14px] font-bold text-gray-600 mb-1.5">Teléfono</label>
-                            <input type="text" x-model="nuevoClienteData.telefono" class="w-full border border-gray-300 rounded-[6px] py-2.5 px-3 text-[15px] focus:border-[#fd7e14] focus:outline-none">
+                            <label class="block text-[15px] font-bold text-gray-600 mb-2">Teléfono</label>
+                            <input type="text" x-model="nuevoClienteData.telefono" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                         </div>
                     </div>
 
-                    <div x-show="clienteSeleccionado || clienteFormVisible" class="pt-4 border-t border-gray-200 transition-all">
+                    <div x-show="clienteSeleccionado || clienteFormVisible" class="pt-6 border-t border-gray-200 transition-all">
                         <div class="flex justify-between items-center mb-4">
-                            <label class="block text-[14px] font-bold text-gray-700">Dirección de Entrega *</label>
-                            <button @click="dirFormVisible = !dirFormVisible; dirSeleccionada = null" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-bold px-4 py-2 rounded-[6px] text-[13px] flex items-center gap-1 shadow-sm transition-colors">
+                            <label class="block text-[16px] font-bold text-gray-700">Dirección de Entrega *</label>
+                            <button @click="dirFormVisible = !dirFormVisible; dirSeleccionada = null" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-bold px-5 py-2.5 rounded-[6px] text-[15px] flex items-center gap-1 shadow-sm transition-colors">
                                 + Nueva Dirección
                             </button>
                         </div>
 
-                        <div x-show="!dirFormVisible && direccionesCliente.length > 0" class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                        <div x-show="!dirFormVisible && direccionesCliente.length > 0" class="space-y-3 max-h-60 overflow-y-auto pr-1">
                             <template x-for="dir in direccionesCliente" :key="dir.id_direccion || dir.id_dir || Math.random()">
                                 <label class="block cursor-pointer">
-                                    <div class="border rounded-[8px] p-4 transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'border-[#fd7e14] bg-orange-50 shadow-sm' : 'border-gray-200 hover:bg-gray-50'">
-                                        <div class="flex items-start gap-3">
-                                            <input type="radio" :value="dir.id_direccion || dir.id_dir" x-model="dirSeleccionada" class="mt-1.5 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
-                                            <div class="text-[14px] text-gray-700 leading-snug">
-                                                <span class="font-bold block text-[15px] text-black mb-1" x-text="dir.calle || dir.Calle || 'Sin calle'"></span>
-                                                <span class="block text-gray-500" x-text="'Manzana: ' + (dir.manzana||dir.Manzana||'-') + ' | Lote: ' + (dir.lote||dir.Lote||'-')"></span>
-                                                <span class="block text-gray-500" x-text="'Colonia: ' + (dir.colonia||dir.Colonia||'-')"></span>
-                                                <span class="block text-gray-500 italic mt-1 font-medium" x-show="dir.referencia || dir.Referencia" x-text="'Ref: ' + (dir.referencia || dir.Referencia)"></span>
+                                    <div class="border rounded-[8px] p-5 transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'border-2 border-[#fd7e14] bg-orange-50 shadow-md' : 'border-gray-200 hover:bg-gray-50'">
+                                        <div class="flex items-start gap-4">
+                                            <input type="radio" :value="dir.id_direccion || dir.id_dir" x-model="dirSeleccionada" class="mt-1 text-[#fd7e14] focus:ring-[#fd7e14] w-6 h-6">
+                                            <div class="text-[15px] text-gray-700 leading-snug">
+                                                <span class="font-black block text-[18px] text-black mb-1.5" x-text="dir.calle || dir.Calle || 'Sin calle'"></span>
+                                                <span class="block text-gray-600 mb-1" x-text="'Manzana: ' + (dir.manzana||dir.Manzana||'-') + ' | Lote: ' + (dir.lote||dir.Lote||'-')"></span>
+                                                <span class="block text-gray-600 font-medium" x-text="'Colonia: ' + (dir.colonia||dir.Colonia||'-')"></span>
+                                                <span class="block text-gray-500 italic mt-2 bg-white px-3 py-1.5 border border-gray-200 rounded" x-show="dir.referencia || dir.Referencia" x-text="'Referencia: ' + (dir.referencia || dir.Referencia)"></span>
                                             </div>
                                         </div>
                                     </div>
                                 </label>
                             </template>
                         </div>
-                        <div x-show="!dirFormVisible && direccionesCliente.length === 0 && !clienteFormVisible" class="text-center p-6 border-2 border-dashed border-gray-300 rounded-[8px] text-[14px] text-gray-500 font-medium">
-                            Este cliente no tiene direcciones guardadas. Agrega una nueva.
+                        <div x-show="!dirFormVisible && direccionesCliente.length === 0 && !clienteFormVisible" class="text-center p-8 border-2 border-dashed border-gray-300 rounded-[8px] text-[16px] text-gray-500 font-medium bg-gray-50">
+                            Este cliente no tiene direcciones guardadas.<br>Haz clic en "+ Nueva Dirección".
                         </div>
 
-                        <div x-show="dirFormVisible" class="bg-gray-50 p-5 rounded-[8px] border border-gray-200 space-y-4 mt-2">
-                            <h4 class="font-bold text-[15px] text-gray-800 border-b border-gray-200 pb-2">Registrar Nueva Dirección</h4>
+                        <div x-show="dirFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4 mt-3">
+                            <h4 class="font-black text-[18px] text-gray-800 border-b border-gray-200 pb-3">Registrar Nueva Dirección</h4>
                             <div>
-                                <label class="block text-[13px] font-bold text-gray-600 mb-1.5">Calle *</label>
-                                <input type="text" x-model="nuevaDirData.calle" class="w-full border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] focus:border-[#fd7e14] focus:outline-none">
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Calle *</label>
+                                <input type="text" x-model="nuevaDirData.calle" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                             </div>
                             <div class="flex gap-4">
                                 <div class="flex-1">
-                                    <label class="block text-[13px] font-bold text-gray-600 mb-1.5">Manzana</label>
-                                    <input type="text" x-model="nuevaDirData.manzana" class="w-full border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] focus:border-[#fd7e14] focus:outline-none">
+                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Manzana</label>
+                                    <input type="text" x-model="nuevaDirData.manzana" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                                 </div>
                                 <div class="flex-1">
-                                    <label class="block text-[13px] font-bold text-gray-600 mb-1.5">Lote</label>
-                                    <input type="text" x-model="nuevaDirData.lote" class="w-full border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] focus:border-[#fd7e14] focus:outline-none">
+                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Lote</label>
+                                    <input type="text" x-model="nuevaDirData.lote" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[13px] font-bold text-gray-600 mb-1.5">Colonia</label>
-                                <input type="text" x-model="nuevaDirData.colonia" class="w-full border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] focus:border-[#fd7e14] focus:outline-none">
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Colonia</label>
+                                <input type="text" x-model="nuevaDirData.colonia" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-[13px] font-bold text-gray-600 mb-1.5">Referencia</label>
-                                <textarea x-model="nuevaDirData.referencia" rows="2" class="w-full border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] focus:border-[#fd7e14] focus:outline-none resize-none"></textarea>
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Referencia</label>
+                                <textarea x-model="nuevaDirData.referencia" rows="2" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none resize-none"></textarea>
                             </div>
                         </div>
 
@@ -757,9 +772,9 @@
 
                 </div>
 
-                <div class="p-5 flex gap-3 bg-white border-t border-gray-100">
-                    <button @click="modalCliente = false" class="flex-1 bg-[#e9ecef] hover:bg-[#dee2e6] text-gray-700 font-bold py-3.5 rounded-[8px] text-[15px]">Cancelar</button>
-                    <button @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-bold py-3.5 rounded-[8px] text-[15px] transition-colors">Confirmar Selección</button>
+                <div class="p-6 flex gap-4 bg-gray-50 border-t border-gray-200">
+                    <button @click="modalCliente = false" class="flex-1 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold py-4 rounded-[8px] text-[18px] transition-colors">Cancelar</button>
+                    <button @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Dirección</button>
                 </div>
             </div>
         </div>
@@ -780,7 +795,6 @@
                 <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4">
                     <p class="text-[13px] text-gray-500 mb-2">Selecciona métodos de pago (puedes elegir varios):</p>
                     
-                    {{-- 1. Transferencia (id_metpago = 3) --}}
                     <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.transferencia.activo ? 'border-[#ffc107]' : 'border-gray-200'">
                         <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                             <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-5 h-5 rounded border-gray-300 text-[#ffc107] focus:ring-[#ffc107]">
@@ -802,7 +816,6 @@
                         </div>
                     </div>
 
-                    {{-- 2. Tarjeta (id_metpago = 2) --}}
                     <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.tarjeta.activo ? 'border-[#ffc107]' : 'border-gray-200'">
                         <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                             <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-5 h-5 rounded border-gray-300 text-[#ffc107] focus:ring-[#ffc107]">
@@ -819,7 +832,6 @@
                         </div>
                     </div>
 
-                    {{-- 3. Efectivo (id_metpago = 1) --}}
                     <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.efectivo.activo ? 'border-[#ffc107]' : 'border-gray-200'">
                         <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                             <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-5 h-5 rounded border-gray-300 text-[#ffc107] focus:ring-[#ffc107]">
@@ -850,7 +862,7 @@
                 </div>
 
                 <div class="p-5 bg-white border-t border-gray-100 flex flex-col gap-2">
-                    <button @click="procesarOrdenFinal()" :disabled="!pagosValidos()" :class="!pagosValidos() ? 'bg-[#1a202c]/50 text-white cursor-not-allowed' : 'bg-[#1a202c] hover:bg-black text-white shadow-md'" class="w-full font-bold py-3.5 rounded-[8px] text-[15px] transition-colors flex justify-center items-center gap-2">
+                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos()" :class="!pagosValidos() ? 'bg-[#1a202c]/50 text-white cursor-not-allowed' : 'bg-[#1a202c] hover:bg-black text-white shadow-md'" class="w-full font-bold py-3.5 rounded-[8px] text-[15px] transition-colors flex justify-center items-center gap-2">
                         Confirmar Pagos <span class="bg-white/20 px-2 py-0.5 rounded text-[13px]" x-text="'$' + getTotalPagarInputs().toFixed(2)"></span>
                     </button>
                     <p x-show="!pagosValidos()" class="text-[11px] text-red-500 text-center font-medium">Asegúrate de que la suma coincida con el total y rellenar referencias.</p>
@@ -907,15 +919,17 @@
                     return d;
                 },
                 
-                get clientesFiltrados() {
+                getClientesFiltrados() {
                     let listaSegura = Array.isArray(dbClientes) ? dbClientes : [];
-                    if(!this.searchClienteText) return listaSegura; 
+                    if(!this.searchClienteText || this.searchClienteText.trim() === '') return listaSegura; 
                     
                     let txt = this.searchClienteText.toLowerCase().trim();
                     return listaSegura.filter(c => {
-                        return Object.values(c).some(val => 
-                            String(val || '').toLowerCase().includes(txt)
-                        );
+                        let nom = (c.nombre || '').toLowerCase();
+                        let ape = (c.apellido || '').toLowerCase();
+                        let tel = (c.telefono || '').toLowerCase();
+                        let full = nom + ' ' + ape;
+                        return full.includes(txt) || tel.includes(txt);
                     });
                 },
 
@@ -942,7 +956,6 @@
                     return str; 
                 },
 
-                // Extraccion dinámica de la variable PHP inyectada
                 getPrecioOrilla(nombreBase) {
                     let n = nombreBase.toLowerCase();
                     if(n.includes('chica')) return dbPreciosOrilla.chica;
@@ -1068,8 +1081,8 @@
                 },
 
                 abrirMagnoGeneral() {
-                    // Ahora usa directamente la variable de base de datos extraida desde PHP
-                    this.magnoItem = { id: null, col: 'id_pizza', nombre: 'Magno', precio: dbMagnoPrice };
+                    let precioMagno = dbMagnoPrice && dbMagnoPrice > 150 ? parseFloat(dbMagnoPrice) : 230.00; 
+                    this.magnoItem = { id: null, col: 'id_pizza', nombre: 'Magno', precio: precioMagno };
                     this.magnoSel = [];
                     this.modalMagno = true;
                 },
@@ -1199,7 +1212,7 @@
                         this.cart.push({ 
                             db_id: id, col: 'id_paquete', tipo: 'paq', nombre_base: 'Paquete '+id, variante: variante, 
                             precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(),
-                            orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande // Usa PHP variable
+                            orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande 
                         }); 
                     }
                     this.actualizarCarrito();
@@ -1278,9 +1291,13 @@
                 abrirModalComentarios() { this.comentariosGeneralesTemp = this.comentariosGenerales; this.modalComentarios = true; },
                 guardarComentarios() { this.comentariosGenerales = this.comentariosGeneralesTemp; this.modalComentarios = false; },
                 getTotal() { return this.cartGroups.reduce((s, g) => s + g.subtotal, 0); },
-                nomServicio() { const s = {1: 'Comer Aqui', 2: 'Para Llevar', 3: 'A Domicilio'}; return s[this.servicio] || 'Seleccionar'; },
+                nomServicio() { 
+                    if(this.servicio === 1) return 'Comer Aqui';
+                    if(this.servicio === 2) return 'Para Llevar';
+                    if(this.servicio === 3) return 'A Domicilio';
+                    return 'Seleccionar'; 
+                },
 
-                // LOGICA DOMICILIO
                 toggleFormNuevoCliente() {
                     this.clienteFormVisible = !this.clienteFormVisible;
                     if(this.clienteFormVisible) {
@@ -1330,7 +1347,6 @@
                     }
                 },
 
-                // LOGICA MULTIPAGO
                 abrirModalPago() {
                     this.pagos = {
                         efectivo: { activo: true, monto: this.getTotal(), entregado: null },
@@ -1365,18 +1381,19 @@
                     return true;
                 },
 
-                // ENVIO FINAL
                 procesarOrden() {
-                    if(this.servicio === 1 && !this.mesa) return alert("Ingrese el número de mesa.");
-                    if(this.servicio === 3) {
-                        this.modalCliente = true; 
-                    } else {
+                    if(this.servicio === 1) {
+                        if(!this.mesa) return alert("Ingrese el número de mesa.");
+                        this.procesarOrdenFinal(true); 
+                    } else if(this.servicio === 2) {
                         this.abrirModalPago(); 
+                    } else if(this.servicio === 3) {
+                        this.modalCliente = true; 
                     }
                 },
 
-                procesarOrdenFinal() {
-                    if(!this.pagosValidos()) return;
+                procesarOrdenFinal(esAbierta = false) {
+                    if(!esAbierta && !this.pagosValidos()) return;
 
                     let cartPayload = [];
                     this.cartGroups.forEach(g => {
@@ -1388,14 +1405,16 @@
                     });
 
                     let pagosToSend = [];
-                    if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
-                        pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto }); 
-                    }
-                    if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
-                        pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
-                    }
-                    if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
-                        pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+                    if(!esAbierta) {
+                        if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
+                            pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
+                        }
+                        if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
+                            pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
+                        }
+                        if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
+                            pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+                        }
                     }
 
                     let reqBody = {

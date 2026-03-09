@@ -26,13 +26,14 @@
         
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; vertical-align: top; padding: 2px 0; }
-        th { border-bottom: 1px dashed #000; font-weight: normal; }
+        th { border-bottom: 1px dashed #000; font-weight: normal; padding-bottom: 5px;}
         
         .sub-item { 
             font-size: 12px; 
-            font-style: italic; 
-            padding-left: 15px; 
             color: #333;
+        }
+        .sub-text {
+            padding-left: 10px;
         }
         
         @media print {
@@ -74,65 +75,83 @@
     <table class="mb-1">
         <thead>
             <tr>
-                <th style="width: 15%;">Cant</th>
-                <th style="width: 60%;">Prod</th>
-                <th style="width: 25%; text-align: right;">$$</th>
+                <th style="width: 10%;">Cant</th>
+                <th style="width: 65%;">Descripción</th>
+                <th style="width: 25%; text-align: right;">Importe</th>
             </tr>
         </thead>
         <tbody>
             @foreach($detalles as $det)
             <tr>
-                <td>{{ $det->cantidad }}</td>
-                <td>{{ $det->prod_nombre }}</td>
-                <td class="text-right">${{ number_format($det->precio_unitario * $det->cantidad, 2) }}</td>
+                <td class="font-bold">{{ $det->cantidad }}</td>
+                <td class="font-bold">{{ $det->prod_nombre }}</td>
+                <td class="text-right font-bold">${{ number_format($det->p_base * $det->cantidad, 2) }}</td>
             </tr>
-            @if($det->prod_sub)
-            <tr>
+            
+            {{-- Desglose Explícito de Extras, Orillas y Descuentos --}}
+            @foreach($det->sub_items as $sub)
+            <tr class="sub-item">
                 <td></td>
-                <td colspan="2" class="sub-item">{!! nl2br(e($det->prod_sub)) !!}</td>
+                <td class="sub-text">{{ $sub['text'] }}</td>
+                <td class="text-right">
+                    @if($sub['price'] > 0)
+                        ${{ number_format($sub['price'], 2) }}
+                    @elseif($sub['price'] < 0)
+                        -${{ number_format(abs($sub['price']), 2) }}
+                    @endif
+                </td>
             </tr>
-            @endif
+            @endforeach
+            
+            {{-- Espacio separador entre productos --}}
+            <tr><td colspan="3" style="height: 5px;"></td></tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="border-top mb-1 border-bottom">
+    <div class="border-top mb-1 border-bottom" style="padding: 5px 0;">
         <table>
             <tr>
-                <td class="font-bold text-lg">TOTAL:</td>
+                <td class="font-bold text-lg">TOTAL A PAGAR:</td>
                 <td class="font-bold text-lg text-right">${{ number_format($venta->total, 2) }}</td>
             </tr>
         </table>
     </div>
 
     @if($venta->comentarios)
-        <div class="mb-1 text-center font-bold">
+        <div class="mb-1 text-center font-bold" style="margin-top: 10px; margin-bottom: 10px;">
             *** NOTA: {{ $venta->comentarios }} ***
         </div>
     @endif
 
-    <div class="mb-1">
-        <div class="font-bold mb-1">FORMA DE PAGO:</div>
-        @foreach($pagos as $pago)
-            <div>
-                @if($pago->id_metpago == 1)
-                    Tarjeta: Se enviará terminal.
-                @elseif($pago->id_metpago == 2)
-                    Efectivo: 
-                    @if($pago->referencia && is_numeric($pago->referencia))
-                        Pagará con ${{ number_format($pago->referencia, 2) }} (Cambio: ${{ number_format($pago->referencia - $pago->monto, 2) }})
-                    @else
-                        ${{ number_format($pago->monto, 2) }}
+    @if($venta->status == 0)
+        <div class="mb-1 text-center font-bold" style="border: 2px dashed #000; padding: 5px; margin-top: 10px;">
+            CUENTA ABIERTA<br>PENDIENTE DE PAGO
+        </div>
+    @else
+        <div class="mb-1" style="margin-top: 10px;">
+            <div class="font-bold mb-1">MÉTODO DE PAGO:</div>
+            @foreach($pagos as $pago)
+                <div style="padding-left: 10px;">
+                    @if($pago->id_metpago == 1)
+                        • Tarjeta: Se enviará terminal.
+                    @elseif($pago->id_metpago == 2)
+                        • Efectivo: 
+                        @if($pago->referencia && is_numeric($pago->referencia) && $pago->referencia > $pago->monto)
+                            Pagó con ${{ number_format($pago->referencia, 2) }} (Cambio: ${{ number_format($pago->referencia - $pago->monto, 2) }})
+                        @else
+                            ${{ number_format($pago->monto, 2) }}
+                        @endif
+                    @elseif($pago->id_metpago == 3)
+                        • Transferencia: Pagado (Ref: {{ $pago->referencia }})
                     @endif
-                @elseif($pago->id_metpago == 3)
-                    Transferencia: Ya está pagado (Ref: {{ $pago->referencia }})
-                @endif
-            </div>
-        @endforeach
-    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
-    <div class="text-center mt-1 pt-1" style="margin-top: 15px;">
-        ¡Gracias por su compra!
+    <div class="text-center mt-1 pt-1" style="margin-top: 15px; border-top: 1px dashed #000;">
+        ¡Gracias por su preferencia!
     </div>
 
 </body>
