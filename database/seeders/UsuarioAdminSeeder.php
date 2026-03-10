@@ -10,32 +10,38 @@ class UsuarioAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $id_suc = DB::table('Sucursales')->first()->id_suc ?? 1;
-
-        if (!DB::table('Sucursales')->where('id_suc', $id_suc)->exists()) {
-            $id_suc = DB::table('Sucursales')->insertGetId([
-                'nombre' => 'Chalco Centro',
-                'direccion' => 'Dirección Conocida',
-                'telefono' => '5500000000',
-                'status' => 1
+        // 1. Insertamos el Cargo (quitamos los timestamps que dan error)
+        // Si ya existe el ID 1, lo ignoramos para que no falle por duplicado
+        $cargoExiste = DB::table('cargos')->where('id_ca', 1)->first();
+        
+        if (!$cargoExiste) {
+            DB::table('cargos')->insert([
+                'id_ca' => 1,
+                'nombre' => 'Administrador',
             ]);
         }
 
-        DB::table('Empleados')->insert([
-            'nombre' => 'Administrador',
-            'apellido' => 'Principal',
-            'nickName' => 'admin', 
-            'email' => 'admin@pizzetos.com',
-            'password' => Hash::make('123'), 
-            'id_suc' => $id_suc,
-            'id_cargo' => 1, 
-            'status' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
+        // 2. Buscamos o creamos la sucursal (Tabla: Sucursal)
+        $sucursal = DB::table('Sucursal')->first();
+        $id_suc = $sucursal ? $sucursal->id_suc : DB::table('Sucursal')->insertGetId([
+            'nombre' => 'Miraflores',
+            'direccion' => 'Dirección Conocida',
+            'telefono' => '5500000000',
         ]);
 
-        $this->command->info('Usuario Administrador creado exitosamente.');
-        $this->command->warn('Usuario: admin');
-        $this->command->warn('Contraseña: admin1234');
+        // 3. Insertamos el empleado (Tabla: Empleados)
+        // Nota: Asegúrate de que los nombres de las columnas sean id_ca e id_suc
+        DB::table('Empleados')->insert([
+            'nombre' => 'Josue Lazaro',
+            'direccion' => 'Dirección de prueba',
+            'telefono' => '1234567890',
+            'id_ca' => 1, 
+            'id_suc' => $id_suc,
+            'nickName' => 'admin@pizzetos.com',
+            'password' => Hash::make('password'), 
+            'status' => 1,
+        ]);
+
+        $this->command->info('¡Perfecto! Se creó el cargo y el administrador sin errores de timestamps.');
     }
 }

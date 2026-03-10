@@ -15,13 +15,13 @@ class Empleado extends Model
 
     protected $fillable = [
         'nombre',
-        'direccion',
-        'telefono',
+        'apellido',
         'nickName',
-        'id_ca',
+        'email',
+        'password',
         'id_suc',
+        'id_cargo',
         'status',
-        'password'
     ];
 
     public function cargo()

@@ -13,13 +13,21 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void
+   public function run(): void
     {
-        // User::factory(10)->create();
-
+      $this->call([
+            UsuarioAdminSeeder::class,
+        ]);
+        
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'nombre'   => 'Josue Lazaro',
+            'nickName' => 'admin_pizzetos',
+            'password' => bcrypt('admin123'), // O la contraseña que prefieras
+            'id_ca'    => 1,  // IMPORTANTE: Asegúrate de que el cargo ID 1 exista
+            'id_suc'   => 1,  // IMPORTANTE: Asegúrate de que la sucursal ID 1 exista
+            'status'   => 1,
+            'direccion'=> 'Dirección de prueba',
+            'telefono' => '1234567890',
         ]);
     }
 }
