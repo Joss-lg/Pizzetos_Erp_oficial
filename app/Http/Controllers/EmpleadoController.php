@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Empleado;
 use App\Models\Cargo;
 use App\Models\Sucursal;
+use Illuminate\Support\Facades\Hash;
 
 class EmpleadoController extends Controller
 {
     public function index()
     {
-        $empleados = Empleado::all();
+        // Cargamos las relaciones para no saturar la base de datos
+        $empleados = Empleado::with(['cargo', 'sucursal'])->get();
         return view('empleados.index', compact('empleados'));
     }
 
@@ -26,69 +28,83 @@ class EmpleadoController extends Controller
     {
         $request->validate([
             'nombre'   => 'required|string|max:255',
-            'nickName' => 'required|string|unique:empleados,nickName',
+            'apellido' => 'nullable|string|max:255',
+            'nickName' => 'required|string|unique:Empleados,nickName',
+            'email'    => 'required|email|unique:Empleados,email',
             'telefono' => 'required',
-            'id_ca'    => 'required', 
-            'id_suc'   => 'required',
+            'id_cargo' => 'required|exists:Cargos,id_cargo', 
+            'id_suc'   => 'required|exists:Sucursales,id_suc',
             'password' => 'required|string|min:6',
         ]);
         
-        $empleado = new Empleado($request->all());
-        $empleado->status = 1; 
-        
-        $empleado->password = bcrypt($request->password);
+        $empleado = new Empleado();
+        $empleado->nombre = $request->nombre;
+        $empleado->apellido = $request->apellido ?? '';
+        $empleado->nickName = $request->nickName;
+        $empleado->email = $request->email;
+        $empleado->telefono = $request->telefono;
+        $empleado->id_cargo = $request->id_cargo;
+        $empleado->id_suc = $request->id_suc;
+        $empleado->status = 1; // Activo por defecto
+        $empleado->password = Hash::make($request->password);
         
         $empleado->save();
 
         return redirect()->route('empleados.index')->with('success', '¡Empleado registrado correctamente!');
     }
 
-    // 1. EDITAR
     public function edit($id)
     {
         $empleado = Empleado::where('id_emp', $id)->firstOrFail();
-        
         $cargos = Cargo::all();
         $sucursales = Sucursal::all();
 
         return view('empleados.edit', compact('empleado', 'cargos', 'sucursales'));
     }
 
-    // 2. ACTUALIZAR
     public function update(Request $request, $id)
     {
         $request->validate([
             'nombre'   => 'required|string|max:255',
+            'apellido' => 'nullable|string|max:255',
             'telefono' => 'required',
-            'id_ca'    => 'required',
-            'id_suc'   => 'required',
-            'nickName' => 'required|string|unique:empleados,nickName,' . $id . ',id_emp',
+            'id_cargo' => 'required|exists:Cargos,id_cargo',
+            'id_suc'   => 'required|exists:Sucursales,id_suc',
+            'nickName' => 'required|string|unique:Empleados,nickName,' . $id . ',id_emp',
+            'email'    => 'required|email|unique:Empleados,email,' . $id . ',id_emp',
             'password' => 'nullable|string|min:6',
         ]);
 
         $empleado = Empleado::where('id_emp', $id)->firstOrFail();
         
-        $datosParaActualizar = $request->except('password');
+        $empleado->nombre = $request->nombre;
+        $empleado->apellido = $request->apellido ?? '';
+        $empleado->nickName = $request->nickName;
+        $empleado->email = $request->email;
+        $empleado->telefono = $request->telefono;
+        $empleado->id_cargo = $request->id_cargo;
+        $empleado->id_suc = $request->id_suc;
 
         if ($request->filled('password')) {
-            $datosParaActualizar['password'] = bcrypt($request->password);
+            $empleado->password = Hash::make($request->password);
         }
 
-        $empleado->update($datosParaActualizar);
+        $empleado->save();
 
         return redirect()->route('empleados.index')->with('success', 'Empleado actualizado con éxito');
     }
 
-    // 3. ELIMINAR
     public function destroy($id)
     {
         $empleado = Empleado::where('id_emp', $id)->firstOrFail();
+        
+        // En sistemas de este tipo es mejor desactivar que borrar físicamente
+        // pero si deseas borrarlo:
         $empleado->delete();
 
-        return redirect()->route('empleados.index')->with('success', 'Empleado eliminado');
+        return redirect()->route('empleados.index')->with('success', 'Empleado eliminado del sistema');
     }
 
-    // 4. CAMBIAR ESTADO 
     public function toggleStatus($id)
     {
         $empleado = Empleado::where('id_emp', $id)->firstOrFail();
