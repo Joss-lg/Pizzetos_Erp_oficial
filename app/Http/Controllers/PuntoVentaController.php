@@ -63,7 +63,8 @@ class PuntoVentaController extends Controller
                         'uid' => uniqid(), 'qty' => $det->cantidad, 'precioBase' => $ing->p_base ?? $det->precio_unitario, 'precioFinal' => $det->precio_unitario,
                         'orilla_queso' => ($det->queso > 0), 'orillas_qty' => $det->queso, 'precio_orilla' => $ing->p_orilla ?? 0, 'descuentoPromo' => $ing->desc ?? 0,
                         'comentario' => $ing->nota ?? '', 'ingredientes_extra' => $ing->extras ?? [], 'es_pizza' => false, 'is_magno' => false, 'tipo' => 'directo',
-                        'col' => '', 'db_id' => null, 'nombre_base' => 'Producto', 'variante' => ''
+                        'col' => '', 'db_id' => null, 'nombre_base' => 'Producto', 'variante' => '',
+                        'is_old' => true // <-- ETIQUETA MÁGICA: Ya estaba en el pedido
                     ];
 
                     if ($det->id_pizza) {
@@ -125,7 +126,6 @@ class PuntoVentaController extends Controller
             $id_clie = $request->id_clie ?? null;
             $id_dir = $request->id_dir ?? null;
 
-            // 1. REVISIÓN CREACIÓN DE NUEVO CLIENTE
             if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
                 $id_clie = DB::table('Clientes')->insertGetId([
                     'nombre' => $request->nuevo_cliente['nombre'], 
@@ -134,7 +134,6 @@ class PuntoVentaController extends Controller
                 ]);
             }
 
-            // 2. REVISIÓN CREACIÓN DE NUEVA DIRECCIÓN
             if ($request->has('nueva_direccion') && is_array($request->nueva_direccion) && !empty($request->nueva_direccion['calle']) && $id_clie) {
                 $id_dir = DB::table('Direcciones')->insertGetId([
                     'id_clie' => $id_clie, 
@@ -151,17 +150,13 @@ class PuntoVentaController extends Controller
             $nombreClienteMesa = ($request->tipo_servicio == 1) ? $request->nombre_cliente : null;
             $id_venta = $request->id_venta_edit ?? null;
 
-            // --- INICIO DEL TRUCO: OBTENER NOMBRE DEL CAJERO ---
             $nombreCajero = Auth::check() ? (Auth::user()->nickName ?? 'Usuario') : 'Sistema';
-            
             $comentariosFinales = "Atendió: " . $nombreCajero;
             if (!empty($request->comentarios)) {
                 $comentariosFinales .= " | " . $request->comentarios;
             }
-            // --- FIN DEL TRUCO ---
 
             if ($id_venta) {
-                // Actualiza y guarda comentarios con el cajero
                 DB::table('Venta')->where('id_venta', $id_venta)->update([
                     'total' => $request->total, 'tipo_servicio' => $request->tipo_servicio, 'mesa' => $request->mesa, 
                     'nombreClie' => $nombreClienteMesa, 'comentarios' => $comentariosFinales, 'status' => $estado_venta
@@ -170,7 +165,6 @@ class PuntoVentaController extends Controller
                 DB::table('Pago')->where('id_venta', $id_venta)->delete();
                 DB::table('PDomicilio')->where('id_venta', $id_venta)->delete();
             } else {
-                // Inserta y guarda comentarios con el cajero
                 $id_venta = DB::table('Venta')->insertGetId([
                     'id_suc' => $id_sucursal, 'id_caja' => $cajaAbierta->id_caja, 'total' => $request->total, 'tipo_servicio' => $request->tipo_servicio,
                     'mesa' => $request->mesa, 'nombreClie' => $nombreClienteMesa, 'comentarios' => $comentariosFinales,
@@ -193,6 +187,7 @@ class PuntoVentaController extends Controller
                 $extraData['p_base'] = $item['precioBase'] ?? ($item['precioFinal'] ?? 0);
                 $extraData['p_orilla'] = $item['precio_orilla'] ?? 0;
                 $extraData['desc'] = $item['descuentoPromo'] ?? 0;
+                $extraData['is_old'] = $item['is_old'] ?? false; // <-- GUARDAMOS SI ERA VIEJO
 
                 if(!empty($item['comentario'])) $extraData['nota'] = $item['comentario'];
                 if(!empty($item['ingredientes_extra'])) $extraData['extras'] = $item['ingredientes_extra'];
@@ -202,7 +197,6 @@ class PuntoVentaController extends Controller
                 if ($item['tipo'] == 'paq') { 
                     $datosInsert['id_paquete'] = json_encode(['id' => $item['db_id'], 'variante' => $item['variante']]); 
                 } 
-                // 3. REVISIÓN LÓGICA DE MITAD Y MITAD
                 elseif ($item['tipo'] == 'piz_mitad') { 
                     $datosInsert['pizza_mitad'] = json_encode([
                         'mitad1' => $item['mitad1'], 
@@ -236,12 +230,11 @@ class PuntoVentaController extends Controller
                 foreach($request->pagos as $pago) {
                     $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];
                     if (isset($pago['referencia'])) $datosPago['referencia'] = $pago['referencia'];
-                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado']; // Guardamos en referencia para el cambio
+                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado']; 
                     DB::table('Pago')->insert($datosPago);
                 }
             }
 
-            // GUARDA DOMICILIO SI EL TIPO DE SERVICIO ES 3 Y HAY CLIENTE Y DIRECCIÓN
             if ($request->tipo_servicio == 3 && $id_clie && $id_dir) {
                 DB::table('PDomicilio')->insert([
                     'id_venta' => $id_venta, 
@@ -285,7 +278,7 @@ class PuntoVentaController extends Controller
         }
     }
 
-    public function ticket($id)
+    public function ticket(Request $request, $id) // <-- AGREGAMOS Request $request
     {
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
@@ -299,8 +292,15 @@ class PuntoVentaController extends Controller
             $sub = [];
 
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
-            $p_orilla = $ing->p_orilla ?? 0;
+            
+            // --- MAGIA: SALTAMOS LOS PRODUCTOS VIEJOS SI PIDEN "SOLO NUEVOS" ---
+            if ($request->has('solo_nuevos') && $request->solo_nuevos == 1) {
+                if ($ing && isset($ing->is_old) && $ing->is_old == true) {
+                    continue; // Brincamos este producto
+                }
+            }
 
+            $p_orilla = $ing->p_orilla ?? 0;
             $is_pairable = false;
             $clean_name = "";
 
@@ -342,7 +342,6 @@ class PuntoVentaController extends Controller
                 $j = json_decode($det->id_paquete); $nombre = "Paquete " . ($j->id ?? '');
                 if(isset($j->variante)) { $vars = explode("\n", str_replace(" / ", "\n", $j->variante)); foreach($vars as $v) { $sub[] = $v; } }
             }
-            // LÓGICA DE MITAD Y MITAD PARA EL TICKET
             elseif($det->pizza_mitad) {
                 $j = json_decode($det->pizza_mitad); 
                 $nombre = "Mitades " . ($j->tamano ?? ''); 
@@ -448,7 +447,7 @@ class PuntoVentaController extends Controller
 
     public function historial(Request $request)
     {
-        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES)
+        $id_sucursal = 1; 
         
         $ventas = DB::table('Venta')
             ->leftJoin('PDomicilio', 'Venta.id_venta', '=', 'PDomicilio.id_venta')
@@ -476,11 +475,10 @@ class PuntoVentaController extends Controller
         $venta = DB::table('Venta')->where('id_venta', $request->id_venta)->first();
         if(!$venta) return response()->json(['success' => false, 'message' => 'Venta no encontrada']);
 
-        // Aplicamos el truco para guardar el motivo en los comentarios
         $nuevoComentario = $venta->comentarios . " | CANCELADO - Motivo: " . $request->motivo;
 
         DB::table('Venta')->where('id_venta', $request->id_venta)->update([
-            'status' => 3, // 3 = Estado Cancelado
+            'status' => 3, 
             'comentarios' => $nuevoComentario
         ]);
 
@@ -493,10 +491,8 @@ class PuntoVentaController extends Controller
             DB::beginTransaction();
             $id_venta = $request->id_venta;
 
-            // Borramos los pagos anteriores de este ticket
             DB::table('Pago')->where('id_venta', $id_venta)->delete();
 
-            // Insertamos los nuevos métodos de pago
             if ($request->has('pagos')) {
                 foreach($request->pagos as $pago) {
                     $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];

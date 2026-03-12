@@ -145,7 +145,7 @@
                     <template x-for="(group, gIdx) in cartGroups" :key="group.id_grupo">
                         <div>
                             
-                            {{-- NUEVO DISEÑO PARA PIZZAS AGRUPADAS (Discreto, sin textos promocionales) --}}
+                            {{-- NUEVO DISEÑO PARA PIZZAS AGRUPADAS --}}
                             <template x-if="group.type === 'pizza_pair'">
                                 <div class="bg-white border-2 border-amber-400 rounded-xl shadow-sm mb-4 overflow-hidden">
                                     
@@ -166,8 +166,9 @@
                                             <div class="relative border border-gray-200 bg-white rounded-lg p-3 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
                                                 
                                                 <div class="flex justify-between items-start mb-3">
-                                                    <div class="pr-8">
+                                                    <div class="pr-8 flex items-center gap-2">
                                                         <h4 class="font-black text-[#212529] text-[15px] leading-tight" x-text="p.item.variante || p.item.nombre_base"></h4>
+                                                        <span x-show="p.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Enviado</span>
                                                     </div>
 
                                                     <button @click="eliminarItemByUid(p.item.uid)" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-1.5 rounded transition-colors absolute right-3 top-3">
@@ -197,7 +198,7 @@
 
                             {{-- TARJETAS PARA OTROS PRODUCTOS NORMALES --}}
                             <template x-if="group.type === 'normal'">
-                                <div class="border border-gray-200 rounded-[8px] p-4 bg-white shadow-sm mb-4 relative">
+                                <div class="border border-gray-200 rounded-[8px] p-4 bg-white shadow-sm mb-4 relative" :class="group.item.is_old ? 'bg-gray-50' : ''">
                                     <div class="flex justify-between items-start mb-2">
                                         <h4 class="font-bold text-[#212529] text-[14px] pr-6 leading-tight" x-text="group.item.nombre_base"></h4>
                                         <button @click="eliminarItemByUid(group.item.uid)" class="text-[#dc3545] hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded absolute right-4 top-4 transition-colors">
@@ -212,6 +213,7 @@
                                             <button @click="updateNormalQty(group.item, 1)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
                                         </div>
                                         <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| Base: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
+                                        <span x-show="group.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1">Enviado</span>
                                     </div>
                                     
                                     <div x-show="group.item.variante" class="bg-[#f8f9fa] border border-gray-200 rounded-[6px] p-2 mt-2">
@@ -301,6 +303,22 @@
 
         {{-- MODALES DE PRODUCTOS Y PAGOS OCULTOS --}}
         
+        <div x-show="modalComentarios" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-[400px] flex flex-col overflow-hidden" @click.away="modalComentarios = false">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 class="text-[18px] font-bold text-[#212529]">Comentarios del Pedido</h2>
+                    <button @click="modalComentarios = false" class="text-gray-400 hover:text-black font-bold text-xl">&times;</button>
+                </div>
+                <div class="p-5 bg-white">
+                    <textarea x-model="comentariosGeneralesTemp" rows="4" placeholder="Ej. Sin cebolla, extra servilletas..." class="w-full border border-gray-300 rounded-[8px] p-3 text-[14px] focus:outline-none focus:border-[#fd7e14]"></textarea>
+                </div>
+                <div class="p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                    <button @click="modalComentarios = false" class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-600 font-bold">Cancelar</button>
+                    <button @click="guardarComentarios()" class="px-4 py-2 bg-[#fd7e14] text-white rounded font-bold shadow-sm">Guardar</button>
+                </div>
+            </div>
+        </div>
+
         {{-- MODAL OPCIONES NORMAL --}}
         <div x-show="modalOpc" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
@@ -1465,7 +1483,14 @@
                             this.mesa = ''; this.nombreClienteMesa = ''; this.comentariosGenerales = '';
                             this.modalPago = false;
                             
-                            window.open('/venta/pos/ticket/' + res.id_venta, 'Ticket', 'width=400,height=600'); 
+                            // MAGIA 2: Si estamos editando, mandamos a imprimir SOLO LO NUEVO
+                            let urlTicket = '/venta/pos/ticket/' + res.id_venta;
+                            if (this.id_venta_edit) {
+                                urlTicket += '?solo_nuevos=1';
+                            }
+                            
+                            window.open(urlTicket, 'Ticket', 'width=400,height=600'); 
+                            
                             if(this.id_venta_edit) {
                                 setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1000);
                             }
