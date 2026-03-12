@@ -228,6 +228,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos');
     Route::post('/venta/pos/guardar', [PuntoVentaController::class, 'store'])->name('ventas.pos.store');
     Route::get('/venta/pos/ticket/{id}', [PuntoVentaController::class, 'ticket'])->name('ventas.pos.ticket');
-    Route::post('/venta/pagar', [PuntoVentaController::class, 'pagarOrden'])->name('ventas.pagar'); // <-- RUTA NUEVA PARA PAGOS
+    
+    // --- NUEVAS RUTAS DE PAGOS Y CANCELACIONES ---
+    Route::post('/venta/pagar', [PuntoVentaController::class, 'pagarOrden'])->name('ventas.pagar');
+    Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');
+    Route::post('/venta/editar-pago', [PuntoVentaController::class, 'editarPago'])->name('ventas.editar_pago');
 
 });

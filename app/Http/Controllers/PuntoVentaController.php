@@ -470,4 +470,47 @@ class PuntoVentaController extends Controller
 
         return view('Ventas.historial', compact('ventas', 'filtroFecha', 'filtroEstado'));
     }
+
+    public function cancelarPedido(Request $request)
+    {
+        $venta = DB::table('Venta')->where('id_venta', $request->id_venta)->first();
+        if(!$venta) return response()->json(['success' => false, 'message' => 'Venta no encontrada']);
+
+        // Aplicamos el truco para guardar el motivo en los comentarios
+        $nuevoComentario = $venta->comentarios . " | CANCELADO - Motivo: " . $request->motivo;
+
+        DB::table('Venta')->where('id_venta', $request->id_venta)->update([
+            'status' => 3, // 3 = Estado Cancelado
+            'comentarios' => $nuevoComentario
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function editarPago(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $id_venta = $request->id_venta;
+
+            // Borramos los pagos anteriores de este ticket
+            DB::table('Pago')->where('id_venta', $id_venta)->delete();
+
+            // Insertamos los nuevos métodos de pago
+            if ($request->has('pagos')) {
+                foreach($request->pagos as $pago) {
+                    $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];
+                    if (isset($pago['referencia'])) $datosPago['referencia'] = $pago['referencia'];
+                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado'];
+                    DB::table('Pago')->insert($datosPago);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
 }
