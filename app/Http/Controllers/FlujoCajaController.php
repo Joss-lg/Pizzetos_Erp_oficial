@@ -43,12 +43,15 @@ class FlujoCajaController extends Controller
         $gastos_detalle = DB::table('Gastos')->where('id_caja', $cajaAbierta->id_caja)->get();
         $stats['total_gastos'] = $gastos_detalle->sum('precio');
 
-        // 2. Obtener Ventas de esta caja
+        // 2. Obtener Ventas de esta caja (Para mostrar en la tabla)
         $ventas_detalle = DB::table('Venta')->where('id_caja', $cajaAbierta->id_caja)->get();
-        $stats['num_ventas'] = $ventas_detalle->count();
-        $stats['venta_total'] = $ventas_detalle->sum('total');
+        
+        // 2.1 Estadísticas IGNORANDO cancelados (status = 3)
+        $ventasValidas = $ventas_detalle->where('status', '!=', 3);
+        $stats['num_ventas'] = $ventasValidas->count();
+        $stats['venta_total'] = $ventasValidas->sum('total');
 
-        // 3. Desglose preciso por método de pago
+        // 3. Desglose preciso por método de pago (Los cancelados ya no tienen registros en Pago)
         $pagos = DB::table('Pago')
             ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
             ->join('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
@@ -148,7 +151,7 @@ class FlujoCajaController extends Controller
         if (!$caja) abort(404);
 
         $gastos = DB::table('Gastos')->where('id_caja', $id)->sum('precio');
-        $ventas = DB::table('Venta')->where('id_caja', $id)->get();
+        $ventas = DB::table('Venta')->where('id_caja', $id)->where('status', '!=', 3)->get(); // Ignorar cancelados en PDF
         
         $pagos = DB::table('Pago')
             ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')

@@ -23,7 +23,7 @@
 
     @if(!$cajaAbierta)
         {{-- ========================================== --}}
-        {{--        PANTALLA DE APERTURA DE CAJA         --}}
+        {{--        PANTALLA DE APERTURA DE CAJA        --}}
         {{-- ========================================== --}}
         <div class="flex flex-col items-center justify-center mt-12 px-4 text-center">
             <div class="bg-amber-100 w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-inner">
@@ -142,27 +142,53 @@
                 </div>
 
                 <div class="space-y-4">
-                    <div x-data="{ open: false }" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    {{-- DETALLE DE VENTAS --}}
+                    <div x-data="{ open: true }" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <button @click="open = !open" class="w-full flex justify-between items-center p-6 hover:bg-gray-50 transition-colors">
-                            <h3 class="font-black text-gray-800 uppercase italic tracking-tighter text-sm">Registro de Ventas ({{ $stats['num_ventas'] }})</h3>
+                            <h3 class="font-black text-gray-800 uppercase italic tracking-tighter text-sm">Detalle de Ventas del Turno ({{ $stats['num_ventas'] }})</h3>
                             <svg :class="open ? 'rotate-180' : ''" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
-                        <div x-show="open" x-collapse x-cloak class="p-6 border-t border-gray-50 bg-gray-50/30">
-                            @if($ventas_detalle->isEmpty())
-                                <p class="text-sm text-gray-400 font-bold text-center py-4 uppercase">Sin movimientos registrados</p>
-                            @else
-                                <div class="space-y-2">
-                                    @foreach($ventas_detalle as $v)
-                                        <div class="flex justify-between items-center bg-white border border-gray-100 p-3 rounded-xl shadow-sm">
-                                            <span class="text-xs font-bold text-gray-500">Venta #{{ $v->id_venta }} <span class="mx-2 text-gray-200">|</span> {{ \Carbon\Carbon::parse($v->fecha_hora)->format('h:i a') }}</span>
-                                            <span class="font-black text-green-600">${{ number_format($v->total, 2) }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
+                        <div x-show="open" x-collapse x-cloak class="p-0 border-t border-gray-50 bg-white">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            <th class="px-6 py-3">ID</th>
+                                            <th class="px-6 py-3">Hora</th>
+                                            <th class="px-6 py-3">Cliente / Mesa</th>
+                                            <th class="px-6 py-3 text-right">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-50 text-sm">
+                                        @foreach($ventas_detalle as $venta)
+                                            <tr class="hover:bg-gray-50 transition-colors {{ $venta->status == 3 ? 'bg-red-50' : '' }}">
+                                                <td class="px-6 py-4 font-bold {{ $venta->status == 3 ? 'text-red-700' : 'text-gray-900' }}">#{{ $venta->id_venta }}</td>
+                                                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('h:i a') }}</td>
+                                                <td class="px-6 py-4 text-gray-700 font-medium">
+                                                    @if($venta->tipo_servicio == 1)
+                                                        Mesa {{ $venta->mesa }} - {{ $venta->nombreClie }}
+                                                    @elseif($venta->tipo_servicio == 2)
+                                                        Mostrador
+                                                    @else
+                                                        {{ $venta->nombreClie ?? 'Domicilio' }}
+                                                    @endif
+                                                    
+                                                    @if($venta->status == 3)
+                                                        <span class="block text-[10px] text-red-600 font-black uppercase tracking-tighter">¡ANULADO!</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-6 py-4 text-right font-black {{ $venta->status == 3 ? 'text-red-500 line-through' : 'text-green-600' }}">
+                                                    ${{ number_format($venta->total, 2) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
+                    {{-- DETALLE DE GASTOS --}}
                     <div x-data="{ open: false }" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
                         <button @click="open = !open" class="w-full flex justify-between items-center p-6 hover:bg-gray-50 transition-colors">
                             <h3 class="font-black text-gray-800 uppercase italic tracking-tighter text-sm">Registro de Gastos</h3>
@@ -175,7 +201,7 @@
                                 <div class="space-y-2">
                                     @foreach($gastos_detalle as $g)
                                         <div class="flex justify-between items-center bg-white border border-gray-100 p-3 rounded-xl shadow-sm">
-                                            <span class="text-xs font-bold text-gray-500">{{ $g->descripcion }}</span>
+                                            <span class="text-xs font-bold text-gray-500 uppercase tracking-tight">{{ $g->descripcion }}</span>
                                             <span class="font-black text-red-500">-${{ number_format($g->precio, 2) }}</span>
                                         </div>
                                     @endforeach
