@@ -24,7 +24,7 @@
 
             <select name="estado" class="border border-gray-300 text-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-w-[160px]">
                 <option value="todos" {{ ($filtroEstado ?? 'todos') == 'todos' ? 'selected' : '' }}>Todos los estados</option>
-                <option value="0" {{ ($filtroEstado ?? '') == '0' ? 'selected' : '' }}>Esperando</option>
+                <option value="0" {{ ($filtroEstado ?? '') == '0' ? 'selected' : '' }}>Esperando / Abierta</option>
                 <option value="1" {{ ($filtroEstado ?? '') == '1' ? 'selected' : '' }}>Pagado</option>
                 <option value="3" {{ ($filtroEstado ?? '') == '3' ? 'selected' : '' }}>Cancelado</option>
             </select>
@@ -49,26 +49,42 @@
                         <th class="px-6 py-4 font-semibold">FECHA / HORA</th>
                         <th class="px-6 py-4 font-semibold">USUARIO</th>
                         <th class="px-6 py-4 font-semibold">CLIENTE / MESA</th>
+                        <th class="px-6 py-4 font-semibold">REPARTIDOR</th>
                         <th class="px-6 py-4 font-semibold text-center">PRODUCTOS</th>
                         <th class="px-6 py-4 font-semibold">TOTAL</th>
-                        <th class="px-6 py-4 font-semibold text-center">ESTADO</th>
+                        <th class="px-6 py-4 font-semibold text-center">ESTADO CAJA</th>
                         <th class="px-6 py-4 font-semibold text-center">ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 text-sm">
                     @foreach($ventas as $venta)
                         @php
-                            // Extraer el nombre del usuario y el motivo de cancelación desde los comentarios
                             $usuarioVenta = 'Sistema';
                             $motivoCancelacion = '';
-                            if ($venta->comentarios && str_contains($venta->comentarios, 'Atendió:')) {
-                                $partes = explode('|', $venta->comentarios);
-                                $usuarioVenta = trim(str_replace('Atendió:', '', $partes[0]));
-                                
-                                foreach($partes as $p) {
-                                    if(str_contains($p, 'CANCELADO - Motivo:')) {
-                                        $motivoCancelacion = trim(str_replace('CANCELADO - Motivo:', '', $p));
+                            $repartidor = '-';
+                            $esCompletado = false;
+
+                            if ($venta->comentarios) {
+                                // OBTENER USUARIO QUE ATENDIÓ
+                                if (str_contains($venta->comentarios, 'Atendió:')) {
+                                    $partes = explode('|', $venta->comentarios);
+                                    $usuarioVenta = trim(str_replace('Atendió:', '', $partes[0]));
+                                    
+                                    foreach($partes as $p) {
+                                        if(str_contains($p, 'CANCELADO - Motivo:')) {
+                                            $motivoCancelacion = trim(str_replace('CANCELADO - Motivo:', '', $p));
+                                        }
                                     }
+                                }
+                                
+                                // OBTENER REPARTIDOR DE LOS COMENTARIOS
+                                if (preg_match('/Repartidor:\s*([^|]+)/i', $venta->comentarios, $matches)) {
+                                    $repartidor = trim($matches[1]);
+                                }
+
+                                // OBTENER SI YA SE ENTREGÓ / COMPLETÓ
+                                if (str_contains($venta->comentarios, 'ENTREGADO') || $venta->status == 2) {
+                                    $esCompletado = true;
                                 }
                             }
                         @endphp
@@ -91,6 +107,17 @@
                                     <div class="text-xs text-red-500 font-bold mt-1">Motivo: {{ $motivoCancelacion }}</div>
                                 @endif
                             </td>
+
+                            <td class="px-6 py-4">
+                                @if($venta->tipo_servicio == 3 && $repartidor != '-')
+                                    <span class="bg-orange-100 text-orange-800 border border-orange-200 font-bold px-2.5 py-1 rounded text-[11px] whitespace-nowrap flex items-center gap-1.5 w-max">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                        {{ $repartidor }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 font-medium ml-4">-</span>
+                                @endif
+                            </td>
                             
                             <td class="px-6 py-4 text-center">
                                 <span class="bg-blue-50 text-blue-700 border border-blue-200 font-bold px-2.5 py-1 rounded text-xs">
@@ -100,7 +127,7 @@
 
                             <td class="px-6 py-4 font-black text-green-600">${{ number_format($venta->total, 2) }}</td>
                             
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-6 py-4 text-center flex flex-col items-center gap-1.5">
                                 @if($venta->status == 0)
                                     <span class="bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-full text-xs">Cuenta Abierta</span>
                                 @elseif($venta->status == 1)
@@ -108,7 +135,13 @@
                                 @elseif($venta->status == 3)
                                     <span class="bg-red-100 text-red-600 font-bold px-3 py-1 rounded-full text-xs">Cancelado</span>
                                 @else
-                                    <span class="bg-blue-100 text-blue-600 font-bold px-3 py-1 rounded-full text-xs">Preparando</span>
+                                    <span class="bg-gray-100 text-gray-500 font-bold px-3 py-1 rounded-full text-xs">Desconocido</span>
+                                @endif
+
+                                @if($esCompletado && $venta->status != 3)
+                                    <span class="bg-blue-50 text-blue-600 border border-blue-200 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                                        Completado
+                                    </span>
                                 @endif
                             </td>
 
@@ -191,14 +224,12 @@
                     <div x-show="pagos.efectivo.activo" class="px-4 pb-4 pt-1 space-y-3">
                         <div>
                             <label class="block text-[12px] text-gray-500 mb-1">Monto a cobrar con Efectivo</label>
-                            <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.monto" class="w-full border border-gray-300 rounded px-3 py-2 text-[14px] font-bold focus:outline-none">
+                            <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.monto" class="w-full border border-gray-300 rounded px-3 py-2 text-[14px] font-bold focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-[12px] text-green-600 font-bold mb-1">¿Con cuánto paga el cliente?</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2 text-green-600 font-bold">$</span>
-                                <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.entregado" placeholder="Monto entregado" class="w-full pl-7 pr-3 py-2 border border-green-200 bg-green-50 rounded text-[14px] font-bold focus:outline-none focus:border-green-400">
-                            </div>
+                            <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.entregado" placeholder="Monto entregado" class="w-full border border-green-200 bg-green-50 rounded px-3 py-2 text-[14px] font-bold focus:outline-none focus:border-green-400">
+                            
                             <p x-show="pagos.efectivo.entregado > 0 && (pagos.efectivo.entregado - pagos.efectivo.monto) >= 0" class="text-[12px] text-gray-600 mt-2 font-bold bg-white p-2 rounded border border-gray-100 shadow-sm text-center">
                                 Su cambio: <span class="text-green-600 text-[16px]"> $<span x-text="(pagos.efectivo.entregado - pagos.efectivo.monto).toFixed(2)"></span></span>
                             </p>
@@ -214,7 +245,7 @@
                     </label>
                     <div x-show="pagos.tarjeta.activo" class="px-4 pb-4 pt-1">
                         <label class="block text-[12px] text-gray-500 mb-1">Monto a cobrar con Tarjeta</label>
-                        <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" class="w-full border border-gray-300 rounded px-3 py-2 text-[14px] font-bold focus:outline-none">
+                        <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" class="w-full border border-gray-300 rounded px-3 py-2 text-[14px] font-bold focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 
@@ -227,7 +258,7 @@
                     <div x-show="pagos.transferencia.activo" class="px-4 pb-4 pt-1 space-y-3">
                         <div>
                             <label class="block text-[12px] text-gray-500 mb-1">Monto a cobrar con Transferencia</label>
-                            <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" class="w-full border border-gray-300 rounded px-3 py-2 text-[14px] font-bold focus:outline-none">
+                            <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" class="w-full border border-gray-300 rounded px-3 py-2 text-[14px] font-bold focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-[12px] text-blue-600 font-bold mb-1">Número de Referencia *</label>
@@ -311,18 +342,20 @@
                     return pE + pT + pTr;
                 },
 
-                faltaPagar() { return parseFloat((this.total_pago - this.getTotalPagarInputs()).toFixed(2)); },
+                faltaPagar() { 
+                    return parseFloat((this.total_pago - this.getTotalPagarInputs()).toFixed(2)); 
+                },
                 
                 pagosValidos() { 
-                    if(this.faltaPagar() !== 0) return false;
-                    if(this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
+                    if (this.faltaPagar() !== 0) return false;
+                    if (this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
                     return true;
                 },
 
                 procesarPagoFinal() {
                     if(!this.pagosValidos()) return;
                     this.isProcessing = true;
-                    
+
                     let pagosToSend = [];
                     if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
                         pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
@@ -338,10 +371,16 @@
 
                     fetch(url, {
                         method: 'POST', 
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json' 
+                        },
                         body: JSON.stringify({ _token: '{{ csrf_token() }}', id_venta: this.id_venta_pago, pagos: pagosToSend })
                     }).then(async r => {
-                        if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
+                        if(!r.ok) {
+                            const errText = await r.text();
+                            throw new Error("El servidor devolvió un error. " + r.status);
+                        }
                         return r.json();
                     }).then(res => {
                         if(res.success) {
@@ -353,7 +392,7 @@
                             this.isProcessing = false;
                         }
                     }).catch(e => {
-                        alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
+                        alert("Ocurrió un error de conexión o la sesión expiró. Intenta recargar la página.\n\n" + e.message);
                         this.isProcessing = false;
                     });
                 }
