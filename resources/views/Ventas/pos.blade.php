@@ -51,7 +51,7 @@
                     <button @click="abrirPaquete(1)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
                     <button @click="abrirPaquete(2)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
                     <button @click="abrirPaquete(3)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
-                    <button @click="modalIngredientes = true" class="bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
+                    <button @click="abrirModalIngredientes()" class="bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
                     <button @click="modalMitades = true; mitSel = []; mitTam = null;" class="bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
                 </div>
 
@@ -65,7 +65,7 @@
                         <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Barra</button>
                         
                         {{-- MENÚ EXTRAS --}}
-                        <div class="relative" x-data="{ openExtras: false }">
+                        <div class="relative">
                             <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
                                 Extras 
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -95,35 +95,39 @@
                 </div>
 
                 {{-- GRID PRODUCTOS --}}
-                <div class="flex-1 overflow-y-auto scrollbar-hide pb-2">
+                <div class="flex-1 overflow-y-auto scrollbar-hide pb-2 pt-1">
                     
                     {{-- Pizzas / Mariscos --}}
-                    <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 content-start pr-1">
+                    <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2">
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
-                            <button @click="abrirOpciones(p)" class="bg-white rounded-lg shadow-sm border border-gray-100 border-l-[3px] border-l-[#ffc107] px-2.5 py-2 flex flex-col justify-between items-start text-left h-[60px] hover:shadow-md transition">
-                                <span class="font-bold text-[#212529] text-[11px] leading-tight truncate w-full" x-text="p.nombre"></span>
-                                <span class="text-[#fd7e14] text-[10px] font-bold flex items-center gap-1 mt-auto">Opciones <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                            <button @click="abrirOpciones(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
+                                <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
+                                <span class="text-[#fd7e14] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
+                                    Opciones <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                                </span>
                             </button>
                         </template>
                     </div>
 
                     {{-- Bebidas --}}
-                    <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 content-start pr-1" x-cloak>
+                    <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2" x-cloak>
                         <template x-for="b in getListaBebidas()" :key="'beb_'+b.nombre">
-                            <button @click="abrirBebida(b)" class="bg-white rounded-lg shadow-sm border border-gray-100 border-l-[3px] border-l-[#17a2b8] px-2.5 py-2 flex flex-col justify-between items-start text-left h-[60px] hover:shadow-md transition">
-                                <span class="font-bold text-[#212529] text-[11px] leading-tight truncate w-full" x-text="b.nombre"></span>
-                                <span class="text-[#17a2b8] text-[10px] font-bold flex items-center gap-1 mt-auto">Elegir tamaño <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                            <button @click="abrirBebida(b)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
+                                <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="b.nombre"></span>
+                                <span class="text-[#17a2b8] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
+                                    Elegir tamaño <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                                </span>
                             </button>
                         </template>
                     </div>
 
                     {{-- Otros Productos (Hamburguesas, etc) --}}
-                    <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 content-start mt-1 pr-1" x-cloak>
+                    <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start mt-1 pr-2" x-cloak>
                         <template x-for="p in getListaDirectos()" :key="p.id">
-                            <button @click="addDirecto(p)" class="bg-white rounded-lg shadow-sm border border-gray-100 border-l-[3px] border-l-blue-400 px-2.5 py-2 flex flex-col justify-between items-start text-left h-[60px] hover:shadow-md transition">
-                                <span class="font-bold text-[#212529] text-[11px] leading-tight truncate w-full" x-text="p.nombre"></span>
-                                <div class="flex items-center gap-1 mt-auto">
-                                    <span class="text-[#fd7e14] text-[12px] font-black" x-text="'$' + parseFloat(p.precio).toFixed(2)"></span>
+                            <button @click="addDirecto(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
+                                <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
+                                <div class="flex items-center gap-1 mt-3">
+                                    <span class="text-blue-600 text-[14px] font-black group-hover:scale-110 transition-transform origin-left" x-text="'$' + parseFloat(p.precio).toFixed(2)"></span>
                                 </div>
                             </button>
                         </template>
@@ -265,7 +269,7 @@
                         <input type="text" x-model="nombreClienteMesa" placeholder="Nombre cliente *" class="w-2/3 h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
                     </div>
 
-                    <div class="flex h-[45px] relative" x-data="{ openServicio: false }">
+                    <div class="flex h-[45px] relative">
                         
                         <button @click="openServicio = !openServicio" class="w-[45%] h-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold text-[14px] flex justify-between items-center px-4 rounded-l-[6px] border-r border-[#e36b0c] transition-colors shadow-sm">
                             <div class="flex items-center gap-2">
@@ -621,7 +625,7 @@
             </div>
         </div>
 
-        {{-- POR INGREDIENTES --}}
+        {{-- POR INGREDIENTES CON BUSCADOR --}}
         <div x-show="modalIngredientes" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalIngredientes = false">
                 <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Por Ingrediente</h2><button @click="modalIngredientes = false" class="hover:text-orange-200 font-bold text-2xl leading-none">&times;</button></div>
@@ -633,16 +637,28 @@
                             </button>
                         </template>
                     </div>
-                    <div x-show="ingTam">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-[8px] p-4 shadow-sm">
-                            <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
-                                <label class="flex items-center gap-2 cursor-pointer text-[13px] text-[#495057] font-medium p-1.5 hover:bg-orange-50 rounded">
+                    
+                    <div x-show="ingTam" class="mt-4">
+                        <div class="mb-3 relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </span>
+                            <input type="text" x-model="searchIng" placeholder="Buscar ingrediente..." class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-[8px] text-[13px] font-medium focus:outline-none focus:border-[#fd7e14]">
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-[8px] p-4 shadow-sm max-h-[250px] overflow-y-auto scrollbar-hide">
+                            <template x-for="ing in getIngredientesFiltrados()" :key="ing.id_ingrediente">
+                                <label class="flex items-center gap-2 cursor-pointer text-[13px] text-[#495057] font-medium p-1.5 hover:bg-orange-50 rounded transition-colors">
                                     <input type="checkbox" :value="ing.ingrediente" x-model="ingSel" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                                     <span x-text="ing.ingrediente"></span>
                                 </label>
                             </template>
+                            <template x-if="getIngredientesFiltrados().length === 0">
+                                <div class="col-span-2 sm:col-span-3 text-center py-4 text-gray-400 text-xs font-bold">No se encontraron ingredientes.</div>
+                            </template>
                         </div>
                     </div>
+
                 </div>
                 <div class="p-5 flex gap-4 bg-white border-t border-gray-200 items-center justify-between">
                     <div class="flex flex-col">
@@ -657,7 +673,7 @@
             </div>
         </div>
 
-        {{-- MODAL DOMICILIO (TOTALMENTE REDISEÑADO CON LISTA PERMANENTE) --}}
+        {{-- MODAL DOMICILIO --}}
         <div x-show="modalCliente" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[900px] max-w-[95vw] flex flex-col max-h-[95vh] overflow-hidden">
                 <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
@@ -680,7 +696,7 @@
                             </button>
                         </div>
 
-                        {{-- VISTA DE BÚSQUEDA Y LISTA (Solo si no hay cliente seleccionado ni form de nuevo) --}}
+                        {{-- VISTA DE BÚSQUEDA Y LISTA --}}
                         <div x-show="!clienteSeleccionado && !clienteFormVisible" class="space-y-3">
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
@@ -887,8 +903,10 @@
                 </div>
 
                 <div class="p-5 bg-white border-t border-gray-100 flex flex-col gap-2">
-                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos()" :class="!pagosValidos() ? 'bg-[#1a202c]/50 text-white cursor-not-allowed' : 'bg-[#1a202c] hover:bg-black text-white shadow-md'" class="w-full font-bold py-3.5 rounded-[8px] text-[15px] transition-colors flex justify-center items-center gap-2">
-                        Confirmar Pagos <span class="bg-white/20 px-2 py-0.5 rounded text-[13px]" x-text="'$' + getTotalPagarInputs().toFixed(2)"></span>
+                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="(!pagosValidos() || isProcessing) ? 'bg-[#1a202c]/50 text-white cursor-not-allowed' : 'bg-[#1a202c] hover:bg-black text-white shadow-md'" class="w-full font-bold py-3.5 rounded-[8px] text-[15px] transition-colors flex justify-center items-center gap-2">
+                        <span x-show="!isProcessing">Confirmar Pagos</span>
+                        <span x-show="isProcessing">Procesando...</span>
+                        <span x-show="!isProcessing && getTotalPagarInputs() > 0" class="bg-white/20 px-2 py-0.5 rounded text-[13px]" x-text="'$' + getTotalPagarInputs().toFixed(2)"></span>
                     </button>
                     <p x-show="!pagosValidos()" class="text-[11px] text-red-500 text-center font-medium">Asegúrate de que la suma coincida con el total y rellenar referencias.</p>
                 </div>
@@ -900,6 +918,8 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('posApp', () => ({
+                openServicio: false,
+                openExtras: false,
                 cat: 12, view: 'pizzas', search: '', cart: {!! json_encode($cart_preloaded ?? []) !!}, cartGroups: [], 
                 servicio: {{ $venta_edit->tipo_servicio ?? 3 }}, 
                 mesa: '{{ $venta_edit->mesa ?? '' }}', 
@@ -911,7 +931,7 @@
                 modalPaq1: false, paq1Opt: 'Combinado (1 Hawaiana y 1 Pepperoni)', paqObj: null,
                 modalPaq2: false, paq2Tipo: 'hamb', paq2Extra: '', paq2Pizza: '',
                 modalPaq3: false, paq3Pizzas: [],
-                modalIngredientes: false, ingTam: null, ingSel: [],
+                modalIngredientes: false, ingTam: null, ingSel: [], searchIng: '',
                 modalMitades: false, mitTam: null, mitSel: [],
                 modalRectangular: false, rectItem: null, rectSel: [],
                 modalBarra: false, barraItem: null, barraSel: [],
@@ -920,6 +940,7 @@
 
                 modalCliente: false, 
                 modalPago: false,
+                isProcessing: false,
                 searchClienteText: '', showClientesList: false,
                 clienteSeleccionado: null, direccionesCliente: [], dirSeleccionada: null,
                 clienteFormVisible: false, dirFormVisible: false,
@@ -927,9 +948,9 @@
                 nuevaDirData: { calle: '', manzana: '', lote: '', colonia: '', referencia: '' },
 
                 pagos: {
-                    efectivo: { activo: false, monto: 0, entregado: 0 },
-                    tarjeta: { activo: false, monto: 0 },
-                    transferencia: { activo: false, monto: 0, referencia: '' }
+                    efectivo: { activo: false, monto: null, entregado: null },
+                    tarjeta: { activo: false, monto: null },
+                    transferencia: { activo: false, monto: null, referencia: '' }
                 },
 
                 init() {
@@ -1080,8 +1101,6 @@
                             type: 'normal', cIdx: n.cartIndex, item: n.item, subtotal: n.item.subtotal
                         });
                     });
-
-                    if(this.modalPago) this.autoFillPago('efectivo'); 
                 },
 
                 addPizzaToMainCart(obj) {
@@ -1288,6 +1307,18 @@
                     this.addPizzaToMainCart({ db_id: null, col: 'id_pizza', tipo: 'piz_mitad', nombre_base: nomFull, variante: this.mitSel[0] + ' / ' + this.mitSel[1], precioBase: parseFloat(this.mitTam.precio), es_pizza: true, is_magno: false, orilla_queso: false, precio_orilla: this.getPrecioOrilla(cTam), mitad1: this.mitSel[0], mitad2: this.mitSel[1], tamano: this.mitTam.tamano });
                     this.modalMitades = false; this.mitTam = null; this.mitSel = [];
                 },
+                
+                getIngredientesFiltrados() {
+                    if(!this.searchIng || this.searchIng.trim() === '') return dbIngredientes;
+                    let s = this.searchIng.toLowerCase().trim();
+                    return dbIngredientes.filter(i => (i.ingrediente || '').toLowerCase().includes(s));
+                },
+                abrirModalIngredientes() {
+                    this.ingTam = null;
+                    this.ingSel = [];
+                    this.searchIng = '';
+                    this.modalIngredientes = true;
+                },
                 precioPizzaIngredientes() { return !this.ingTam ? 0 : parseFloat(this.ingTam.precio); }, 
                 addIng() {
                     let cTam = this.cleanSize(this.ingTam.tamano);
@@ -1333,6 +1364,18 @@
                     if(this.servicio === 2) return 'Para Llevar';
                     if(this.servicio === 3) return 'A Domicilio';
                     return 'Seleccionar'; 
+                },
+
+                abrirModalCliente() {
+                    this.clienteSeleccionado = null;
+                    this.searchClienteText = '';
+                    this.direccionesCliente = [];
+                    this.dirSeleccionada = null;
+                    this.clienteFormVisible = false;
+                    this.dirFormVisible = false;
+                    this.nuevoClienteData = { nombre: '', telefono: '' };
+                    this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
+                    this.modalCliente = true;
                 },
 
                 toggleFormNuevoCliente() {
@@ -1386,7 +1429,7 @@
 
                 abrirModalPago() {
                     this.pagos = {
-                        efectivo: { activo: true, monto: this.getTotal(), entregado: null },
+                        efectivo: { activo: false, monto: null, entregado: null },
                         tarjeta: { activo: false, monto: null },
                         transferencia: { activo: false, monto: null, referencia: '' }
                     };
@@ -1414,6 +1457,7 @@
                 },
                 pagosValidos() {
                     if(this.faltaPagar() !== 0) return false;
+                    if(!this.pagos.efectivo.activo && !this.pagos.tarjeta.activo && !this.pagos.transferencia.activo) return false;
                     if(this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
                     return true;
                 },
@@ -1425,12 +1469,13 @@
                     } else if(this.servicio === 2) {
                         this.abrirModalPago(); 
                     } else if(this.servicio === 3) {
-                        this.modalCliente = true; 
+                        this.abrirModalCliente(); 
                     }
                 },
 
                 procesarOrdenFinal(esAbierta = false) {
                     if(!esAbierta && !this.pagosValidos()) return;
+                    this.isProcessing = true;
 
                     let cartPayload = [];
                     this.cartGroups.forEach(g => {
@@ -1475,15 +1520,31 @@
                     }
 
                     fetch("{{ route('ventas.pos.store') }}", {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        method: 'POST', 
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json' 
+                        },
                         body: JSON.stringify(reqBody)
-                    }).then(r => r.json()).then(res => {
+                    }).then(async r => {
+                        if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
+                        return r.json();
+                    }).then(res => {
                         if(res.success) { 
                             this.cart = []; this.actualizarCarrito(); 
                             this.mesa = ''; this.nombreClienteMesa = ''; this.comentariosGenerales = '';
                             this.modalPago = false;
                             
-                            // MAGIA 2: Si estamos editando, mandamos a imprimir SOLO LO NUEVO
+                            // Reset del cliente para el próximo pedido
+                            this.clienteSeleccionado = null;
+                            this.searchClienteText = '';
+                            this.direccionesCliente = [];
+                            this.dirSeleccionada = null;
+                            this.clienteFormVisible = false;
+                            this.dirFormVisible = false;
+                            this.nuevoClienteData = { nombre: '', telefono: '' };
+                            this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
+                            
                             let urlTicket = '/venta/pos/ticket/' + res.id_venta;
                             if (this.id_venta_edit) {
                                 urlTicket += '?solo_nuevos=1';
@@ -1493,8 +1554,16 @@
                             
                             if(this.id_venta_edit) {
                                 setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1000);
+                            } else {
+                                this.isProcessing = false;
                             }
-                        } else alert("Error al guardar: " + res.message);
+                        } else {
+                            alert("Error al guardar: " + res.message);
+                            this.isProcessing = false;
+                        }
+                    }).catch(e => {
+                        alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
+                        this.isProcessing = false;
                     });
                 }
             }));

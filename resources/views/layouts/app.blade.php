@@ -70,7 +70,7 @@
                 {{-- 5. PEDIDOS --}}
                 <a href="{{ route('ventas.pedidos') }}" class="flex items-center gap-4 px-6 py-4 rounded-[2rem] transition-all {{ request()->routeIs('ventas.pedidos') ? 'bg-black text-white shadow-xl' : 'hover:bg-black/10 font-black' }}">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 512 512"><path d="M256 0C114.6 0 0 114.6 0 256c0 105.1 63.6 195 155.6 235.6c11 4.8 23.5-3.3 23.5-15.4V432c0-26.5 21.5-48 48-48h57.8c26.5 0 48-21.5 48-48V288c0-26.5-21.5-48-48-48H138.5c-20 0-38.1-12.7-44.5-31.9C85.7 183.1 161.4 160 256 160c94.6 0 170.3 23.1 162.1 48.1c-6.4 19.3-24.5 31.9-44.5 31.9H288c-26.5 0-48 21.5-48 48v48c0 26.5 21.5 48 48 48h44.2v44.2c0 12.1 12.5 20.2 23.5 15.4C448.4 451 512 361.1 512 256C512 114.6 397.4 0 256 0z"/></svg>
-                    <span class="text-xs uppercase tracking-[0.3em] font-black italic mt-0.5">Pedidos</span>
+                    <span class="text-xs uppercase tracking-[0.3em] font-black italic mt-0.5">Repartidor</span>
                 </a>
 
                 {{-- 6. ANTICIPOS --}}

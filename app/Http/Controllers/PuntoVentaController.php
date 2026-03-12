@@ -20,7 +20,7 @@ class PuntoVentaController extends Controller
 
     public function index(Request $request)
     {
-        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
+        $id_sucursal = 1; 
         $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
 
         $pizzas_raw = DB::table('Pizzas')->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')->join('TamanosPizza', 'Pizzas.id_tamano', '=', 'TamanosPizza.id_tamañop')->select('Especialidades.nombre', 'TamanosPizza.tamano', 'TamanosPizza.precio', 'Pizzas.id_pizza')->get();
@@ -43,7 +43,12 @@ class PuntoVentaController extends Controller
 
         $paquetes = DB::table('Paquetes')->get();
         $ingredientes = DB::table('Ingredientes')->get();
-        $tamanos_base = DB::table('TamanosPizza')->where('tamano', 'like', '%Especial%')->get(); 
+        
+        $tamanos_base = DB::table('TamanosPizza')
+            ->whereIn('tamano', ['Chica', 'Mediana', 'Grande', 'Familiar', 'CHICA', 'MEDIANA', 'GRANDE', 'FAMILIAR'])
+            ->orWhere('tamano', 'like', '%Especial%')
+            ->get();
+        
         $especialidades_lista = DB::table('Especialidades')->get();
         $categorias_extras = DB::table('CategoriasProd')->whereNotIn('id_cat', [12, 2, 11, 10, 1])->get();
         $clientes = []; $direcciones = [];
@@ -64,7 +69,7 @@ class PuntoVentaController extends Controller
                         'orilla_queso' => ($det->queso > 0), 'orillas_qty' => $det->queso, 'precio_orilla' => $ing->p_orilla ?? 0, 'descuentoPromo' => $ing->desc ?? 0,
                         'comentario' => $ing->nota ?? '', 'ingredientes_extra' => $ing->extras ?? [], 'es_pizza' => false, 'is_magno' => false, 'tipo' => 'directo',
                         'col' => '', 'db_id' => null, 'nombre_base' => 'Producto', 'variante' => '',
-                        'is_old' => true // <-- ETIQUETA MÁGICA: Ya estaba en el pedido
+                        'is_old' => true
                     ];
 
                     if ($det->id_pizza) {
@@ -119,7 +124,7 @@ class PuntoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
-            $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
+            $id_sucursal = 1; 
             $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
             if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
 
@@ -187,7 +192,7 @@ class PuntoVentaController extends Controller
                 $extraData['p_base'] = $item['precioBase'] ?? ($item['precioFinal'] ?? 0);
                 $extraData['p_orilla'] = $item['precio_orilla'] ?? 0;
                 $extraData['desc'] = $item['descuentoPromo'] ?? 0;
-                $extraData['is_old'] = $item['is_old'] ?? false; // <-- GUARDAMOS SI ERA VIEJO
+                $extraData['is_old'] = $item['is_old'] ?? false;
 
                 if(!empty($item['comentario'])) $extraData['nota'] = $item['comentario'];
                 if(!empty($item['ingredientes_extra'])) $extraData['extras'] = $item['ingredientes_extra'];
@@ -278,10 +283,27 @@ class PuntoVentaController extends Controller
         }
     }
 
-    public function ticket(Request $request, $id) // <-- AGREGAMOS Request $request
+    public function ticket(Request $request, $id)
     {
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
+
+        // --- INICIO LIMPIEZA DE COMENTARIOS PARA EL TICKET ---
+        $comentarios_limpios = [];
+        if ($venta->comentarios) {
+            $partes = explode('|', $venta->comentarios);
+            foreach($partes as $p) {
+                $p = trim($p);
+                if (!str_contains($p, 'Atendió:') && !str_contains($p, 'ENTREGADO') && !str_contains($p, 'EN CAMINO') && !str_contains($p, 'CANCELADO')) {
+                    if(!empty($p)) {
+                        $comentarios_limpios[] = $p;
+                    }
+                }
+            }
+        }
+        $venta->comentarios = count($comentarios_limpios) > 0 ? "Nota: " . implode(" | ", $comentarios_limpios) : null;
+        // --- FIN LIMPIEZA ---
+
         $detalles = DB::table('DetalleVenta')->where('id_venta', $id)->get();
         
         $pizzas_to_pair = [];
@@ -293,10 +315,9 @@ class PuntoVentaController extends Controller
 
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
             
-            // --- MAGIA: SALTAMOS LOS PRODUCTOS VIEJOS SI PIDEN "SOLO NUEVOS" ---
             if ($request->has('solo_nuevos') && $request->solo_nuevos == 1) {
                 if ($ing && isset($ing->is_old) && $ing->is_old == true) {
-                    continue; // Brincamos este producto
+                    continue; 
                 }
             }
 
