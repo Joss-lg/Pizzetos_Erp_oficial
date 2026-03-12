@@ -10,8 +10,8 @@
     
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-            <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">Todos los Pedidos</h2>
-            <p class="text-sm text-gray-500 mt-1">Historial completo de pedidos</p>
+            <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">Historial de Pedidos</h2>
+            <p class="text-sm text-gray-500 mt-1">Historial completo de pedidos registrados en el sistema</p>
         </div>
         
         <form action="{{ route('ventas.resume') }}" method="GET" class="flex flex-wrap items-center gap-3">
@@ -48,6 +48,7 @@
                     <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
                         <th class="px-6 py-4 font-semibold">ID VENTA</th>
                         <th class="px-6 py-4 font-semibold">FECHA / HORA</th>
+                        <th class="px-6 py-4 font-semibold">USUARIO</th>
                         <th class="px-6 py-4 font-semibold">CLIENTE / MESA</th>
                         <th class="px-6 py-4 font-semibold text-center">PRODUCTOS</th>
                         <th class="px-6 py-4 font-semibold">TOTAL</th>
@@ -57,10 +58,20 @@
                 </thead>
                 <tbody class="divide-y divide-gray-50 text-sm">
                     @foreach($ventas as $venta)
+                        @php
+                            // Extraer el nombre del usuario desde los comentarios usando el truco
+                            $usuarioVenta = 'Sistema';
+                            if ($venta->comentarios && str_contains($venta->comentarios, 'Atendió:')) {
+                                $partes = explode('|', $venta->comentarios);
+                                $usuarioVenta = trim(str_replace('Atendió:', '', $partes[0]));
+                            }
+                        @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 font-bold text-gray-900">#{{ $venta->id_venta }}</td>
-                            <td class="px-6 py-4 text-gray-500">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</td>
+                            <td class="px-6 py-4 text-gray-500 whitespace-nowrap">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</td>
                             
+                            <td class="px-6 py-4 font-bold text-blue-600 whitespace-nowrap">{{ $usuarioVenta }}</td>
+
                             <td class="px-6 py-4 text-gray-700 font-medium">
                                 @if($venta->tipo_servicio == 1)
                                     Mesa {{ $venta->mesa ?? '?' }} - {{ $venta->nombreClie ?? 'Sin Nombre' }}

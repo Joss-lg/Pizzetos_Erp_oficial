@@ -15,7 +15,7 @@ class FlujoCajaController extends Controller
      */
     public function index()
     {
-        $id_sucursal = Auth::user()->id_suc;
+        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
         
         $cajaAbierta = DB::table('Caja')
             ->leftJoin('Empleados', 'Caja.id_emp', '=', 'Empleados.id_emp')
@@ -72,7 +72,7 @@ class FlujoCajaController extends Controller
      */
     public function historial()
     {
-        $id_sucursal = Auth::user()->id_suc;
+        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES)
 
         $cajas = DB::table('Caja')
             ->leftJoin('Empleados', 'Caja.id_emp', '=', 'Empleados.id_emp')
@@ -95,12 +95,14 @@ class FlujoCajaController extends Controller
             'observaciones' => 'nullable|string|max:255'
         ]);
 
+        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES)
+
         // Evitar doble apertura
-        $existe = DB::table('Caja')->where('status', 1)->where('id_suc', Auth::user()->id_suc)->exists();
+        $existe = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->exists();
         if($existe) return redirect()->back()->with('error', 'Ya existe una caja abierta.');
 
         DB::table('Caja')->insert([
-            'id_suc' => Auth::user()->id_suc,
+            'id_suc' => $id_sucursal,
             'id_emp' => Auth::user()->id_emp,
             'fecha_apertura' => Carbon::now(),
             'monto_inicial' => $request->monto_inicial,

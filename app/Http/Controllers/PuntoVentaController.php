@@ -20,7 +20,7 @@ class PuntoVentaController extends Controller
 
     public function index(Request $request)
     {
-        $id_sucursal = Auth::check() ? (Auth::user()->id_suc ?? 1) : 1;
+        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
         $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
 
         $pizzas_raw = DB::table('Pizzas')->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')->join('TamanosPizza', 'Pizzas.id_tamano', '=', 'TamanosPizza.id_tamañop')->select('Especialidades.nombre', 'TamanosPizza.tamano', 'TamanosPizza.precio', 'Pizzas.id_pizza')->get();
@@ -118,21 +118,32 @@ class PuntoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
-            $id_sucursal = Auth::check() ? (Auth::user()->id_suc ?? 1) : 1;
+            $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
             $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
             if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
 
             $id_clie = $request->id_clie ?? null;
             $id_dir = $request->id_dir ?? null;
 
-            if ($request->has('nuevo_cliente') && $request->nuevo_cliente) {
-                $id_clie = DB::table('Clientes')->insertGetId(['nombre' => $request->nuevo_cliente['nombre'], 'telefono' => $request->nuevo_cliente['telefono'] ?? '', 'status' => 1]);
+            // 1. REVISIÓN CREACIÓN DE NUEVO CLIENTE
+            if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
+                $id_clie = DB::table('Clientes')->insertGetId([
+                    'nombre' => $request->nuevo_cliente['nombre'], 
+                    'telefono' => $request->nuevo_cliente['telefono'] ?? '', 
+                    'status' => 1
+                ]);
             }
 
-            if ($request->has('nueva_direccion') && $request->nueva_direccion && $id_clie) {
+            // 2. REVISIÓN CREACIÓN DE NUEVA DIRECCIÓN
+            if ($request->has('nueva_direccion') && is_array($request->nueva_direccion) && !empty($request->nueva_direccion['calle']) && $id_clie) {
                 $id_dir = DB::table('Direcciones')->insertGetId([
-                    'id_clie' => $id_clie, 'calle' => $request->nueva_direccion['calle'] ?? '', 'manzana' => $request->nueva_direccion['manzana'] ?? '',
-                    'lote' => $request->nueva_direccion['lote'] ?? '', 'colonia' => $request->nueva_direccion['colonia'] ?? '', 'referencia' => $request->nueva_direccion['referencia'] ?? '', 'status' => 1
+                    'id_clie' => $id_clie, 
+                    'calle' => $request->nueva_direccion['calle'], 
+                    'manzana' => $request->nueva_direccion['manzana'] ?? '',
+                    'lote' => $request->nueva_direccion['lote'] ?? '', 
+                    'colonia' => $request->nueva_direccion['colonia'] ?? '', 
+                    'referencia' => $request->nueva_direccion['referencia'] ?? '', 
+                    'status' => 1
                 ]);
             }
 
@@ -140,25 +151,44 @@ class PuntoVentaController extends Controller
             $nombreClienteMesa = ($request->tipo_servicio == 1) ? $request->nombre_cliente : null;
             $id_venta = $request->id_venta_edit ?? null;
 
+            // --- INICIO DEL TRUCO: OBTENER NOMBRE DEL CAJERO ---
+            $nombreCajero = Auth::check() ? (Auth::user()->nickName ?? 'Usuario') : 'Sistema';
+            
+            $comentariosFinales = "Atendió: " . $nombreCajero;
+            if (!empty($request->comentarios)) {
+                $comentariosFinales .= " | " . $request->comentarios;
+            }
+            // --- FIN DEL TRUCO ---
+
             if ($id_venta) {
+                // Actualiza y guarda comentarios con el cajero
                 DB::table('Venta')->where('id_venta', $id_venta)->update([
                     'total' => $request->total, 'tipo_servicio' => $request->tipo_servicio, 'mesa' => $request->mesa, 
-                    'nombreClie' => $nombreClienteMesa, 'comentarios' => $request->comentarios, 'status' => $estado_venta
+                    'nombreClie' => $nombreClienteMesa, 'comentarios' => $comentariosFinales, 'status' => $estado_venta
                 ]);
                 DB::table('DetalleVenta')->where('id_venta', $id_venta)->delete();
                 DB::table('Pago')->where('id_venta', $id_venta)->delete();
                 DB::table('PDomicilio')->where('id_venta', $id_venta)->delete();
             } else {
+                // Inserta y guarda comentarios con el cajero
                 $id_venta = DB::table('Venta')->insertGetId([
                     'id_suc' => $id_sucursal, 'id_caja' => $cajaAbierta->id_caja, 'total' => $request->total, 'tipo_servicio' => $request->tipo_servicio,
-                    'mesa' => $request->mesa, 'nombreClie' => $nombreClienteMesa, 'comentarios' => $request->comentarios,
+                    'mesa' => $request->mesa, 'nombreClie' => $nombreClienteMesa, 'comentarios' => $comentariosFinales,
                     'status' => $estado_venta, 'fecha_hora' => Carbon::now()
                 ]);
             }
 
             foreach($request->carrito as $item) {
                 $qtyOrillas = $item['orillas_qty'] ?? ((isset($item['orilla_queso']) && $item['orilla_queso']) ? $item['qty'] : 0);
-                $datosInsert = ['id_venta' => $id_venta, 'cantidad' => $item['qty'], 'precio_unitario' => $item['precioFinal'], 'queso' => $qtyOrillas, 'status' => 1];
+                
+                $datosInsert = [
+                    'id_venta' => $id_venta, 
+                    'cantidad' => $item['qty'], 
+                    'precio_unitario' => $item['precioFinal'], 
+                    'queso' => $qtyOrillas, 
+                    'status' => 1
+                ];
+                
                 $extraData = [];
                 $extraData['p_base'] = $item['precioBase'] ?? ($item['precioFinal'] ?? 0);
                 $extraData['p_orilla'] = $item['precio_orilla'] ?? 0;
@@ -168,15 +198,37 @@ class PuntoVentaController extends Controller
                 if(!empty($item['ingredientes_extra'])) $extraData['extras'] = $item['ingredientes_extra'];
                 
                 $col = $item['col'] ?? null;
-                if ($item['tipo'] == 'paq') { $datosInsert['id_paquete'] = json_encode(['id' => $item['db_id'], 'variante' => $item['variante']]); } 
-                elseif ($item['tipo'] == 'piz_mitad') { $datosInsert['pizza_mitad'] = json_encode(['mitad1' => $item['mitad1'], 'mitad2' => $item['mitad2'], 'tamano' => $item['tamano']]); } 
-                elseif ($item['tipo'] == 'piz_ing') { $datosInsert['id_pizza'] = null; $extraData['piz_ing_tamano'] = $item['nombre_base']; } 
-                elseif ($col === 'id_rec') { $datosInsert['id_rec'] = json_encode(['id' => $item['db_id'], 'cuartos' => $item['cuartos'] ?? []]); } 
-                elseif ($col === 'id_barr') { $datosInsert['id_barr'] = json_encode(['id' => $item['db_id'], 'medios' => $item['medios'] ?? []]); } 
-                elseif ($col === 'id_magno') { $datosInsert['id_magno'] = json_encode(['medios' => $item['medios'] ?? []]); } 
-                elseif ($col) { $datosInsert[$col] = $item['db_id']; }
+                
+                if ($item['tipo'] == 'paq') { 
+                    $datosInsert['id_paquete'] = json_encode(['id' => $item['db_id'], 'variante' => $item['variante']]); 
+                } 
+                // 3. REVISIÓN LÓGICA DE MITAD Y MITAD
+                elseif ($item['tipo'] == 'piz_mitad') { 
+                    $datosInsert['pizza_mitad'] = json_encode([
+                        'mitad1' => $item['mitad1'], 
+                        'mitad2' => $item['mitad2'], 
+                        'tamano' => $item['tamano']
+                    ]); 
+                } 
+                elseif ($item['tipo'] == 'piz_ing') { 
+                    $datosInsert['id_pizza'] = null; 
+                    $extraData['piz_ing_tamano'] = $item['nombre_base']; 
+                } 
+                elseif ($col === 'id_rec') { 
+                    $datosInsert['id_rec'] = json_encode(['id' => $item['db_id'], 'cuartos' => $item['cuartos'] ?? []]); 
+                } 
+                elseif ($col === 'id_barr') { 
+                    $datosInsert['id_barr'] = json_encode(['id' => $item['db_id'], 'medios' => $item['medios'] ?? []]); 
+                } 
+                elseif ($col === 'id_magno') { 
+                    $datosInsert['id_magno'] = json_encode(['medios' => $item['medios'] ?? []]); 
+                } 
+                elseif ($col) { 
+                    $datosInsert[$col] = $item['db_id']; 
+                }
 
                 if(!empty($extraData)) $datosInsert['ingredientes'] = json_encode($extraData);
+                
                 DB::table('DetalleVenta')->insert($datosInsert);
             }
 
@@ -184,13 +236,18 @@ class PuntoVentaController extends Controller
                 foreach($request->pagos as $pago) {
                     $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];
                     if (isset($pago['referencia'])) $datosPago['referencia'] = $pago['referencia'];
-                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado'];
+                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado']; // Guardamos en referencia para el cambio
                     DB::table('Pago')->insert($datosPago);
                 }
             }
 
+            // GUARDA DOMICILIO SI EL TIPO DE SERVICIO ES 3 Y HAY CLIENTE Y DIRECCIÓN
             if ($request->tipo_servicio == 3 && $id_clie && $id_dir) {
-                DB::table('PDomicilio')->insert(['id_venta' => $id_venta, 'id_clie' => $id_clie, 'id_dir' => $id_dir]);
+                DB::table('PDomicilio')->insert([
+                    'id_venta' => $id_venta, 
+                    'id_clie' => $id_clie, 
+                    'id_dir' => $id_dir
+                ]);
             }
 
             DB::commit();
@@ -285,11 +342,15 @@ class PuntoVentaController extends Controller
                 $j = json_decode($det->id_paquete); $nombre = "Paquete " . ($j->id ?? '');
                 if(isset($j->variante)) { $vars = explode("\n", str_replace(" / ", "\n", $j->variante)); foreach($vars as $v) { $sub[] = $v; } }
             }
+            // LÓGICA DE MITAD Y MITAD PARA EL TICKET
             elseif($det->pizza_mitad) {
-                $j = json_decode($det->pizza_mitad); $nombre = "Mitades " . ($j->tamano ?? ''); $sub[] = '1/2 ' . ($j->mitad1 ?? '') . ', 1/2 ' . ($j->mitad2 ?? '');
+                $j = json_decode($det->pizza_mitad); 
+                $nombre = "Mitades " . ($j->tamano ?? ''); 
+                $is_pairable = true;
+                $clean_name = "MITAD Y MITAD";
+                $sub[] = '1/2 ' . ($j->mitad1 ?? '') . ' / 1/2 ' . ($j->mitad2 ?? '');
             }
 
-            // Agregamos extras a los subitems (No mostramos precio extra, el precio_unitario del POS ya lo incluye)
             if ($det->queso && $det->queso > 0 && !$is_pairable) { 
                 $sub[] = ($det->queso > 1 ? $det->queso . ' ' : '') . 'ORILLA RELLENA'; 
             }
@@ -308,7 +369,7 @@ class PuntoVentaController extends Controller
                 for($i=0; $i<$det->cantidad; $i++) {
                     $pizzas_to_pair[$size][] = [
                         'clean_name' => $clean_name,
-                        'precio_final' => $det->precio_unitario, // Ya tiene todo el cálculo (descuentos + orillas)
+                        'precio_final' => $det->precio_unitario,
                         'orilla' => ($det->queso > 0),
                         'subs' => $sub
                     ];
@@ -317,7 +378,7 @@ class PuntoVentaController extends Controller
                 $other_items[] = [
                     'cantidad' => $det->cantidad . 'X',
                     'nombre' => mb_strtoupper($nombre),
-                    'total' => $det->precio_unitario * $det->cantidad, // Precio exacto calculado por POS
+                    'total' => $det->precio_unitario * $det->cantidad, 
                     'subs' => $sub
                 ];
             }
@@ -325,7 +386,6 @@ class PuntoVentaController extends Controller
 
         $final_items = [];
 
-        // Agrupar pizzas de 2 en 2
         foreach ($pizzas_to_pair as $size => $pizzas) {
             $chunks = array_chunk($pizzas, 2);
             foreach($chunks as $chunk) {
@@ -357,7 +417,6 @@ class PuntoVentaController extends Controller
             }
         }
 
-        // Agregar los demas items
         foreach ($other_items as $item) {
             $formatted_subs = [];
             foreach($item['subs'] as $s) {
@@ -389,7 +448,7 @@ class PuntoVentaController extends Controller
 
     public function historial(Request $request)
     {
-        $id_sucursal = Auth::check() ? (Auth::user()->id_suc ?? 1) : 1;
+        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES)
         
         $ventas = DB::table('Venta')
             ->leftJoin('PDomicilio', 'Venta.id_venta', '=', 'PDomicilio.id_venta')

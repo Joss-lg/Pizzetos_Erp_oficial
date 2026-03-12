@@ -77,21 +77,34 @@
                             <thead>
                                 <tr class="text-gray-400 uppercase text-[10px] tracking-widest font-bold border-b border-gray-100">
                                     <th class="px-4 py-3 font-semibold">FECHA / HORA</th>
+                                    <th class="px-4 py-3 font-semibold">REGISTRADO POR</th>
                                     <th class="px-4 py-3 font-semibold">DESCRIPCIÓN</th>
-                                    <th class="px-4 py-3 font-semibold">MONTO</th>
-                                    <th class="px-4 py-3 font-semibold text-right">ACCIONES</th>
+                                    <th class="px-4 py-3 font-semibold text-right">MONTO</th>
+                                    <th class="px-4 py-3 font-semibold text-center">ACCIONES</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 text-sm">
                                 @foreach($gastos as $gasto)
+                                    @php
+                                        // Extraer el nombre usando el truco
+                                        $usuarioGasto = 'Sistema';
+                                        $descReal = $gasto->descripcion;
+                                        
+                                        if (str_contains($gasto->descripcion, 'Registró:')) {
+                                            $partes = explode('|', $gasto->descripcion, 2);
+                                            $usuarioGasto = trim(str_replace('Registró:', '', $partes[0]));
+                                            $descReal = isset($partes[1]) ? trim($partes[1]) : $descReal;
+                                        }
+                                    @endphp
                                     <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-4 py-3 text-gray-500">{{ \Carbon\Carbon::parse($gasto->fecha)->format('h:i A') }}</td>
-                                        <td class="px-4 py-3 font-bold text-gray-800">{{ $gasto->descripcion }}</td>
-                                        <td class="px-4 py-3 font-black text-red-600">-${{ number_format($gasto->precio, 2) }}</td>
-                                        <td class="px-4 py-3 text-right">
+                                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ \Carbon\Carbon::parse($gasto->fecha)->format('h:i A') }}</td>
+                                        <td class="px-4 py-3 font-bold text-blue-600 whitespace-nowrap">{{ $usuarioGasto }}</td>
+                                        <td class="px-4 py-3 font-bold text-gray-800">{{ $descReal }}</td>
+                                        <td class="px-4 py-3 font-black text-red-600 text-right">-${{ number_format($gasto->precio, 2) }}</td>
+                                        <td class="px-4 py-3 text-center">
                                             <form action="{{ route('gastos.destroy', $gasto->id_gastos) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este gasto?')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar Gasto">
+                                                <button type="submit" class="text-red-500 hover:text-red-700 transition-colors bg-red-50 hover:bg-red-100 p-1.5 rounded" title="Eliminar Gasto">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 </button>
                                             </form>
