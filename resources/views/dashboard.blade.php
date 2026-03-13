@@ -5,7 +5,7 @@
     {{-- ENCABEZADO --}}
     <div class="mb-10">
         <h2 class="text-5xl font-black text-gray-900 italic tracking-tighter uppercase mb-2 leading-none">
-            ¡Qué onda, {{ Auth::user()->nombre }}! 🍕
+            ¡Bienvenido de Nuevo, {{ Auth::user()->nombre }}! 
         </h2>
         <div class="h-1.5 w-32 bg-amber-400 rounded-full"></div>
         <p class="text-gray-400 font-bold uppercase tracking-[0.3em] text-xs italic mt-4">
