@@ -50,13 +50,6 @@
         </div>
     @else
         {{-- PANTALLA DE CAJA ACTIVA --}}
-        @php
-            $totalMontoPagos = $stats['efectivo_ventas'] + $stats['tarjeta'] + $stats['transferencia'];
-            $pctEfectivo = $totalMontoPagos > 0 ? round(($stats['efectivo_ventas'] / $totalMontoPagos) * 100, 1) : 0;
-            $pctTarjeta = $totalMontoPagos > 0 ? round(($stats['tarjeta'] / $totalMontoPagos) * 100, 1) : 0;
-            $pctTransferencia = $totalMontoPagos > 0 ? round(($stats['transferencia'] / $totalMontoPagos) * 100, 1) : 0;
-        @endphp
-
         <div class="space-y-8">
             {{-- Encabezado --}}
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -126,10 +119,7 @@
                                             <td class="px-8 py-6 leading-none">
                                                 <div class="flex flex-col">
                                                     <span class="text-slate-700 font-black uppercase tracking-tighter text-[13px]">
-                                                        @if($venta->tipo_servicio == 1) MESA {{ $venta->mesa }} - {{ $venta->nombreClie }}
-                                                        @elseif($venta->tipo_servicio == 2) MOSTRADOR
-                                                        @else {{ $venta->nombreClie ?? 'DOMICILIO' }}
-                                                        @endif
+                                                        {{ $venta->nombre_cliente_formateado }}
                                                     </span>
                                                     <span class="text-[10px] font-bold text-slate-400 mt-1 uppercase">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('h:i a') }}</span>
                                                 </div>
