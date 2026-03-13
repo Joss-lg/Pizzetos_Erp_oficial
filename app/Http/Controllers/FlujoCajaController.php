@@ -43,15 +43,40 @@ class FlujoCajaController extends Controller
         $gastos_detalle = DB::table('Gastos')->where('id_caja', $cajaAbierta->id_caja)->get();
         $stats['total_gastos'] = $gastos_detalle->sum('precio');
 
-        // 2. Obtener Ventas de esta caja (Para mostrar en la tabla)
-        $ventas_detalle = DB::table('Venta')->where('id_caja', $cajaAbierta->id_caja)->get();
+        // 2. Obtener Ventas con MÚLTIPLES MÉTODOS DE PAGO (Corregido para ONLY_FULL_GROUP_BY)
+        $ventas_detalle = DB::table('Venta')
+            ->leftJoin('Pago', 'Venta.id_venta', '=', 'Pago.id_venta')
+            ->leftJoin('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
+            ->where('Venta.id_caja', $cajaAbierta->id_caja)
+            ->select(
+                'Venta.id_venta',
+                'Venta.fecha_hora',
+                'Venta.total',
+                'Venta.status',
+                'Venta.tipo_servicio',
+                'Venta.mesa',
+                'Venta.nombreClie',
+                DB::raw("GROUP_CONCAT(MetodosPago.metodo SEPARATOR ', ') as metodos_pago"),
+                DB::raw("GROUP_CONCAT(CONCAT('$', Pago.monto) SEPARATOR ' + ') as montos_detalle")
+            )
+            ->groupBy(
+                'Venta.id_venta',
+                'Venta.fecha_hora',
+                'Venta.total',
+                'Venta.status',
+                'Venta.tipo_servicio',
+                'Venta.mesa',
+                'Venta.nombreClie'
+            ) 
+            ->orderBy('Venta.id_venta', 'desc')
+            ->get();
         
         // 2.1 Estadísticas IGNORANDO cancelados (status = 3)
         $ventasValidas = $ventas_detalle->where('status', '!=', 3);
         $stats['num_ventas'] = $ventasValidas->count();
         $stats['venta_total'] = $ventasValidas->sum('total');
 
-        // 3. Desglose preciso por método de pago (Los cancelados ya no tienen registros en Pago)
+        // 3. Desglose preciso por método de pago para las tarjetas informativas superiores
         $pagos = DB::table('Pago')
             ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
             ->join('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
