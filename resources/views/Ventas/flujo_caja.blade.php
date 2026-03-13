@@ -2,139 +2,143 @@
 
 @section('content')
 <style>
-    /* Estilos base para asegurar que se vea igual en servidor que en local */
+    /* CSS ESTÁNDAR PARA FORZAR EL DISEÑO EN EL SERVIDOR */
     .pizzetos-card {
         background: #ffffff;
-        border-radius: 40px !important;
+        border-radius: 50px !important; /* Bordes súper redondeados */
         border: 1px solid #f1f5f9;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
         padding: 2.5rem;
+        margin-bottom: 1.5rem;
     }
     .pizzetos-card-dark {
-        background: #1e293b;
-        border-radius: 40px !important;
-        padding: 2.5rem;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        background: #1e293b !important; /* Slate muy oscuro */
+        border-radius: 50px !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        padding: 3rem;
+        color: white;
     }
-    .pizzetos-btn-amber {
-        background: #fbbf24;
-        border-radius: 20px;
-        transition: all 0.3s ease;
+    .pizzetos-input {
+        background: rgba(255,255,255,0.05);
+        border: 2px solid rgba(255,255,255,0.1);
+        border-radius: 30px;
+        padding: 1.5rem;
+        color: white;
+        font-weight: 900;
+        font-style: italic;
+        width: 100%;
+        outline: none;
+    }
+    .pizzetos-btn {
+        background: #fbbf24 !important;
+        border-radius: 30px !important;
+        padding: 1.5rem;
         font-weight: 900;
         text-transform: uppercase;
         font-style: italic;
+        color: #000;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        width: 100%;
     }
-    .pizzetos-btn-amber:hover { background: #f59e0b; transform: translateY(-2px); }
-    .text-huge { font-size: 2.5rem; line-height: 1; }
-    .status-badge {
-        padding: 0.4rem 1rem;
-        border-radius: 99px;
-        font-size: 10px;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+    .pizzetos-btn:hover { transform: scale(1.03); background: #f59e0b !important; }
+    .kpi-title { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; font-style: italic; }
+    .kpi-value { font-size: 2.5rem; font-weight: 900; font-style: italic; letter-spacing: -1px; }
 </style>
 
-<div class="w-full space-y-8 pb-10">
+<div class="w-full space-y-10 pb-12">
 
     @if(!$cajaAbierta)
+        {{-- VISTA APERTURA --}}
         <div class="flex flex-col items-center justify-center py-20">
-            <div class="pizzetos-card w-full max-w-md text-center">
-                <div class="bg-amber-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-amber-600" fill="currentColor" viewBox="0 0 512 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64z"/></svg>
-                </div>
-                <h2 class="text-2xl font-black text-slate-800 italic uppercase mb-2">Apertura de Turno</h2>
-                <p class="text-slate-400 text-sm mb-8 font-medium italic">Ingresa el fondo inicial para comenzar.</p>
-                
-                <form action="{{ route('flujo.caja.abrir') }}" method="POST" class="space-y-6">
+            <div class="pizzetos-card" style="max-width: 450px; text-align: center;">
+                <h2 class="text-3xl font-black italic uppercase text-slate-800 mb-6">Apertura de Turno</h2>
+                <form action="{{ route('flujo.caja.abrir') }}" method="POST">
                     @csrf
-                    <div class="relative">
-                        <span class="absolute left-6 top-5 text-slate-300 font-black text-xl">$</span>
-                        <input type="number" step="0.01" name="monto_inicial" required value="3000.00" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 pl-12 text-2xl font-black text-slate-700 outline-none focus:border-amber-400">
+                    <div style="margin-bottom: 2rem;">
+                        <label class="kpi-title block mb-2">Fondo Inicial</label>
+                        <input type="number" step="0.01" name="monto_inicial" value="3000.00" class="pizzetos-input" style="color: #1e293b; background: #f8fafc; border: 2px solid #e2e8f0; text-align: center; font-size: 2rem;">
                     </div>
-                    <button type="submit" class="w-full pizzetos-btn-amber py-5 text-slate-900 shadow-lg">Abrir Caja</button>
+                    <button type="submit" class="pizzetos-btn">Iniciar Operaciones</button>
                 </form>
             </div>
         </div>
     @else
-        {{-- HEADER --}}
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 px-2">
-            <div class="space-y-1">
-                <div class="flex items-center gap-3">
-                    <span class="status-badge bg-green-100 text-green-700">Sistema en Línea</span>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Apertura: {{ \Carbon\Carbon::parse($cajaAbierta->fecha_apertura)->format('h:i a') }}</span>
-                </div>
-                <h1 class="text-5xl font-black text-slate-900 italic uppercase tracking-tighter">Caja #{{ $cajaAbierta->id_caja }}</h1>
-                <p class="text-sm font-bold text-slate-400 uppercase italic tracking-widest">Responsable: <span class="text-amber-500">{{ $cajaAbierta->cajero_nombre }}</span></p>
+        {{-- HEADER DASHBOARD --}}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4">
+            <div>
+                <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-[10px] font-black uppercase italic tracking-widest border border-green-200">Sistema en Línea</span>
+                <h1 class="text-6xl font-black italic uppercase tracking-tighter text-slate-900 mt-4">Caja #{{ $cajaAbierta->id_caja }}</h1>
+                <p class="text-slate-400 font-bold uppercase italic tracking-widest">Responsable: <span class="text-amber-500">{{ $cajaAbierta->cajero_nombre }}</span></p>
             </div>
             
-            <div class="pizzetos-card-dark flex flex-col items-center justify-center min-w-[240px] !py-6 !bg-amber-400 border-b-8 border-amber-600 shadow-amber-200">
-                <span class="text-[10px] font-black uppercase text-amber-900 tracking-widest mb-1 italic">Fondo de Reserva</span>
-                <span class="text-4xl font-black text-black italic tracking-tighter leading-none">${{ number_format($cajaAbierta->monto_inicial, 2) }}</span>
+            <div class="pizzetos-card" style="background: #fbbf24; border: none; min-width: 280px; text-align: center; padding: 1.5rem 2rem; border-bottom: 8px solid #d97706;">
+                <span class="text-[10px] font-black uppercase text-amber-900 italic tracking-widest">Fondo de Reserva</span>
+                <div class="text-4xl font-black italic text-black tracking-tighter">${{ number_format($cajaAbierta->monto_inicial, 2) }}</div>
             </div>
         </div>
 
         {{-- RESUMEN KPI --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
             <div class="pizzetos-card">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Venta Bruta</span>
-                <h3 class="text-3xl font-black text-slate-800 italic tracking-tighter leading-none">${{ number_format($stats['venta_total_bruta'], 2) }}</h3>
+                <span class="kpi-title">Venta Bruta</span>
+                <div class="kpi-value text-slate-900">${{ number_format($stats['venta_total_bruta'], 2) }}</div>
             </div>
-            <div class="pizzetos-card !bg-slate-800 text-white border-none shadow-slate-200">
-                <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-3 block italic">Folios Emitidos</span>
-                <h3 class="text-4xl font-black italic tracking-tighter leading-none">{{ $stats['num_pedidos'] }}</h3>
+            <div class="pizzetos-card" style="background: #1e293b; border: none;">
+                <span class="kpi-title" style="color: #fbbf24;">Folios Emitidos</span>
+                <div class="kpi-value text-white">{{ $stats['num_pedidos'] }}</div>
             </div>
             <div class="pizzetos-card">
-                <span class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-3 block italic">Gastos Reportados</span>
-                <h3 class="text-3xl font-black text-red-500 italic tracking-tighter leading-none">-${{ number_format($stats['total_gastos'], 2) }}</h3>
+                <span class="kpi-title text-red-400">Gastos Reportados</span>
+                <div class="kpi-value text-red-500">-${{ number_format($stats['total_gastos'], 2) }}</div>
             </div>
-            <div class="pizzetos-card !bg-green-600 text-white border-none shadow-green-200 border-b-8 border-green-800">
-                <span class="text-[10px] font-black text-green-100 uppercase tracking-widest mb-3 block italic">Efectivo Real</span>
-                <h3 class="text-4xl font-black italic tracking-tighter leading-none">${{ number_format($stats['efectivo_real_en_sobre'], 2) }}</h3>
-                <p class="text-[8px] mt-3 font-bold uppercase opacity-70">Neto: Ventas EF - Gastos</p>
+            <div class="pizzetos-card" style="background: #10b981; border: none; border-bottom: 8px solid #047857;">
+                <span class="kpi-title" style="color: #ecfdf5;">Efectivo Real</span>
+                <div class="kpi-value text-white">${{ number_format($stats['efectivo_real_en_sobre'], 2) }}</div>
+                <p class="text-[8px] font-black uppercase text-white opacity-60 mt-2">Neto (Ventas EF - Gastos)</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 px-2">
-            {{-- TABLA --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4">
+            {{-- TABLA DETALLE --}}
             <div class="lg:col-span-2">
-                <div class="pizzetos-card !p-0 overflow-hidden">
-                    <div class="p-8 flex items-center justify-between border-b border-slate-50">
-                        <h3 class="text-xl font-black text-slate-800 italic uppercase tracking-tighter">Auditoría de Operaciones</h3>
-                        <div class="h-1.5 w-16 bg-amber-400 rounded-full"></div>
+                <div class="pizzetos-card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="text-xl font-black italic uppercase text-slate-800">Auditoría de Operaciones</h3>
+                        <div style="width: 60px; height: 6px; background: #fbbf24; border-radius: 10px;"></div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead>
-                                <tr class="bg-slate-50 text-[9px] font-black text-slate-400 uppercase tracking-widest italic">
+                            <thead class="bg-slate-50">
+                                <tr class="text-[9px] font-black text-slate-400 uppercase italic">
                                     <th class="px-8 py-5">Folio</th>
                                     <th class="px-8 py-5">Cliente / Servicio</th>
                                     <th class="px-8 py-5">Pagos</th>
                                     <th class="px-8 py-5 text-right">Monto</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-50 text-sm italic">
+                            <tbody class="divide-y divide-slate-50">
                                 @foreach($ventas_detalle as $venta)
-                                    <tr class="hover:bg-slate-50/50 transition-colors {{ $venta->status == 3 ? 'opacity-30 grayscale' : '' }}">
+                                    <tr class="italic {{ $venta->status == 3 ? 'opacity-30' : '' }}">
                                         <td class="px-8 py-6 font-black text-slate-900">#{{ $venta->id_venta }}</td>
-                                        <td class="px-8 py-6 leading-tight">
+                                        <td class="px-8 py-6">
                                             <div class="flex flex-col">
-                                                <span class="text-slate-800 font-black uppercase text-xs tracking-tighter">{{ $venta->nombre_cliente_formateado }}</span>
-                                                <span class="text-[9px] font-bold text-slate-400 uppercase mt-1">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('h:i a') }}</span>
+                                                <span class="text-slate-800 font-black uppercase text-sm tracking-tighter">{{ $venta->nombre_cliente_formateado }}</span>
+                                                <span class="text-[9px] font-bold text-slate-400 uppercase">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('h:i a') }}</span>
                                             </div>
                                         </td>
                                         <td class="px-8 py-6">
                                             <div class="flex flex-wrap gap-2">
                                                 @foreach(explode(', ', $venta->metodos_pago ?? '') as $m)
-                                                    <span class="px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border {{ $m == 'Efectivo' ? 'bg-green-50 text-green-700 border-green-200' : ($m == 'Tarjeta' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200') }}">
+                                                    <span class="px-2 py-1 rounded-md text-[8px] font-black uppercase border {{ $m == 'Efectivo' ? 'bg-green-50 text-green-600 border-green-200' : ($m == 'Tarjeta' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-purple-50 text-purple-600 border-purple-200') }}">
                                                         {{ $m }}
                                                     </span>
                                                 @endforeach
                                             </div>
                                         </td>
-                                        <td class="px-8 py-6 text-right">
-                                            <span class="text-xl font-black text-slate-900 tracking-tighter italic leading-none">${{ number_format($venta->total, 2) }}</span>
+                                        <td class="px-8 py-6 text-right font-black text-xl text-slate-900 tracking-tighter">
+                                            ${{ number_format($venta->total, 2) }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -144,59 +148,60 @@
                 </div>
             </div>
 
-            {{-- SIDEBAR --}}
+            {{-- PANEL ARQUEO --}}
             <div class="space-y-6">
-                <div class="pizzetos-card">
-                    <h3 class="text-xs font-black text-slate-400 uppercase italic tracking-widest mb-6">Resumen de Métodos</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between p-4 bg-slate-50 rounded-2xl font-black italic text-xs">
-                            <span class="text-slate-400">EFECTIVO</span><span class="text-slate-900">${{ number_format($stats['efectivo_ventas'], 2) }}</span>
+                <div class="pizzetos-card" style="padding: 2rem;">
+                    <h3 class="kpi-title mb-6 block text-center">Resumen de Métodos</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between font-black italic text-sm">
+                            <span class="text-slate-400">EFECTIVO:</span><span class="text-slate-900">${{ number_format($stats['efectivo_ventas'], 2) }}</span>
                         </div>
-                        <div class="flex justify-between p-4 bg-slate-50 rounded-2xl font-black italic text-xs">
-                            <span class="text-slate-400">TARJETAS</span><span class="text-slate-900">${{ number_format($stats['tarjeta'], 2) }}</span>
+                        <div class="flex justify-between font-black italic text-sm">
+                            <span class="text-slate-400">TARJETAS:</span><span class="text-slate-900">${{ number_format($stats['tarjeta'], 2) }}</span>
                         </div>
-                        <div class="flex justify-between p-4 bg-slate-50 rounded-2xl font-black italic text-xs">
-                            <span class="text-slate-400">TRANSF.</span><span class="text-slate-900">${{ number_format($stats['transferencia'], 2) }}</span>
+                        <div class="flex justify-between font-black italic text-sm">
+                            <span class="text-slate-400">TRANSF.:</span><span class="text-slate-900">${{ number_format($stats['transferencia'], 2) }}</span>
                         </div>
                     </div>
                 </div>
 
-                {{-- PANEL CIERRE --}}
                 <div x-data="{ modal: false, contado: '', esperado: {{ $stats['efectivo_real_en_sobre'] }} }">
-                    <div class="pizzetos-card-dark !bg-slate-900 border-t-8 border-amber-400">
-                        <h3 class="text-2xl font-black text-white italic uppercase tracking-tighter text-center mb-8">Arqueo Final</h3>
-                        <form id="formCerrar" action="{{ route('flujo.caja.cerrar', $cajaAbierta->id_caja) }}" method="POST" class="space-y-6">
+                    <div class="pizzetos-card-dark" style="border-top: 10px solid #fbbf24;">
+                        <h3 class="text-3xl font-black italic uppercase text-center mb-8">Arqueo Final</h3>
+                        <form id="formCerrar" action="{{ route('flujo.caja.cerrar', $cajaAbierta->id_caja) }}" method="POST">
                             @csrf
-                            <div>
-                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] text-center mb-4 italic">Conteo Físico Real</label>
-                                <div class="relative">
-                                    <span class="absolute left-6 top-5 text-amber-400 font-black text-2xl leading-none italic">$</span>
-                                    <input type="number" step="0.01" name="monto_final" x-model="contado" required class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-white italic tracking-tighter outline-none focus:border-amber-400">
+                            <div class="text-center mb-8">
+                                <label class="kpi-title block mb-4" style="color: #94a3b8;">Conteo Físico Real</label>
+                                <div style="position: relative;">
+                                    <span style="position: absolute; left: 20px; top: 20px; color: #fbbf24; font-size: 2rem; font-weight: 900;">$</span>
+                                    <input type="number" step="0.01" name="monto_final" x-model="contado" required class="pizzetos-input" style="font-size: 3rem; text-align: center; padding-left: 3rem;">
                                 </div>
                             </div>
 
-                            <div class="bg-white/5 rounded-2xl p-6 space-y-4 font-black uppercase italic text-[10px]">
-                                <div class="flex justify-between"><span class="text-slate-500">Balance Sist:</span><span class="text-white">${{ number_format($stats['efectivo_real_en_sobre'], 2) }}</span></div>
-                                <div class="flex justify-between pt-4 border-t border-white/10 text-sm">
-                                    <span class="text-amber-400">Diferencia:</span>
-                                    <span :class="(contado - esperado) > 0 ? 'text-green-400' : ((contado - esperado) < 0 ? 'text-red-400' : 'text-white')" x-text="contado === '' ? '$0.00' : '$' + (contado - esperado).toFixed(2)"></span>
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 20px; margin-bottom: 2rem;">
+                                <div class="flex justify-between text-[10px] font-black uppercase italic mb-2">
+                                    <span style="color: #64748b;">En Sistema:</span>
+                                    <span class="text-white">${{ number_format($stats['efectivo_real_en_sobre'], 2) }}</span>
+                                </div>
+                                <div class="flex justify-between font-black italic border-t border-white/10 pt-3">
+                                    <span style="color: #fbbf24; font-size: 11px;">DIFERENCIA:</span>
+                                    <span style="font-size: 1.2rem;" :class="(contado - esperado) > 0 ? 'text-green-400' : ((contado - esperado) < 0 ? 'text-red-400' : 'text-white')" x-text="contado === '' ? '$0.00' : '$' + (contado - esperado).toFixed(2)"></span>
                                 </div>
                             </div>
 
-                            <button type="button" @click="if(contado !== '') { modal = true } else { alert('Ingresa el monto contado.') }" class="w-full pizzetos-btn-amber py-6 text-sm">Finalizar Turno</button>
-                            
-                            <div class="text-center">
-                                <a href="{{ route('flujo.caja.pdf', $cajaAbierta->id_caja) }}" target="_blank" class="text-white/30 hover:text-amber-400 text-[9px] font-black uppercase underline italic tracking-widest transition-all">Vista Previa PDF</a>
+                            <button type="button" @click="if(contado !== '') { modal = true } else { alert('Ingresa el monto físico.') }" class="pizzetos-btn">Finalizar Turno</button>
+                            <div style="text-align: center; margin-top: 1.5rem;">
+                                <a href="{{ route('flujo.caja.pdf', $cajaAbierta->id_caja) }}" target="_blank" style="color: rgba(255,255,255,0.3); font-size: 9px; font-weight: 900; text-transform: uppercase; text-decoration: underline;">Vista Previa PDF</a>
                             </div>
 
                             {{-- MODAL --}}
-                            <div x-show="modal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-sm">
-                                <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm p-12 text-center">
-                                    <h3 class="text-2xl font-black text-slate-900 italic uppercase mb-4 leading-none">¿Confirmar Cierre?</h3>
-                                    <p class="text-slate-400 text-xs font-bold uppercase italic mb-10">Se bloquearán los folios y se debe retirar el fondo de reserva de ${{ number_format($cajaAbierta->monto_inicial, 2) }}.</p>
+                            <div x-show="modal" x-cloak style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem;">
+                                <div class="pizzetos-card" style="max-width: 400px; text-align: center;">
+                                    <h3 class="text-2xl font-black italic uppercase text-slate-900 mb-4">¿Confirmar?</h3>
+                                    <p class="text-slate-400 font-bold italic text-sm mb-8 uppercase">El fondo de reserva de ${{ number_format($cajaAbierta->monto_inicial, 2) }} debe ser retirado ahora.</p>
                                     <div class="flex gap-4">
-                                        <button @click="modal = false" type="button" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-xl text-[10px] uppercase italic">Cancelar</button>
-                                        <button type="button" @click="document.getElementById('formCerrar').submit()" class="flex-1 bg-red-600 text-white font-black py-4 rounded-xl text-[10px] uppercase italic shadow-lg shadow-red-200">Confirmar</button>
+                                        <button @click="modal = false" type="button" class="pizzetos-btn" style="background: #e2e8f0 !important; font-size: 10px;">Cancelar</button>
+                                        <button type="button" @click="document.getElementById('formCerrar').submit()" class="pizzetos-btn" style="background: #ef4444 !important; color: white !important; font-size: 10px;">Confirmar</button>
                                     </div>
                                 </div>
                             </div>
