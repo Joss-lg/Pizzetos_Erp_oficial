@@ -4,35 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class SucursalesController extends Controller
 {
     public function index()
     {
-        $sucursales = DB::table('sucursal')->get();
-        return view('sucursales.index', compact('sucursales'));
+        $sucursales = DB::table('Sucursales')->get();
+        return view('recursos.sucursales.index', compact('sucursales'));
     }
 
     public function create()
     {
-        return view('sucursales.create');
+        return view('recursos.sucursales.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'direccion' => 'required|string',
-            'telefono' => 'required|string|max:20'
+            'ubicacion' => 'nullable|string'
         ]);
 
-        DB::table('sucursal')->insert([
+        // Eliminamos created_at y updated_at porque no existen en tu BD
+        DB::table('Sucursales')->insert([
             'nombre' => $request->nombre,
-            'direccion' => $request->direccion,
-            'telefono' => $request->telefono,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
+            'ubicacion' => $request->ubicacion,
+            'status' => 1
         ]);
 
         return redirect()->route('sucursales.index')->with('success', 'Sucursal añadida correctamente.');
@@ -40,23 +37,24 @@ class SucursalesController extends Controller
 
     public function edit($id)
     {
-        $sucursal = DB::table('sucursal')->where('id_suc', $id)->first();
-        return view('sucursales.edit', compact('sucursal'));
+        // Buscamos por id_suc en la tabla Sucursales
+        $sucursal = DB::table('Sucursales')->where('id_suc', $id)->first();
+        
+        if (!$sucursal) abort(404);
+
+        return view('recursos.sucursales.edit', compact('sucursal'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'direccion' => 'required|string',
-            'telefono' => 'required|string|max:20'
+            'ubicacion' => 'nullable|string'
         ]);
         
-        DB::table('sucursal')->where('id_suc', $id)->update([
+        DB::table('Sucursales')->where('id_suc', $id)->update([
             'nombre' => $request->nombre,
-            'direccion' => $request->direccion,
-            'telefono' => $request->telefono,
-            'updated_at' => Carbon::now()
+            'ubicacion' => $request->ubicacion
         ]);
         
         return redirect()->route('sucursales.index')->with('success', 'Sucursal actualizada correctamente.');
@@ -64,7 +62,7 @@ class SucursalesController extends Controller
 
     public function destroy($id)
     {
-        DB::table('sucursal')->where('id_suc', $id)->delete();
-        return redirect()->route('sucursales.index')->with('success', 'Sucursal eliminada correctamente.');
+        DB::table('Sucursales')->where('id_suc', $id)->update(['status' => 0]);
+        return redirect()->route('sucursales.index')->with('success', 'Sucursal desactivada correctamente.');
     }
 }

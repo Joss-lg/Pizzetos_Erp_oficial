@@ -9,7 +9,6 @@
     <style>
         [x-cloak] { display: none !important; }
         .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        /* Evita el parpadeo y suaviza iconos */
         svg { flex-shrink: 0; }
         .nav-link-active { @apply bg-black text-amber-400 shadow-lg; }
     </style>
@@ -153,7 +152,7 @@
                 </button>
                 <div class="hidden md:block">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic leading-none">Pizzetos Management</h2>
-                    <p class="text-xs font-bold text-slate-600 mt-1">Oaxaca de Juárez</p>
+                    <p class="text-xs font-bold text-slate-600 mt-1">Pizzetos-POS</p>
                 </div>
             </div>
 
