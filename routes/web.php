@@ -23,14 +23,13 @@ use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\VentasController;
 use App\Http\Controllers\FlujoCajaController;
 use App\Http\Controllers\PedidosController;
-use App\Http\Controllers\AnticiposController;
 use App\Http\Controllers\GastosController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\PuntoVentaController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes - Sistema Pizzetos (Versión Final Blindada)
 |--------------------------------------------------------------------------
 */
 
@@ -45,15 +44,59 @@ Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 
-// --- RUTAS PROTEGIDAS
+// =====================================================================
+// SECCIÓN 1: ACCESO GENERAL (Administrador y Cajeros)
+// =====================================================================
 Route::middleware(['auth'])->group(function () {
     
-    // Dashboard Principal
+    // Dashboard Principal (Esencial para evitar el error 404 al loguear)
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
 
-    // --- MÓDULO DE EMPLEADOS ---
+    // --- PUNTO DE VENTA (POS) ---
+    Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos');
+    Route::post('/venta/pos/guardar', [PuntoVentaController::class, 'store'])->name('ventas.pos.store');
+    Route::get('/venta/pos/ticket/{id}', [PuntoVentaController::class, 'ticket'])->name('ventas.pos.ticket');
+    Route::get('/venta/resume', [VentasController::class, 'resume'])->name('ventas.resume');
+    Route::post('/venta/pagar', [PuntoVentaController::class, 'pagarOrden'])->name('ventas.pagar');
+
+    // --- MONITOR DE PEDIDOS Y ENVÍOS ---
+    Route::get('/venta/pedidos', [PedidosController::class, 'index'])->name('ventas.pedidos');
+    Route::put('/venta/pedidos/{id}/status', [PedidosController::class, 'cambiarStatus'])->name('ventas.pedidos.status');
+
+    // --- FLUJO DE CAJA (Apertura y Cierre) ---
+    Route::get('/venta/flujo-caja', [FlujoCajaController::class, 'index'])->name('flujo.caja.index');
+    Route::post('/venta/flujo-caja/abrir', [FlujoCajaController::class, 'abrirCaja'])->name('flujo.caja.abrir');
+    Route::post('/venta/flujo-caja/cerrar/{id}', [FlujoCajaController::class, 'cerrarCaja'])->name('flujo.caja.cerrar');
+    Route::get('/venta/flujo-caja/pdf/{id}', [FlujoCajaController::class, 'descargarPdf'])->name('flujo.caja.pdf');
+
+    // --- CLIENTES (Consulta y Registro rápido) ---
+    Route::get('/clientes', [ClientesController::class, 'index'])->name('clientes.index');
+    Route::get('/clientes/crear', [ClientesController::class, 'create'])->name('clientes.create');
+    Route::post('/clientes', [ClientesController::class, 'store'])->name('clientes.store');
+
+});
+
+
+// =====================================================================
+// SECCIÓN 2: ACCESO RESTRINGIDO (Solo Administrador - Middleware 'admin')
+// =====================================================================
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    // --- SEGURIDAD FINANCIERA ---
+    Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');
+    Route::post('/venta/editar-pago', [PuntoVentaController::class, 'editarPago'])->name('ventas.editar_pago');
+
+    // --- GESTIÓN AVANZADA DE CLIENTES ---
+    Route::get('/clientes/{id}/editar', [ClientesController::class, 'edit'])->name('clientes.edit');
+    Route::put('/clientes/{id}', [ClientesController::class, 'update'])->name('clientes.update');
+    Route::put('/clientes/{id}/desactivar', [ClientesController::class, 'destroy'])->name('clientes.destroy'); 
+    Route::put('/clientes/{id}/activar', [ClientesController::class, 'activar'])->name('clientes.activar'); 
+    Route::post('/clientes/{id}/direcciones', [ClientesController::class, 'storeDireccion'])->name('clientes.storeDireccion');
+    Route::delete('/direcciones/{id}', [ClientesController::class, 'destroyDireccion'])->name('clientes.destroyDireccion');
+
+    // --- GESTIÓN DE EMPLEADOS ---
     Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados.index');
     Route::get('/empleados/crear', [EmpleadoController::class, 'create'])->name('empleados.create');
     Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados.store');
@@ -62,11 +105,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/empleados/{id}', [EmpleadoController::class, 'destroy'])->name('empleados.destroy');
     Route::patch('/empleados/{id}/estado', [EmpleadoController::class, 'toggleStatus'])->name('empleados.status');
 
-    // --- MÓDULO DE CORTE MENSUAL ---
+    // --- REPORTES Y CORTES CRÍTICOS ---
     Route::get('/corte-mensual', [CorteController::class, 'index'])->name('corte.index');
     Route::get('/corte-mensual/dia/{fecha}', [CorteController::class, 'getDetalleDia'])->name('corte.dia');
+    Route::get('/venta/flujo-caja/historial', [FlujoCajaController::class, 'historial'])->name('flujo.caja.historial');
 
-   // --- MÓDULO DE PRODUCTOS: PIZZAS ---
+    // --- CATÁLOGO DE PRODUCTOS (Configuración de Precios) ---
+    
+    // Pizzas
     Route::get('/productos/pizzas', [PizzaController::class, 'index'])->name('pizzas.index');
     Route::get('/productos/pizzas/crear', [PizzaController::class, 'create'])->name('pizzas.create');
     Route::post('/productos/pizzas', [PizzaController::class, 'store'])->name('pizzas.store');
@@ -74,7 +120,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/pizzas/{id}', [PizzaController::class, 'update'])->name('pizzas.update');
     Route::delete('/productos/pizzas/{id}', [PizzaController::class, 'destroy'])->name('pizzas.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: ALITAS ---
+    // Alitas
     Route::get('/productos/alitas', [AlitasController::class, 'index'])->name('alitas.index');
     Route::get('/productos/alitas/crear', [AlitasController::class, 'create'])->name('alitas.create');
     Route::post('/productos/alitas', [AlitasController::class, 'store'])->name('alitas.store');
@@ -82,7 +128,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/alitas/{id}', [AlitasController::class, 'update'])->name('alitas.update');
     Route::delete('/productos/alitas/{id}', [AlitasController::class, 'destroy'])->name('alitas.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: COSTILLAS ---
+    // Costillas
     Route::get('/productos/costillas', [CostillasController::class, 'index'])->name('costillas.index');
     Route::get('/productos/costillas/crear', [CostillasController::class, 'create'])->name('costillas.create');
     Route::post('/productos/costillas', [CostillasController::class, 'store'])->name('costillas.store');
@@ -90,7 +136,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/costillas/{id}', [CostillasController::class, 'update'])->name('costillas.update');
     Route::delete('/productos/costillas/{id}', [CostillasController::class, 'destroy'])->name('costillas.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: HAMBURGUESAS ---
+    // Hamburguesas
     Route::get('/productos/hamburguesas', [HamburguesasController::class, 'index'])->name('hamburguesas.index');
     Route::get('/productos/hamburguesas/crear', [HamburguesasController::class, 'create'])->name('hamburguesas.create');
     Route::post('/productos/hamburguesas', [HamburguesasController::class, 'store'])->name('hamburguesas.store');
@@ -98,7 +144,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/hamburguesas/{id}', [HamburguesasController::class, 'update'])->name('hamburguesas.update');
     Route::delete('/productos/hamburguesas/{id}', [HamburguesasController::class, 'destroy'])->name('hamburguesas.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: MAGNO ---
+    // Magno
     Route::get('/productos/magno', [MagnoController::class, 'index'])->name('magno.index');
     Route::get('/productos/magno/crear', [MagnoController::class, 'create'])->name('magno.create');
     Route::post('/productos/magno', [MagnoController::class, 'store'])->name('magno.store');
@@ -106,7 +152,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/magno/{id}', [MagnoController::class, 'update'])->name('magno.update');
     Route::delete('/productos/magno/{id}', [MagnoController::class, 'destroy'])->name('magno.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: PAPAS ---
+    // Papas
     Route::get('/productos/papas', [PapasController::class, 'index'])->name('papas.index');
     Route::get('/productos/papas/crear', [PapasController::class, 'create'])->name('papas.create');
     Route::post('/productos/papas', [PapasController::class, 'store'])->name('papas.store');
@@ -114,7 +160,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/papas/{id}', [PapasController::class, 'update'])->name('papas.update');
     Route::delete('/productos/papas/{id}', [PapasController::class, 'destroy'])->name('papas.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: MARISCOS ---
+    // Mariscos
     Route::get('/productos/mariscos', [MariscosController::class, 'index'])->name('mariscos.index');
     Route::get('/productos/mariscos/crear', [MariscosController::class, 'create'])->name('mariscos.create');
     Route::post('/productos/mariscos', [MariscosController::class, 'store'])->name('mariscos.store');
@@ -122,7 +168,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/mariscos/{id}', [MariscosController::class, 'update'])->name('mariscos.update');
     Route::delete('/productos/mariscos/{id}', [MariscosController::class, 'destroy'])->name('mariscos.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: RECTANGULAR ---
+    // Rectangular
     Route::get('/productos/rectangular', [RectangularController::class, 'index'])->name('rectangular.index');
     Route::get('/productos/rectangular/crear', [RectangularController::class, 'create'])->name('rectangular.create');
     Route::post('/productos/rectangular', [RectangularController::class, 'store'])->name('rectangular.store');
@@ -130,7 +176,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/rectangular/{id}', [RectangularController::class, 'update'])->name('rectangular.update');
     Route::delete('/productos/rectangular/{id}', [RectangularController::class, 'destroy'])->name('rectangular.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: REFRESCOS ---
+    // Refrescos
     Route::get('/productos/refrescos', [RefrescosController::class, 'index'])->name('refrescos.index');
     Route::get('/productos/refrescos/crear', [RefrescosController::class, 'create'])->name('refrescos.create');
     Route::post('/productos/refrescos', [RefrescosController::class, 'store'])->name('refrescos.store');
@@ -138,7 +184,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/refrescos/{id}', [RefrescosController::class, 'update'])->name('refrescos.update');
     Route::delete('/productos/refrescos/{id}', [RefrescosController::class, 'destroy'])->name('refrescos.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: SPAGUETTY ---
+    // Spaguetty
     Route::get('/productos/spaguetty', [SpaguettyController::class, 'index'])->name('spaguetty.index');
     Route::get('/productos/spaguetty/crear', [SpaguettyController::class, 'create'])->name('spaguetty.create');
     Route::post('/productos/spaguetty', [SpaguettyController::class, 'store'])->name('spaguetty.store');
@@ -146,7 +192,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/spaguetty/{id}', [SpaguettyController::class, 'update'])->name('spaguetty.update');
     Route::delete('/productos/spaguetty/{id}', [SpaguettyController::class, 'destroy'])->name('spaguetty.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: ESPECIALIDADES ---
+    // Especialidades
     Route::get('/productos/especialidades', [EspecialidadesController::class, 'index'])->name('especialidades.index');
     Route::get('/productos/especialidades/crear', [EspecialidadesController::class, 'create'])->name('especialidades.create');
     Route::post('/productos/especialidades', [EspecialidadesController::class, 'store'])->name('especialidades.store');
@@ -154,7 +200,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/especialidades/{id}', [EspecialidadesController::class, 'update'])->name('especialidades.update');
     Route::delete('/productos/especialidades/{id}', [EspecialidadesController::class, 'destroy'])->name('especialidades.destroy');
 
-    // --- MÓDULO DE PRODUCTOS: BARRA ---
+    // Barra
     Route::get('/productos/barra', [BarraController::class, 'index'])->name('barra.index');
     Route::get('/productos/barra/crear', [BarraController::class, 'create'])->name('barra.create');
     Route::post('/productos/barra', [BarraController::class, 'store'])->name('barra.store');
@@ -162,7 +208,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/productos/barra/{id}', [BarraController::class, 'update'])->name('barra.update');
     Route::delete('/productos/barra/{id}', [BarraController::class, 'destroy'])->name('barra.destroy');
 
-    // --- MÓDULO DE RECURSOS:  CATEGORÍAS ---
+    // --- RECURSOS DEL SISTEMA ---
     Route::get('/recursos/categorias', [CategoriasController::class, 'index'])->name('categorias.index');
     Route::get('/recursos/categorias/crear', [CategoriasController::class, 'create'])->name('categorias.create');
     Route::post('/recursos/categorias', [CategoriasController::class, 'store'])->name('categorias.store');
@@ -170,7 +216,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/recursos/categorias/{id}', [CategoriasController::class, 'update'])->name('categorias.update');
     Route::delete('/recursos/categorias/{id}', [CategoriasController::class, 'destroy'])->name('categorias.destroy');
 
-    // --- SUCURSALES ---
     Route::get('/recursos/sucursales', [SucursalesController::class, 'index'])->name('sucursales.index');
     Route::get('/recursos/sucursales/crear', [SucursalesController::class, 'create'])->name('sucursales.create');
     Route::post('/recursos/sucursales', [SucursalesController::class, 'store'])->name('sucursales.store');
@@ -178,7 +223,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/recursos/sucursales/{id}', [SucursalesController::class, 'update'])->name('sucursales.update');
     Route::delete('/recursos/sucursales/{id}', [SucursalesController::class, 'destroy'])->name('sucursales.destroy');
 
-    // --- CARGOS ---
     Route::get('/recursos/cargos', [CargosController::class, 'index'])->name('cargos.index');
     Route::get('/recursos/cargos/crear', [CargosController::class, 'create'])->name('cargos.create');
     Route::post('/recursos/cargos', [CargosController::class, 'store'])->name('cargos.store');
@@ -186,52 +230,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/recursos/cargos/{id}', [CargosController::class, 'update'])->name('cargos.update');
     Route::delete('/recursos/cargos/{id}', [CargosController::class, 'destroy'])->name('cargos.destroy');
 
-    // --- CLIENTES ---
-    Route::get('/clientes', [ClientesController::class, 'index'])->name('clientes.index');
-    Route::get('/clientes/crear', [ClientesController::class, 'create'])->name('clientes.create');
-    Route::post('/clientes', [ClientesController::class, 'store'])->name('clientes.store');
-    Route::get('/clientes/{id}/editar', [ClientesController::class, 'edit'])->name('clientes.edit');
-    Route::put('/clientes/{id}', [ClientesController::class, 'update'])->name('clientes.update');
-    Route::put('/clientes/{id}/desactivar', [ClientesController::class, 'destroy'])->name('clientes.destroy'); 
-    Route::put('/clientes/{id}/activar', [ClientesController::class, 'activar'])->name('clientes.activar'); 
-    Route::post('/clientes/{id}/direcciones', [ClientesController::class, 'storeDireccion'])->name('clientes.storeDireccion');
-    Route::delete('/direcciones/{id}', [ClientesController::class, 'destroyDireccion'])->name('clientes.destroyDireccion');
-
-    // =====================================================================
-    // MÓDULO DE VENTAS
-    // =====================================================================
-    Route::get('/venta/resume', [VentasController::class, 'resume'])->name('ventas.resume');
-
-    // --- FLUJO DE CAJA ---
-    Route::get('/venta/flujo-caja', [FlujoCajaController::class, 'index'])->name('flujo.caja.index');
-    Route::get('/venta/flujo-caja/historial', [FlujoCajaController::class, 'historial'])->name('flujo.caja.historial');
-    Route::post('/venta/flujo-caja/abrir', [FlujoCajaController::class, 'abrirCaja'])->name('flujo.caja.abrir');
-    Route::post('/venta/flujo-caja/cerrar/{id}', [FlujoCajaController::class, 'cerrarCaja'])->name('flujo.caja.cerrar');
-    Route::get('/venta/flujo-caja/pdf/{id}', [FlujoCajaController::class, 'descargarPdf'])->name('flujo.caja.pdf');
-
-    // --- MONITOR DE PEDIDOS (COCINA/ENTREGA) ---
-    Route::get('/venta/pedidos', [PedidosController::class, 'index'])->name('ventas.pedidos');
-    Route::put('/venta/pedidos/{id}/status', [PedidosController::class, 'cambiarStatus'])->name('ventas.pedidos.status');
-
-    // --- PEDIDOS ESPECIALES / ANTICIPOS ---
-    Route::get('/venta/anticipos', [AnticiposController::class, 'index'])->name('ventas.anticipos');
-
-    // --- GASTOS ---
+    // --- GASTOS Y CONFIGURACIÓN ---
     Route::get('/venta/gastos', [GastosController::class, 'index'])->name('gastos.index');
     Route::post('/venta/gastos', [GastosController::class, 'store'])->name('gastos.store');
     Route::delete('/venta/gastos/{id}', [GastosController::class, 'destroy'])->name('gastos.destroy');
-
-    // --- CONFIGURACIÓN POS ---
     Route::get('/Conf/configuracion', [ConfiguracionController::class, 'index'])->name('ventas.configuracion');
-    
-    // --- PUNTO DE VENTA (POS) ---
-    Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos');
-    Route::post('/venta/pos/guardar', [PuntoVentaController::class, 'store'])->name('ventas.pos.store');
-    Route::get('/venta/pos/ticket/{id}', [PuntoVentaController::class, 'ticket'])->name('ventas.pos.ticket');
-    
-    // --- NUEVAS RUTAS DE PAGOS Y CANCELACIONES ---
-    Route::post('/venta/pagar', [PuntoVentaController::class, 'pagarOrden'])->name('ventas.pagar');
-    Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');
-    Route::post('/venta/editar-pago', [PuntoVentaController::class, 'editarPago'])->name('ventas.editar_pago');
 
-});
+    }); // Fin Grupo Admin
