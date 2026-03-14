@@ -39,16 +39,16 @@
             width: 150px;
             height: auto;
             margin-bottom: 5px;
-            /* Filtro opcional para mejorar impresión en térmicas blanco y negro */
             filter: grayscale(100%) contrast(1.2);
         }
 
         @media print {
             body { padding: 0; width: 100%; }
+            .no-print { display: none; }
         }
     </style>
 </head>
-<body onload="window.print()">
+<body>
 
     <div class="text-center mb-1">
         {{-- LOGO DE LA PIZZERÍA --}}
@@ -58,7 +58,7 @@
         
         {{-- ACTUALIZACIÓN: USANDO FOLIO VIRTUAL CRONOLÓGICO --}}
         <div class="font-bold mt-1" style="font-size: 16px;">
-            FOLIO: {{ $venta->folio_virtual }}
+            FOLIO: {{ $venta->folio_virtual ?? $venta->id_venta }}
         </div>
         
         <div style="font-size: 12px;">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</div>
@@ -78,12 +78,12 @@
     @if($venta->tipo_servicio == 3 && $domicilio)
         <div class="mb-1" style="font-size: 12px;">
             <div class="font-bold" style="font-size: 14px;">CLIENTE:</div>
-            <div>{{ trim($domicilio->cnombre . ' ' . $domicilio->capellido) }}</div>
-            <div><span class="font-bold">TEL:</span> {{ $domicilio->telefono }}</div>
-            <div class="mt-1"><span class="font-bold">DIR:</span> {{ $domicilio->calle }}</div>
-            <div><span class="font-bold">COL:</span> {{ $domicilio->colonia }}</div>
-            <div><span class="font-bold">MZ:</span> {{ $domicilio->manzana }} | <span class="font-bold">LT:</span> {{ $domicilio->lote }}</div>
-            @if($domicilio->referencia)
+            <div>{{ trim(($domicilio->cnombre ?? '') . ' ' . ($domicilio->capellido ?? '')) }}</div>
+            <div><span class="font-bold">TEL:</span> {{ $domicilio->telefono ?? 'S/N' }}</div>
+            <div class="mt-1"><span class="font-bold">DIR:</span> {{ $domicilio->calle ?? 'S/N' }}</div>
+            <div><span class="font-bold">COL:</span> {{ $domicilio->colonia ?? 'S/N' }}</div>
+            <div><span class="font-bold">MZ:</span> {{ $domicilio->manzana ?? '-' }} | <span class="font-bold">LT:</span> {{ $domicilio->lote ?? '-' }}</div>
+            @if(isset($domicilio->referencia) && $domicilio->referencia)
                 <div><span class="font-bold">REF:</span> {{ $domicilio->referencia }}</div>
             @endif
         </div>
@@ -133,8 +133,8 @@
     </div>
 
     @if($venta->comentarios)
-        <div class="text-center font-bold border-bottom" style="padding: 5px 0; font-size: 12px;">
-            ** {{ $venta->comentarios }} **
+        <div class="text-center font-bold border-bottom" style="padding: 5px 0; font-size: 11px;">
+            {{ $venta->comentarios }}
         </div>
     @endif
 
@@ -145,7 +145,7 @@
         </div>
     @else
         <div style="margin-top: 10px;">
-            <div class="font-bold mb-1" style="font-size: 14px;">MÉTODO DE PAGO:</div>
+            <div class="font-bold mb-1" style="font-size: 13px;">MÉTODO DE PAGO:</div>
             
             @foreach($pagos as $pago)
                 <div style="margin-bottom: 4px;">
@@ -186,6 +186,26 @@
     <div class="text-center mt-1 pt-1" style="margin-top: 20px; font-size: 12px; font-weight: bold;">
         ¡GRACIAS POR SU PREFERENCIA!
     </div>
+
+    {{-- LÓGICA DE AUTO-IMPRESIÓN Y AUTO-CIERRE DE POPUP --}}
+    <script>
+        window.onload = function() {
+            // Disparar la impresión en cuanto cargue la página
+            window.print();
+        };
+
+        // Escuchar el evento después de que se cierre el cuadro de diálogo de impresión
+        window.onafterprint = function() {
+            // Cerrar la ventana emergente automáticamente
+            window.close();
+        };
+
+        // Seguridad para navegadores que no soportan onafterprint
+        // Si el usuario no interactuó con la impresión en 1 minuto, intentar cerrar.
+        setTimeout(() => {
+            // window.close(); 
+        }, 60000);
+    </script>
 
 </body>
 </html>

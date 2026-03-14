@@ -109,7 +109,7 @@
         </thead>
         <tbody>
             <tr>
-                <td><b>EFECTIVO (SENCILLEZ Y VENTA)</b></td>
+                <td><b>EFECTIVO (VENTAS)</b></td>
                 <td>${{ number_format($stats['efectivo'], 2) }}</td>
                 <td class="text-red">-${{ number_format($stats['total_gastos'], 2) }}</td>
                 <td style="text-align: right;" class="text-green"><b>${{ number_format($stats['efectivo_esperado'], 2) }}</b></td>

@@ -106,7 +106,6 @@
                             }
                         @endphp
                         <tr class="transition-all {{ $venta->status == 3 ? 'bg-red-50/50 grayscale-[0.5]' : 'hover:bg-white' }}">
-                            {{-- FOLIO VIRTUAL --}}
                             <td class="px-6 py-6 font-black text-slate-900 folio-badge text-base">
                                 #{{ $venta->folio_virtual }}
                             </td>
@@ -174,9 +173,10 @@
                                         </button>
                                     @endif
 
-                                    <a href="/venta/pos/ticket/{{ $venta->id_venta }}" target="_blank" title="Imprimir" class="hover:scale-110 text-slate-400 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
+                                    {{-- BOTÓN REIMPRIMIR CON POPUP --}}
+                                    <button @click="imprimirTicketPop({{ $venta->id_venta }})" title="Reimprimir" class="hover:scale-110 text-slate-400 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -227,7 +227,6 @@
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-4">
-                {{-- Efectivo --}}
                 <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.efectivo.activo ? 'border-amber-400 shadow-lg shadow-amber-50' : 'border-slate-100'">
                     <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                         <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-5 h-5 rounded-lg border-gray-300 text-amber-400 focus:ring-amber-400">
@@ -247,7 +246,6 @@
                     </div>
                 </div>
 
-                {{-- Tarjeta --}}
                 <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.tarjeta.activo ? 'border-amber-400 shadow-lg shadow-amber-50' : 'border-slate-100'">
                     <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                         <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-5 h-5 rounded-lg border-gray-300 text-amber-400 focus:ring-amber-400">
@@ -259,7 +257,6 @@
                     </div>
                 </div>
 
-                {{-- Transferencia --}}
                 <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.transferencia.activo ? 'border-amber-400 shadow-lg shadow-amber-50' : 'border-slate-100'">
                     <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                         <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-5 h-5 rounded-lg border-gray-300 text-amber-400 focus:ring-amber-400">
@@ -306,6 +303,20 @@
                     efectivo: { activo: false, monto: null, entregado: null },
                     tarjeta: { activo: false, monto: null },
                     transferencia: { activo: false, monto: null, referencia: '' }
+                },
+
+                // FUNCIÓN PARA ABRIR EL TICKET EN POPUP
+                imprimirTicketPop(id) {
+                    const width = 400;
+                    const height = 650;
+                    const left = (window.screen.width / 2) - (width / 2);
+                    const top = (window.screen.height / 2) - (height / 2);
+                    
+                    window.open(
+                        '/venta/pos/ticket/' + id, 
+                        'TicketPizzetos', 
+                        `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
+                    );
                 },
 
                 abrirCancelar(id, folio) {
@@ -390,7 +401,10 @@
                     }).then(r => r.json()).then(res => {
                         if(res.success) {
                             this.modalPago = false;
-                            if(!this.es_edicion_pago) window.open('/venta/pos/ticket/' + this.id_venta_pago, 'Ticket', 'width=400,height=600');
+                            if(!this.es_edicion_pago) {
+                                // ABRIR TICKET EN POPUP AL COBRAR
+                                this.imprimirTicketPop(this.id_venta_pago);
+                            }
                             setTimeout(() => { window.location.reload(); }, 1000);
                         } else { 
                             alert("Error: " + res.message); 

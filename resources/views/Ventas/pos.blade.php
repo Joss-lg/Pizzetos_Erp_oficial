@@ -9,13 +9,28 @@
 </style>
 
 @if(!$cajaAbierta)
-    <div class="w-full flex flex-col items-center justify-center min-h-[70vh]">
-        <div class="bg-white border border-gray-200 rounded-xl p-8 text-center max-w-lg shadow-sm">
-            <h3 class="text-2xl font-black text-gray-800 mb-2">¡Caja Cerrada!</h3>
-            <p class="text-gray-500 mb-6">Para empezar a vender, necesitas abrir el turno de caja primero.</p>
-            <a href="{{ route('flujo.caja.index') }}" class="bg-[#fd7e14] text-white font-bold py-3 px-8 rounded-lg shadow-sm inline-block">
-                Ir a Abrir Caja
-            </a>
+    {{-- Reemplaza TODO lo que esté aquí adentro por esto: --}}
+    <div class="w-full flex flex-col items-center justify-center min-h-[70vh]" x-data="{ modalAbrir: true }">
+        <div class="bg-white rounded-[45px] shadow-2xl border border-gray-100 p-12 text-center max-w-lg">
+            <div class="bg-amber-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            <h3 class="text-4xl font-black text-gray-900 mb-2 uppercase italic tracking-tighter">Turno Cerrado</h3>
+            <p class="text-gray-500 mb-8 font-bold uppercase text-xs tracking-widest">Debes iniciar un nuevo turno para vender</p>
+            
+            <form action="{{ route('flujo.caja.abrir') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 italic text-left ml-4">Monto Inicial en Caja ($)</label>
+                    <input type="number" name="monto_inicial" step="0.01" placeholder="0.00" required 
+                           class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl py-4 px-6 text-2xl font-black text-center focus:border-amber-400 focus:ring-0 transition-all">
+                </div>
+                <button type="submit" class="w-full bg-amber-400 hover:bg-amber-500 text-black font-black py-5 rounded-2xl shadow-lg shadow-amber-100 uppercase italic tracking-tighter transition-all active:scale-95">
+                    Abrir Caja y Comenzar
+                </button>
+            </form>
         </div>
     </div>
 @else
@@ -1474,98 +1489,105 @@
                 },
 
                 procesarOrdenFinal(esAbierta = false) {
-                    if(!esAbierta && !this.pagosValidos()) return;
-                    this.isProcessing = true;
+                if(!esAbierta && !this.pagosValidos()) return;
+                this.isProcessing = true;
 
-                    let cartPayload = [];
-                    this.cartGroups.forEach(g => {
-                        if(g.type === 'pizza_pair') {
-                            g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
-                        } else {
-                            cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
-                        }
-                    });
-
-                    let pagosToSend = [];
-                    if(!esAbierta) {
-                        if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
-                            pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
-                        }
-                        if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
-                            pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
-                        }
-                        if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
-                            pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
-                        }
+                let cartPayload = [];
+                this.cartGroups.forEach(g => {
+                    if(g.type === 'pizza_pair') {
+                        g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
+                    } else {
+                        cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
                     }
+                });
 
-                    let reqBody = {
-                        _token: '{{ csrf_token() }}', 
-                        tipo_servicio: this.servicio, 
-                        mesa: this.mesa, 
-                        nombre_cliente: this.nombreClienteMesa,
-                        comentarios: this.comentariosGenerales, 
-                        total: this.getTotal(), 
-                        carrito: cartPayload, 
-                        pagos: pagosToSend,
-                        id_venta_edit: this.id_venta_edit
-                    };
-
-                    if(this.servicio === 3) {
-                        if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
-                        else reqBody.id_clie = this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie;
-
-                        if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
-                        else reqBody.id_dir = this.dirSeleccionada;
+                let pagosToSend = [];
+                if(!esAbierta) {
+                    if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
+                        pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
                     }
+                    if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
+                        pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
+                    }
+                    if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
+                        pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+                    }
+                }
 
-                    fetch("{{ route('ventas.pos.store') }}", {
-                        method: 'POST', 
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json' 
-                        },
-                        body: JSON.stringify(reqBody)
-                    }).then(async r => {
-                        if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
-                        return r.json();
-                    }).then(res => {
-                        if(res.success) { 
-                            this.cart = []; this.actualizarCarrito(); 
-                            this.mesa = ''; this.nombreClienteMesa = ''; this.comentariosGenerales = '';
-                            this.modalPago = false;
-                            
-                            // Reset del cliente para el próximo pedido
-                            this.clienteSeleccionado = null;
-                            this.searchClienteText = '';
-                            this.direccionesCliente = [];
-                            this.dirSeleccionada = null;
-                            this.clienteFormVisible = false;
-                            this.dirFormVisible = false;
-                            this.nuevoClienteData = { nombre: '', telefono: '' };
-                            this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
-                            
-                            let urlTicket = '/venta/pos/ticket/' + res.id_venta;
-                            if (this.id_venta_edit) {
-                                urlTicket += '?solo_nuevos=1';
-                            }
-                            
-                            window.open(urlTicket, 'Ticket', 'width=400,height=600'); 
-                            
-                            if(this.id_venta_edit) {
-                                setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1000);
-                            } else {
-                                this.isProcessing = false;
-                            }
+                let reqBody = {
+                    _token: '{{ csrf_token() }}', 
+                    tipo_servicio: this.servicio, 
+                    mesa: this.mesa, 
+                    nombre_cliente: this.nombreClienteMesa,
+                    comentarios: this.comentariosGenerales, 
+                    total: this.getTotal(), 
+                    carrito: cartPayload, 
+                    pagos: pagosToSend,
+                    id_venta_edit: this.id_venta_edit
+                };
+
+                if(this.servicio === 3) {
+                    if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
+                    else reqBody.id_clie = this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie;
+
+                    if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
+                    else reqBody.id_dir = this.dirSeleccionada;
+                }
+
+                fetch("{{ route('ventas.pos.store') }}", {
+                    method: 'POST', 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json' 
+                    },
+                    body: JSON.stringify(reqBody)
+                }).then(async r => {
+                    if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
+                    return r.json();
+                }).then(res => {
+                    if(res.success) { 
+                        // 1. Limpiar variables locales
+                        this.cart = []; 
+                        this.actualizarCarrito(); 
+                        this.mesa = ''; 
+                        this.nombreClienteMesa = ''; 
+                        this.comentariosGenerales = '';
+                        this.modalPago = false;
+                        
+                        this.clienteSeleccionado = null;
+                        this.searchClienteText = '';
+                        this.direccionesCliente = [];
+                        this.dirSeleccionada = null;
+                        this.clienteFormVisible = false;
+                        this.dirFormVisible = false;
+
+                        // 2. CONFIGURACIÓN DEL POPUP PARA EL TICKET
+                        let urlTicket = '/venta/pos/ticket/' + res.id_venta;
+                        if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
+
+                        const width = 420;
+                        const height = 700;
+                        const left = (window.screen.width / 2) - (width / 2);
+                        const top = (window.screen.height / 2) - (height / 2);
+
+                        // ABRIR VENTANA PEQUEÑA
+                        window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
+                        
+                        // 3. Redirección o reset de estado
+                        if(this.id_venta_edit) {
+                            setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
                         } else {
-                            alert("Error al guardar: " + res.message);
                             this.isProcessing = false;
                         }
-                    }).catch(e => {
-                        alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
+                    } else {
+                        alert("Error al guardar: " + res.message);
                         this.isProcessing = false;
-                    });
-                }
+                    }
+                }).catch(e => {
+                    alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
+                    this.isProcessing = false;
+                });
+            }
             }));
         });
     </script>
