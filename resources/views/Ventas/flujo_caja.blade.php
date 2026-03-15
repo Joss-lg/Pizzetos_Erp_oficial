@@ -146,7 +146,7 @@
                 <div class="text-3xl pizzetos-title text-slate-900 italic">${{ number_format($stats['venta_total_bruta'], 2) }}</div>
             </div>
             <div class="pizzetos-card">
-                <span class="pizzetos-label" style="color: var(--pizzetos-amber) !important;">Tickets</span>
+                <span class="pizzetos-label" style="color: var(--pizzetos-amber) !important;">Tickets Válidos</span>
                 <div class="text-4xl pizzetos-title italic" style="color: var(--pizzetos-amber) !important;">{{ $stats['num_ventas'] }}</div>
             </div>
             <div class="pizzetos-card">
@@ -179,26 +179,47 @@
                             </thead>
                             <tbody class="divide-y divide-slate-50 text-sm">
                                 @foreach($ventas_detalle as $venta)
-                                    <tr class="{{ $venta->status == 3 ? 'opacity-30' : '' }}">
-                                        <td class="px-8 py-6 font-black text-slate-900 text-lg">#{{ $venta->folio_virtual }}</td>
+                                    <tr class="{{ $venta->status == 3 ? 'bg-red-50/50 hover:bg-red-50' : 'hover:bg-slate-50 transition-colors' }}">
+                                        <td class="px-8 py-6 font-black {{ $venta->status == 3 ? 'text-red-400 line-through' : 'text-slate-900' }} text-lg">
+                                            #{{ $venta->folio_virtual }}
+                                        </td>
                                         <td class="px-8 py-6 leading-tight">
                                             <div class="flex flex-col">
-                                                <span class="text-slate-800 font-black uppercase text-sm tracking-tighter">{{ $venta->nombre_cliente_formateado }}</span>
-                                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('h:i a') }}</span>
+                                                <span class="{{ $venta->status == 3 ? 'text-red-600 line-through' : 'text-slate-800' }} font-black uppercase text-sm tracking-tighter">
+                                                    {{ $venta->nombre_cliente_formateado }}
+                                                </span>
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    <span class="text-[9px] font-bold {{ $venta->status == 3 ? 'text-red-400' : 'text-slate-400' }} uppercase tracking-widest">
+                                                        {{ \Carbon\Carbon::parse($venta->fecha_hora)->format('h:i a') }}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="px-8 py-6">
-                                            @foreach(explode(' + ', $venta->montos_detalle ?? '') as $detalle)
-                                                @php
-                                                    $partes = explode(': ', $detalle);
-                                                    $metodo = $partes[0] ?? '';
-                                                    $monto = $partes[1] ?? '';
-                                                    $clase = str_contains($metodo, 'Efectivo') ? 'bg-efectivo' : (str_contains($metodo, 'Tarjeta') ? 'bg-tarjeta' : 'bg-transf');
-                                                @endphp
-                                                <div class="pay-badge-split w-fit"><span class="pay-method {{ $clase }}">{{ $metodo }}</span><span class="pay-amount">{{ $monto }}</span></div>
-                                            @endforeach
+                                            {{-- LÓGICA BLINDADA PARA LOS PAGOS Y CANCELADOS --}}
+                                            @if($venta->status == 3)
+                                                <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border border-red-200">CANCELADO</span>
+                                            @elseif(empty($venta->montos_detalle))
+                                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border border-slate-200">PENDIENTE</span>
+                                            @else
+                                                @foreach(explode(' + ', $venta->montos_detalle) as $detalle)
+                                                    @php
+                                                        $partes = explode(': ', $detalle);
+                                                        if(count($partes) < 2) continue; // Si viene roto de la BD, lo ignoramos
+                                                        $metodo = $partes[0];
+                                                        $monto = $partes[1];
+                                                        $clase = str_contains($metodo, 'Efectivo') ? 'bg-efectivo' : (str_contains($metodo, 'Tarjeta') ? 'bg-tarjeta' : 'bg-transf');
+                                                    @endphp
+                                                    <div class="pay-badge-split w-fit mb-1">
+                                                        <span class="pay-method {{ $clase }}">{{ $metodo }}</span>
+                                                        <span class="pay-amount">{{ $monto }}</span>
+                                                    </div>
+                                                @endforeach
+                                            @endif
                                         </td>
-                                        <td class="px-8 py-6 text-right font-black text-2xl text-slate-900 tracking-tighter italic">${{ number_format($venta->total, 2) }}</td>
+                                        <td class="px-8 py-6 text-right font-black text-2xl tracking-tighter italic {{ $venta->status == 3 ? 'text-red-400 line-through' : 'text-slate-900' }}">
+                                            ${{ number_format($venta->total, 2) }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

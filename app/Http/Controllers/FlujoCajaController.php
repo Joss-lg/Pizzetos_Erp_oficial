@@ -55,13 +55,11 @@ class FlujoCajaController extends Controller
         $total_gastos = $gastos_detalle->sum('precio');
 
         // 2. VENTAS CON FOLIO VIRTUAL (Ej: 14-03-26 001)
-        // Se mantiene filtrando status != 3 para la vista en vivo de la caja,
-        // a menos que también quieras ver las canceladas en la tabla del sistema.
+        // Se quitó el filtro de status != 3 para que los cancelados aparezcan en la vista del turno
         $ventas_detalle = DB::table('Venta')
             ->leftJoin('Pago', 'Venta.id_venta', '=', 'Pago.id_venta')
             ->leftJoin('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
             ->where('Venta.id_caja', $cajaAbierta->id_caja)
-            ->where('Venta.status', '!=', 3) // Aquí no se modificó, asumiendo que solo se querían en PDF. Si las quieres aquí también, quita esta línea.
             ->select(
                 'Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.status', 'Venta.mesa', 'Venta.tipo_servicio',
                 DB::raw("CASE 
