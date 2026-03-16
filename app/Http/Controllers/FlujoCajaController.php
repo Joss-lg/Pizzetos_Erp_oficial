@@ -158,7 +158,9 @@ class FlujoCajaController extends Controller
                     ELSE COALESCE(Venta.nombreClie, 'DOMICILIO')
                 END as nombreClie"),
                 DB::raw("GROUP_CONCAT(MetodosPago.metodo SEPARATOR ', ') as metodos"),
-                DB::raw("GROUP_CONCAT(COALESCE(Pago.referencia, '-') SEPARATOR ' / ') as refs")
+                DB::raw("GROUP_CONCAT(COALESCE(Pago.referencia, '-') SEPARATOR ' / ') as refs"),
+                // 👇 NUEVA LÍNEA AGREGADA PARA EL DESGLOSE EN EL PDF
+                DB::raw("GROUP_CONCAT(CONCAT(MetodosPago.metodo, ': $', Pago.monto) SEPARATOR '<br>') as montos_detalle")
             )
             ->groupBy('Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.tipo_servicio', 'Venta.mesa', 'Venta.nombreClie', 'Venta.status')
             ->get();

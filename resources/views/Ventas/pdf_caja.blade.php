@@ -2,209 +2,171 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Cierre de Caja - Pizzetos</title>
+    <title>Cierre de Caja - Pizzetos</title>
     <style>
-        @page { margin: 1cm; }
-        body { font-family: 'Helvetica', sans-serif; color: #1e293b; line-height: 1.4; margin: 0; padding: 0; font-size: 10px; }
+        body { 
+            font-family: Arial, Helvetica, sans-serif; 
+            font-size: 13px; 
+            color: #333; 
+            margin: 0; 
+            padding: 0; 
+        }
         
-        /* Encabezado Estilo Pizzetos */
-        .header { background-color: #f8fafc; padding: 20px; border-bottom: 3px solid #f59e0b; margin-bottom: 20px; }
-        .header table { width: 100%; }
-        .brand-container { vertical-align: middle; }
-        .logo { height: 50px; width: auto; }
-        .report-title { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748b; letter-spacing: 2px; margin-top: 5px; }
+        /* Control de saltos de página */
+        .page-break { page-break-before: always; }
         
-        /* Bloques de Información */
-        .section-title { font-size: 11px; font-weight: 900; text-transform: uppercase; font-style: italic; color: #000; border-left: 4px solid #f59e0b; padding-left: 8px; margin: 20px 0 10px 0; }
+        /* Utilidades de texto */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .bold { font-weight: bold; }
+        .text-red { color: #dc2626; }
+        .line-through { text-decoration: line-through; }
         
-        /* Grid de Resumen Financiero */
-        .kpi-container { width: 100%; margin-bottom: 20px; }
-        .kpi-box { width: 23%; padding: 10px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: inline-block; vertical-align: top; margin-right: 1%; text-align: center; }
-        .kpi-title { font-size: 7px; font-weight: bold; text-transform: uppercase; color: #94a3b8; margin-bottom: 5px; }
-        .kpi-value { font-size: 12px; font-weight: 900; color: #1e293b; font-style: italic; }
-        .bg-amber-light { background-color: #fef3c7; border-color: #f59e0b; }
-        .text-green { color: #166534; }
-        .text-red { color: #991b1b; }
+        /* Elementos gráficos solicitados */
+        .linea-azul { 
+            border-top: 3px solid #2563eb; 
+            margin: 20px 0; 
+        }
+        
+        .cuadro-amarillo {
+            background-color: #fef08a; /* Amarillo suave */
+            border: 2px solid #eab308; /* Borde amarillo fuerte */
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
 
-        /* Tablas de Datos */
-        table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        table.data-table th { background-color: #f8fafc; padding: 8px; text-align: left; font-size: 8px; font-weight: bold; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
-        table.data-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .table-bordered th, .table-bordered td { 
+            border: 1px solid #cbd5e1; 
+            padding: 10px; 
+        }
+        .table-bordered th { 
+            background-color: #f8fafc; 
+            text-transform: uppercase; 
+            text-align: left;
+        }
+        .table-layout td { border: none; padding: 5px 0; }
         
-        /* Footer */
-        .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 8px; color: #94a3b8; padding: 10px 0; border-top: 1px solid #f1f5f9; }
-        
-        /* Estilos para tickets cancelados */
-        .row-cancelada { color: #dc2626; text-decoration: line-through; background-color: #fef2f2; }
-        .badge-cancelado { color: #dc2626; font-size: 7px; font-weight: bold; text-decoration: none !important; display: inline-block; margin-top: 2px; border: 1px solid #dc2626; padding: 1px 3px; border-radius: 3px; }
+        .section-title { font-size: 18px; margin-bottom: 5px; color: #000; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <table>
+    {{-- ================= HOJA 1: RESUMEN GENERAL ================= --}}
+    
+    <div class="text-center">
+        <img src="{{ public_path('pizzetos.png') }}" style="max-width: 150px;">
+    </div>
+    
+    <h1 class="text-center" style="font-size: 24px; margin-top: 10px;">CIERRE DE CAJA #{{ $caja->folio_virtual }}</h1>
+    
+    <table class="table-layout">
+        <tr>
+            <td class="bold">Apertura:</td>
+            <td>{{ \Carbon\Carbon::parse($caja->fecha_apertura)->format('d/m/Y h:i A') }}</td>
+            <td class="text-right bold">Cierre:</td>
+            <td class="text-right">{{ $caja->fecha_cierre ? \Carbon\Carbon::parse($caja->fecha_cierre)->format('d/m/Y h:i A') : 'EN CURSO' }}</td>
+        </tr>
+        <tr>
+            <td class="bold">Cajero:</td>
+            <td colspan="3">{{ $caja->responsable_apertura ?? 'ADMIN' }}</td>
+        </tr>
+    </table>
+
+    <div class="linea-azul"></div>
+
+    <h2 class="section-title">Información General</h2>
+    <table class="table-bordered">
+        <tr><td style="width: 50%;">Fondo Inicial</td><td class="text-right">$ {{ number_format($stats['fondo'], 2) }}</td></tr>
+        <tr><td>Venta Total</td><td class="text-right">$ {{ number_format($stats['venta_total'], 2) }}</td></tr>
+        <tr><td>Número de Pedidos</td><td class="text-right">{{ $stats['num_ventas'] }}</td></tr>
+        <tr><td>Gastos</td><td class="text-right text-red">-$ {{ number_format($stats['total_gastos'], 2) }}</td></tr>
+    </table>
+
+    <h2 class="section-title" style="margin-top: 25px;">Desglose por Método de Pago</h2>
+    <table class="table-bordered">
+        <tr><td style="width: 50%;">Efectivo</td><td class="text-right">$ {{ number_format($stats['efectivo'], 2) }}</td></tr>
+        <tr><td>Tarjeta</td><td class="text-right">$ {{ number_format($stats['tarjeta'], 2) }}</td></tr>
+        <tr><td>Transferencia</td><td class="text-right">$ {{ number_format($stats['transferencia'], 2) }}</td></tr>
+    </table>
+
+    {{-- CUADRO AMARILLO --}}
+    <div class="cuadro-amarillo">
+        <h3 class="text-center" style="margin-top: 0; font-size: 18px;">RESUMEN FINAL DE CAJA</h3>
+        <table class="table-layout">
+            <tr><td class="bold">Venta Total:</td><td class="text-right">$ {{ number_format($stats['venta_total'], 2) }}</td></tr>
+            <tr><td class="bold">Gastos:</td><td class="text-right text-red">-$ {{ number_format($stats['total_gastos'], 2) }}</td></tr>
+            <tr><td class="bold">Tarjeta:</td><td class="text-right">$ {{ number_format($stats['tarjeta'], 2) }}</td></tr>
+            <tr><td class="bold">Transferencia:</td><td class="text-right">$ {{ number_format($stats['transferencia'], 2) }}</td></tr>
             <tr>
-                <td class="brand-container">
-                    <img src="{{ public_path('pizzetos.png') }}" class="logo">
-                    <div class="report-title">Acta de Cierre de Caja #{{ $caja->folio_virtual }}</div>
-                </td>
-                <td style="text-align: right; vertical-align: top;">
-                    <div style="font-weight: bold; font-size: 8px; color: #94a3b8;">FECHA DE EMISIÓN</div>
-                    <div style="font-weight: 900; font-style: italic;">{{ date('d/m/Y H:i:s') }}</div>
-                </td>
+                <td class="bold" style="font-size: 16px; padding-top: 15px;">Efectivo Esperado (Caja):</td>
+                {{-- Efectivo de ventas MENOS Gastos (Ignoramos el fondo inicial) --}}
+                <td class="text-right bold" style="font-size: 16px; padding-top: 15px;">$ {{ number_format($stats['efectivo'] - $stats['total_gastos'], 2) }}</td>
             </tr>
         </table>
     </div>
 
-    {{-- 1. INFORMACIÓN DE OPERACIÓN --}}
-    <table style="width: 100%; margin-bottom: 20px;">
-        <tr>
-            <td style="width: 50%; border:none;">
-                <div class="section-title">Datos de Apertura</div>
-                <div style="margin-left: 10px;">
-                    <div><b>Iniciado por:</b> {{ $caja->responsable_apertura ?? 'Admin' }}</div>
-                    <div><b>Fecha/Hora:</b> {{ \Carbon\Carbon::parse($caja->fecha_apertura)->format('d/m/Y h:i a') }}</div>
-                    <div><b>Comentarios:</b> {{ $caja->observaciones_apertura ?? 'Sin notas' }}</div>
-                </div>
-            </td>
-            <td style="width: 50%; border:none;">
-                <div class="section-title">Datos de Cierre</div>
-                <div style="margin-left: 10px;">
-                    <div><b>Finalizado el:</b> {{ $caja->fecha_cierre ? \Carbon\Carbon::parse($caja->fecha_cierre)->format('d/m/Y h:i a') : 'OPERACIÓN EN CURSO' }}</div>
-                    <div><b>Efectivo contado:</b> ${{ number_format($caja->monto_final ?? 0, 2) }}</div>
-                    <div><b>Notas de cierre:</b> {{ $caja->observaciones_cierre ?? 'Sin observaciones' }}</div>
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    {{-- 2. INDICADORES FINANCIEROS --}}
-    <div class="section-title">Resumen Financiero</div>
-    <div class="kpi-container">
-        <div class="kpi-box bg-amber-light">
-            <div class="kpi-title">Fondo Inicial</div>
-            <div class="kpi-value">${{ number_format($stats['fondo'], 2) }}</div>
-        </div>
-        <div class="kpi-box">
-            <div class="kpi-title">Venta Bruta (Válida)</div>
-            <div class="kpi-value">${{ number_format($stats['venta_total'], 2) }}</div>
-        </div>
-        <div class="kpi-box">
-            <div class="kpi-title">Egresos (Gastos)</div>
-            <div class="kpi-value text-red">-${{ number_format($stats['total_gastos'], 2) }}</div>
-        </div>
-        <div class="kpi-box">
-            <div class="kpi-title">Efectivo Real (Sistema)</div>
-            <div class="kpi-value text-green">${{ number_format($stats['arqueo_real'] ?? $stats['efectivo_esperado'], 2) }}</div>
-        </div>
-    </div>
-
-    {{-- 3. CONCILIACIÓN POR MÉTODO --}}
-    <div class="section-title">Conciliación por Métodos de Pago</div>
-    <table class="data-table">
+    {{-- ================= HOJA 2: DETALLES DE GASTOS ================= --}}
+    <div class="page-break"></div>
+    
+    <h2 class="text-center" style="font-size: 20px;">DETALLES DE GASTOS - CAJA #{{ $caja->folio_virtual }}</h2>
+    
+    <table class="table-bordered">
         <thead>
             <tr>
-                <th>Método de Pago</th>
-                <th>Venta Bruta</th>
-                <th>Egresos Aplicados</th>
-                <th style="text-align: right;">Monto Neto en Caja</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><b>EFECTIVO (VENTAS)</b></td>
-                <td>${{ number_format($stats['efectivo'], 2) }}</td>
-                <td class="text-red">-${{ number_format($stats['total_gastos'], 2) }}</td>
-                <td style="text-align: right;" class="text-green"><b>${{ number_format($stats['efectivo_esperado'], 2) }}</b></td>
-            </tr>
-            <tr>
-                <td><b>TARJETA (VOUCHERS BANCARIOS)</b></td>
-                <td>${{ number_format($stats['tarjeta'], 2) }}</td>
-                <td>$0.00</td>
-                <td style="text-align: right;">${{ number_format($stats['tarjeta'], 2) }}</td>
-            </tr>
-            <tr>
-                <td><b>TRANSFERENCIAS ELECTRÓNICAS</b></td>
-                <td>${{ number_format($stats['transferencia'], 2) }}</td>
-                <td>$0.00</td>
-                <td style="text-align: right;">${{ number_format($stats['transferencia'], 2) }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    {{-- 4. DETALLE DE GASTOS --}}
-    <div class="section-title">Detalle de Gastos (Egresos)</div>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th width="60%">Descripción / Concepto</th>
-                <th width="20%">Responsable</th>
-                <th width="20%" style="text-align: right;">Monto</th>
+                <th style="width: 50%;">Concepto</th>
+                <th style="width: 30%;">Responsable</th>
+                <th style="width: 20%;" class="text-right">Monto</th>
             </tr>
         </thead>
         <tbody>
             @forelse($gastos as $g)
             <tr>
                 <td>{{ $g->descripcion }}</td>
-                <td>{{ $g->responsable }}</td>
-                <td style="text-align: right;" class="text-red">-${{ number_format($g->precio, 2) }}</td>
+                <td class="text-center">{{ $g->responsable }}</td>
+                <td class="text-right text-red">-$ {{ number_format($g->precio, 2) }}</td>
             </tr>
             @empty
-            <tr>
-                <td colspan="3" style="text-align: center; color: #94a3b8;">No hay egresos registrados en este turno.</td>
-            </tr>
+            <tr><td colspan="3" class="text-center" style="color: #666;">No se registraron gastos en este turno.</td></tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- 5. HISTORIAL DE PEDIDOS --}}
-    <div class="section-title">Historial de Pedidos Procesados</div>
-    <div style="font-size: 8px; color: #64748b; margin-bottom: 8px; font-style: italic;">
-        * Los pedidos cancelados se muestran tachados por motivos de auditoría y su monto <b>no suma</b> al balance de caja.
-    </div>
+    {{-- ================= HOJA 3: DETALLES DE VENTAS ================= --}}
+    <div class="page-break"></div>
     
-    <table class="data-table">
+    <h2 class="text-center" style="font-size: 20px;">DETALLES DE VENTAS - CAJA #{{ $caja->folio_virtual }}</h2>
+    
+    <table class="table-bordered">
         <thead>
             <tr>
-                <th width="15%">Folio</th>
-                <th width="32%">Cliente / Servicio</th>
-                <th width="33%">Pagos / Referencias</th>
-                <th width="20%" style="text-align: right;">Subtotal</th>
+                <th style="width: 15%;">Id Venta</th>
+                <th style="width: 25%;">Referencia</th>
+                <th style="width: 45%;">Desglose por Método de Pago</th>
+                <th style="width: 15%;" class="text-right">Total</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($ventas as $v)
-            {{-- IDENTIFICACIÓN DE TICKET CANCELADO --}}
-            <tr class="{{ isset($v->status) && $v->status == 3 ? 'row-cancelada' : '' }}">
-                <td><b>#{{ $v->folio_virtual }}</b></td>
+            @forelse($ventas as $v)
+            <tr class="{{ isset($v->status) && $v->status == 3 ? 'text-red line-through' : '' }}">
+                <td class="text-center bold">#{{ $v->folio_virtual }}</td>
+                <td class="text-center">{{ $v->refs && $v->refs != '-' ? $v->refs : 'N/A' }}</td>
                 <td>
-                    {{ $v->nombreClie }}
                     @if(isset($v->status) && $v->status == 3)
-                        <br><span class="badge-cancelado">CANCELADO</span>
+                        <span class="bold">CANCELADO</span>
+                    @else
+                        {!! $v->montos_detalle ?? $v->metodos !!}
                     @endif
                 </td>
-                <td>
-                    {{ $v->metodos }} 
-                    @if($v->refs && $v->refs != '-') <br><span style="font-size: 7px; color: #64748b;">Ref: {{ $v->refs }}</span> @endif
-                </td>
-                <td style="text-align: right;"><b>${{ number_format($v->total, 2) }}</b></td>
+                <td class="text-right bold">$ {{ number_format($v->total, 2) }}</td>
             </tr>
-            @endforeach
+            @empty
+            <tr><td colspan="4" class="text-center" style="color: #666;">No hay ventas registradas.</td></tr>
+            @endforelse
         </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" style="text-align: right; padding: 10px; font-weight: 900; font-style: italic;">Diferencia de Arqueo (Sistema vs Físico):</td>
-                <td style="text-align: right; padding: 10px; font-weight: 900;" class="{{ ($stats['diferencia'] ?? 0) < 0 ? 'text-red' : 'text-green' }}">
-                    ${{ number_format($stats['diferencia'] ?? 0, 2) }}
-                </td>
-            </tr>
-        </tfoot>
     </table>
-
-    <div class="footer">
-        Este documento es un comprobante oficial de Pizzetos. Generado por Ollintem ERP.<br>
-        © {{ date('Y') }} Pizzetos - Todos los derechos reservados.
-    </div>
 
 </body>
 </html>
