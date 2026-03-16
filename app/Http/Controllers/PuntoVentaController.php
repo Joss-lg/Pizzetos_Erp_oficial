@@ -306,10 +306,8 @@ class PuntoVentaController extends Controller
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
 
-        // --- NUEVO: GENERACIÓN DE FOLIO VIRTUAL PARA EL TICKET ---
         $venta->folio_virtual = Carbon::parse($venta->fecha_hora)->format('d-m-y') . ' ' . str_pad($venta->id_venta, 3, '0', STR_PAD_LEFT);
 
-        // --- INICIO LIMPIEZA DE COMENTARIOS PARA EL TICKET ---
         $comentarios_limpios = [];
         if ($venta->comentarios) {
             $partes = explode('|', $venta->comentarios);
@@ -323,7 +321,6 @@ class PuntoVentaController extends Controller
             }
         }
         $venta->comentarios = count($comentarios_limpios) > 0 ? "Nota: " . implode(" | ", $comentarios_limpios) : null;
-        // --- FIN LIMPIEZA ---
 
         $detalles = DB::table('DetalleVenta')->where('id_venta', $id)->get();
         
@@ -431,7 +428,7 @@ class PuntoVentaController extends Controller
             $chunks = array_chunk($pizzas, 2);
             foreach($chunks as $chunk) {
                 $qty = count($chunk);
-                $title = $qty . " PIZZA" . ($qty > 1 ? 'S' : '') . " " . $size;
+                $title =" PIZZA" . ($qty > 1 ? 'S' : '') . " " . $size;
                 $total = 0;
                 $subs = [];
                 

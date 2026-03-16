@@ -1587,6 +1587,7 @@
                         this.mesa = ''; 
                         this.nombreClienteMesa = ''; 
                         this.comentariosGenerales = '';
+                        this.comentariosGeneralesTemp = ''; 
                         this.modalPago = false;
                         
                         this.clienteSeleccionado = null;
