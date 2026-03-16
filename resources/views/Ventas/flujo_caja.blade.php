@@ -125,10 +125,6 @@
 
         {{-- DESGLOSE POR MÉTODO DE PAGO --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="pizzetos-card" style="border-left: 8px solid #16a34a !important; padding: 1.5rem !important;">
-                <span class="pizzetos-label">Efectivo</span>
-                <div class="text-3xl pizzetos-title text-green-600 italic">${{ number_format($stats['efectivo_ventas'], 2) }}</div>
-            </div>
             <div class="pizzetos-card" style="border-left: 8px solid #2563eb !important; padding: 1.5rem !important;">
                 <span class="pizzetos-label">Tarjeta</span>
                 <div class="text-3xl pizzetos-title text-blue-600 italic">${{ number_format($stats['tarjeta'], 2) }}</div>
