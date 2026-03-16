@@ -105,7 +105,7 @@
         <tbody>
             @foreach($final_items as $item)
                 <tr>
-                    <td class="font-bold" style="white-space: nowrap;">{{ $item->cantidad }}</td>
+                    <td class="font-bold" style="white-space: nowrap;">{{ $item->cantidad}}</td>
                     <td class="font-bold">{{ $item->nombre }}</td>
                     <td class="text-right font-bold">${{ number_format($item->total, 2) }}</td>
                 </tr>
@@ -123,19 +123,21 @@
         </tbody>
     </table>
 
+     @if($venta->comentarios)
+        <div class="text-center font-bold border-bottom" style="padding: 5px 0; font-size: 11px;">
+            {{ $venta->comentarios }}
+        </div>
+    
+
+
     <div class="border-top border-bottom" style="padding: 5px 0;">
         <div class="flex-between">
             <div class="font-bold text-lg">TOTAL A PAGAR:</div>
             <div class="font-bold text-lg">${{ number_format($venta->total, 2) }}</div>
         </div>
     </div>
-
-    @if($venta->comentarios)
-        <div class="text-center font-bold border-bottom" style="padding: 5px 0; font-size: 11px;">
-            {{ $venta->comentarios }}
-        </div>
-    @endif
-
+@endif
+   
     {{-- ZONA DE PAGOS --}}
     @if($venta->status == 0)
         <div class="text-center font-bold" style="border: 2px solid #000; padding: 5px; margin-top: 10px;">
