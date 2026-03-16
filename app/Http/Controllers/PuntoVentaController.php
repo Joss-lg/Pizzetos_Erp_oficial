@@ -330,16 +330,12 @@ class PuntoVentaController extends Controller
         foreach($detalles as $det) {
             $nombre = "Producto";
             $sub = [];
-
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
             
             if ($request->has('solo_nuevos') && $request->solo_nuevos == 1) {
-                if ($ing && isset($ing->is_old) && $ing->is_old == true) {
-                    continue; 
-                }
+                if ($ing && isset($ing->is_old) && $ing->is_old == true) continue; 
             }
 
-            $p_orilla = $ing->p_orilla ?? 0;
             $is_pairable = false;
             $clean_name = "";
 
@@ -428,27 +424,22 @@ class PuntoVentaController extends Controller
             $chunks = array_chunk($pizzas, 2);
             foreach($chunks as $chunk) {
                 $qty = count($chunk);
-                $title =" PIZZA" . ($qty > 1 ? 'S' : '') . " " . $size;
+                // CORRECCIÓN: Quitamos espacio inicial y número
+                $title = "PIZZA" . ($qty > 1 ? 'S' : '') . " " . $size;
                 $total = 0;
                 $subs = [];
                 
                 foreach($chunk as $p) {
                     $total += $p['precio_final'];
-                    
                     $desc = "1 " . $p['clean_name'];
-                    if($p['orilla']) {
-                        $desc .= " + ORILLA RELLENA";
-                    }
+                    if($p['orilla']) $desc .= " + ORILLA RELLENA";
                     $subs[] = "> " . $desc;
-                    
-                    foreach($p['subs'] as $s) {
-                        $subs[] = "  " . mb_strtoupper($s);
-                    }
+                    foreach($p['subs'] as $s) $subs[] = "  " . mb_strtoupper($s);
                 }
 
                 $final_items[] = (object)[
                     'cantidad' => '',
-                    'nombre' => $title,
+                    'nombre' => trim($title), // Limpiamos espacios
                     'total' => $total,
                     'subs' => $subs
                 ];
@@ -457,9 +448,7 @@ class PuntoVentaController extends Controller
 
         foreach ($other_items as $item) {
             $formatted_subs = [];
-            foreach($item['subs'] as $s) {
-                $formatted_subs[] = "> " . mb_strtoupper($s);
-            }
+            foreach($item['subs'] as $s) $formatted_subs[] = "> " . mb_strtoupper($s);
 
             $final_items[] = (object)[
                 'cantidad' => $item['cantidad'],

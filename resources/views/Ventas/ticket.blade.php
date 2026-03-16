@@ -22,8 +22,6 @@
         .text-lg { font-size: 16px; }
         .mt-1 { margin-top: 5px; }
         .mb-1 { margin-bottom: 5px; }
-        .border-top { border-top: 1px dashed #000; padding-top: 5px; margin-top: 5px; }
-        .border-bottom { border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
         th, td { text-align: left; vertical-align: top; padding: 3px 0; }
@@ -32,7 +30,7 @@
         .sub-item { font-size: 12px; color: #333; }
         .sub-text { padding-left: 8px; }
         
-        .flex-between { display: flex; justify-content: space-between; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
         
         .ticket-logo {
             width: 150px;
@@ -56,12 +54,12 @@
         <div style="font-size: 12px;">TICKET DE VENTA</div>
         
         <div class="font-bold mt-1" style="font-size: 16px;">
-            FOLIO: {{ str_pad($venta->id_venta, STR_PAD_LEFT) }}
+            FOLIO: {{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}
         </div>
         
         <div style="font-size: 12px;">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</div>
         
-        <div class="font-bold text-lg mt-1 mb-1 border-top border-bottom py-1" style="padding: 5px 0;">
+        <div class="font-bold text-lg mt-1 mb-1 py-1" style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0;">
             @if($venta->tipo_servicio == 1)
                 * COMEDOR - MESA {{ $venta->mesa }} *
             @elseif($venta->tipo_servicio == 2)
@@ -85,13 +83,13 @@
                 <div><span class="font-bold">REF:</span> {{ $domicilio->referencia }}</div>
             @endif
         </div>
-        <div class="border-top"></div>
+        <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
     @elseif($venta->tipo_servicio == 1 && $venta->nombreClie)
         <div class="mb-1" style="font-size: 12px;">
             <div class="font-bold">CLIENTE:</div>
             <div>{{ $venta->nombreClie }}</div>
         </div>
-        <div class="border-top"></div>
+        <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
     @endif
 
     <table class="mb-1">
@@ -123,29 +121,38 @@
         </tbody>
     </table>
 
-     @if($venta->comentarios)
-        <div class="text-center font-bold border-bottom" style="padding: 5px 0; font-size: 11px;">
+    {{-- SECCIÓN DE COMENTARIOS --}}
+    @if($venta->comentarios)
+        <div style="border-top: 1px dashed #000; margin-top: 5px;"></div>
+        
+        <div class="text-center" style="padding: 5px 0; font-size: 12px; font-weight: bold;">
             {{ $venta->comentarios }}
         </div>
-    
+        
+    @endif
 
-
-    <div class="border-top border-bottom" style="padding: 5px 0;">
-        <div class="flex-between">
-            <div class="font-bold text-lg">TOTAL A PAGAR:</div>
-            <div class="font-bold text-lg">${{ number_format($venta->total, 2) }}</div>
-        </div>
-    </div>
-@endif
-   
-    {{-- ZONA DE PAGOS --}}
+    {{-- ZONA DE TOTAL Y PAGOS --}}
     @if($venta->status == 0)
         <div class="text-center font-bold" style="border: 2px solid #000; padding: 5px; margin-top: 10px;">
             CUENTA ABIERTA<br>PENDIENTE DE PAGO
         </div>
     @else
-        <div style="margin-top: 10px;">
-            <div class="font-bold mb-1" style="font-size: 13px;">MÉTODO DE PAGO:</div>
+        
+        {{-- TOTAL A PAGAR  --}}
+        <div style="border-top: 1px dashed #000; margin-top: 5px;"></div>
+        
+        <div style="padding: 5px 0;">
+            <div class="flex-between">
+                <div class="font-bold text-lg" style="margin: 0;">TOTAL A PAGAR:</div>
+                <div class="font-bold text-lg" style="margin: 0;">${{ number_format($venta->total, 2) }}</div>
+            </div>
+        </div>
+
+        <div style="border-top: 1px dashed #000; margin-bottom: 10px;"></div>
+
+        {{-- MÉTODOS DE PAGO LIBRES POR DEBAJO --}}
+        <div>
+            <div class="font-bold" style="font-size: 13px; margin-bottom: 5px;">MÉTODO DE PAGO:</div>
             
             @foreach($pagos as $pago)
                 <div style="margin-bottom: 4px;">
@@ -181,6 +188,7 @@
                 </div>
             @endforeach
         </div>
+
     @endif
 
     <div class="text-center mt-1 pt-1" style="margin-top: 20px; font-size: 12px; font-weight: bold;">
@@ -190,18 +198,12 @@
     {{-- LÓGICA DE AUTO-IMPRESIÓN Y AUTO-CIERRE DE POPUP --}}
     <script>
         window.onload = function() {
-            // Disparar la impresión en cuanto cargue la página
             window.print();
         };
 
-        // Escuchar el evento después de que se cierre el cuadro de diálogo de impresión
         window.onafterprint = function() {
-            // Cerrar la ventana emergente automáticamente
             window.close();
         };
-
-        setTimeout(() => {
-        }, 60000);
     </script>
 
 </body>
