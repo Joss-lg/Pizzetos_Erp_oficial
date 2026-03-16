@@ -248,7 +248,6 @@ class PuntoVentaController extends Controller
                 ]);
             }
 
-// VARIABLES PARA RETORNAR LOS OBJETOS CREADOS A LA VISTA (PARCHE PARA REFRESH)
             $nuevoClient_resp = null;
             $nuevaDir_resp = null;
 
@@ -301,7 +300,7 @@ class PuntoVentaController extends Controller
         }
     }
 
-    public function ticket(Request $request, $id)
+   public function ticket(Request $request, $id)
     {
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
@@ -379,10 +378,13 @@ class PuntoVentaController extends Controller
             }
             elseif($det->pizza_mitad) {
                 $j = json_decode($det->pizza_mitad); 
-                $nombre = "Mitades " . ($j->tamano ?? ''); 
+                
+                // 1. Que se llame "Pizza" para que el sistema sepa cómo agruparla por tamaño (CHICA, GRANDE, etc)
+                $nombre = "Pizza " . ($j->tamano ?? ''); 
                 $is_pairable = true;
-                $clean_name = "MITAD Y MITAD";
-                $sub[] = '1/2 ' . ($j->mitad1 ?? '') . ' / 1/2 ' . ($j->mitad2 ?? '');
+                
+                // 2. Aquí armamos directamente la frase limpia "1/2 ESPECIALIDAD Y 1/2 OTRA"
+                $clean_name = mb_strtoupper("1/2 " . ($j->mitad1 ?? '') . " Y 1/2 " . ($j->mitad2 ?? ''));
             }
 
             if ($det->queso && $det->queso > 0 && !$is_pairable) { 
@@ -424,22 +426,31 @@ class PuntoVentaController extends Controller
             $chunks = array_chunk($pizzas, 2);
             foreach($chunks as $chunk) {
                 $qty = count($chunk);
-                // CORRECCIÓN: Quitamos espacio inicial y número
                 $title = "PIZZA" . ($qty > 1 ? 'S' : '') . " " . $size;
                 $total = 0;
                 $subs = [];
                 
                 foreach($chunk as $p) {
                     $total += $p['precio_final'];
-                    $desc = "1 " . $p['clean_name'];
-                    if($p['orilla']) $desc .= " + ORILLA RELLENA";
+                    
+                    // 3. Quitamos la estorbosa "1 " que se ponía al principio
+                    $desc = $p['clean_name']; 
+                    
+                    // Si tiene orilla, se la sumamos a la misma línea
+                    if($p['orilla']) {
+                        $desc .= " + ORILLA RELLENA";
+                    }
                     $subs[] = "> " . $desc;
-                    foreach($p['subs'] as $s) $subs[] = "  " . mb_strtoupper($s);
+                    
+                    // Extras si los hay
+                    foreach($p['subs'] as $s) {
+                        $subs[] = "  " . mb_strtoupper($s);
+                    }
                 }
 
                 $final_items[] = (object)[
                     'cantidad' => '',
-                    'nombre' => trim($title), // Limpiamos espacios
+                    'nombre' => trim($title),
                     'total' => $total,
                     'subs' => $subs
                 ];
@@ -472,7 +483,7 @@ class PuntoVentaController extends Controller
 
         return view('Ventas.ticket', compact('venta', 'final_items', 'pagos', 'domicilio'));
     }
-
+    
     public function historial(Request $request)
     {
         $id_sucursal = 1; 
