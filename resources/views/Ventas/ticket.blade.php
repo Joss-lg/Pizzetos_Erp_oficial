@@ -11,7 +11,7 @@
             font-size: 13px; 
             margin: 0 auto; 
             padding: 10px; 
-            width: 250px; 
+            width: 230px; 
             color: #000; 
             text-transform: uppercase; 
         }
