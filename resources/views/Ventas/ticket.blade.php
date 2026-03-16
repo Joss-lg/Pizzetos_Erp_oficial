@@ -11,7 +11,7 @@
             font-size: 13px; 
             margin: 0 auto; 
             padding: 10px; 
-            width: 280px; 
+            width: 250px; 
             color: #000; 
             text-transform: uppercase; 
         }
@@ -55,9 +55,8 @@
         
         <div style="font-size: 12px;">TICKET DE VENTA</div>
         
-        {{-- ACTUALIZACIÓN: FOLIO DE 5 DÍGITOS SIN FECHA --}}
         <div class="font-bold mt-1" style="font-size: 16px;">
-            FOLIO: {{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}
+            FOLIO: {{ str_pad($venta->id_venta, STR_PAD_LEFT) }}
         </div>
         
         <div style="font-size: 12px;">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</div>
@@ -114,7 +113,7 @@
                 @foreach($item->subs as $sub)
                 <tr class="sub-item">
                     <td></td>
-                    <td class="sub-text" colspan="2" style="white-space: pre-wrap;">{{ $sub }}</td>
+                    <td class="font-bold" colspan="2" style="white-space: pre-wrap;">{{ $sub }}</td>
                 </tr>
                 @endforeach
                 
