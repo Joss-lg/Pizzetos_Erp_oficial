@@ -20,21 +20,28 @@ class DashboardController extends Controller
         $ventasHoy = (float)($queryVentas->sum('total') ?? 0);
         $numVentas = (int)($queryVentas->count());
         
-        // 2. Desglose por Métodos con detección de columna
-        try {
-            $col = DB::getSchemaBuilder()->hasColumn('Venta', 'metodo_pago') ? 'metodo_pago' : 'metodo';
-            
-            // Usamos LIKE para mayor compatibilidad con mayúsculas/minúsculas
-            $efectivoVentas = (float)((clone $queryVentas)->where($col, 'LIKE', 'Efectivo%')->sum('total') ?? 0);
-            $tarjetasHoy = (float)((clone $queryVentas)->where($col, 'LIKE', 'Tarjeta%')->sum('total') ?? 0);
-            $transferenciasHoy = (float)((clone $queryVentas)->where($col, 'LIKE', 'Transferencia%')->sum('total') ?? 0);
-        } catch (\Exception $e) {
-            $efectivoVentas = 0; $tarjetasHoy = 0; $transferenciasHoy = 0;
+        // 2. Desglose por Métodos: Leemos correctamente de la tabla 'Pago'
+        $pagos = DB::table('Pago')
+            ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
+            ->whereDate('Venta.fecha_hora', $hoy)
+            ->where('Venta.status', 1) // Solo ventas concretadas
+            ->select('Pago.id_metpago', DB::raw('SUM(Pago.monto) as total_monto'))
+            ->groupBy('Pago.id_metpago')
+            ->get();
+
+        $efectivoVentas = 0;
+        $tarjetasHoy = 0;
+        $transferenciasHoy = 0;
+
+        foreach ($pagos as $pago) {
+            if ($pago->id_metpago == 1) $tarjetasHoy = (float)$pago->total_monto;       // 1 = Tarjeta
+            if ($pago->id_metpago == 2) $efectivoVentas = (float)$pago->total_monto;    // 2 = Efectivo
+            if ($pago->id_metpago == 3) $transferenciasHoy = (float)$pago->total_monto; // 3 = Transferencia
         }
 
-        // 3. Gastos del día
+        // 3. Gastos del día (Usamos 'Gastos', 'fecha' y 'precio' según tu GastosController)
         try {
-            $gastosHoy = (float)(DB::table('gastos')->whereDate('fecha_hora', $hoy)->sum('monto') ?? 0);
+            $gastosHoy = (float)(DB::table('Gastos')->whereDate('fecha', $hoy)->sum('precio') ?? 0);
         } catch (\Exception $e) {
             $gastosHoy = 0;
         }

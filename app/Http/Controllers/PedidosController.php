@@ -10,7 +10,7 @@ class PedidosController extends Controller
 {
     public function index()
     {
-        $id_sucursal = 1; // <-- FORZAMOS MIRAFLORES PARA CAJA ÚNICA
+        $id_sucursal = 1; 
         
         // 1. Buscar la caja que esté abierta actualmente
         $cajaAbierta = DB::table('Caja')
@@ -29,8 +29,8 @@ class PedidosController extends Controller
             ->leftJoin('Clientes', 'PDomicilio.id_clie', '=', 'Clientes.id_clie')
             ->leftJoin('Direcciones', 'PDomicilio.id_dir', '=', 'Direcciones.id_dir')
             ->where('Venta.id_suc', $id_sucursal)
-            ->where('Venta.id_caja', $cajaAbierta->id_caja) // <-- FILTRO MÁGICO: Solo carga pedidos del turno actual
-            ->where('Venta.status', '!=', 3) // Solo excluimos cancelados por BD
+            ->where('Venta.id_caja', $cajaAbierta->id_caja) 
+            ->where('Venta.status', '!=', 3) 
             ->select(
                 'Venta.*', 
                 'Clientes.nombre as cnombre', 
