@@ -31,14 +31,17 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 /*
-|--------------------------------------------------------------------------
-| Web Routes - Sistema Pizzetos (Versión Final Post-Pull)
-|--------------------------------------------------------------------------
+|--------------------------------
+| Web Routes - Sistema Pizzetos 
+|--------------------------------
 */
 
 // Redirección inicial
 Route::get('/', function () {
-    return auth()->check() ? redirect('/dashboard') : redirect('/login');
+    if (auth()->check()) {
+        return auth()->user()->id_ca == 1 ? redirect('/dashboard') : redirect('/venta/flujo-caja');
+    }
+    return redirect('/login');
 });
 
 // --- AUTENTICACIÓN ---
@@ -52,9 +55,6 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 // =====================================================================
 Route::middleware(['auth'])->group(function () {
     
-    // DASHBOARD CONECTADO AL CONTROLADOR
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     // --- PUNTO DE VENTA (POS) ---
     Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos');
     Route::post('/venta/pos/guardar', [PuntoVentaController::class, 'store'])->name('ventas.pos.store');
@@ -91,6 +91,9 @@ Route::middleware(['auth'])->group(function () {
 // SECCIÓN 2: ACCESO RESTRINGIDO (Solo Administrador)
 // =====================================================================
 Route::middleware(['auth', 'admin'])->group(function () {
+
+    // DASHBOARD CONECTADO AL CONTROLADOR (Movido a la sección de Admin)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- SEGURIDAD FINANCIERA ---
     Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');

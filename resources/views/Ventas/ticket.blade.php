@@ -103,7 +103,8 @@
         <tbody>
             @foreach($final_items as $item)
                 <tr>
-                    <td class="font-bold" style="white-space: nowrap;">{{ $item->cantidad}}</td>
+                    {{-- Si no hay cantidad (como en pizzas agrupadas), no poner la X --}}
+                    <td class="font-bold" style="white-space: nowrap;">{{ $item->cantidad }}</td>
                     <td class="font-bold">{{ $item->nombre }}</td>
                     <td class="text-right font-bold">${{ number_format($item->total, 2) }}</td>
                 </tr>
@@ -111,12 +112,13 @@
                 @foreach($item->subs as $sub)
                 <tr class="sub-item">
                     <td></td>
-                    <td class="font-bold" colspan="2" style="white-space: pre-wrap;">{{ $sub }}</td>
+                    {{-- Usamos font-bold y nos aseguramos de que cada sub-elemento sea una fila nueva --}}
+                    <td class="font-bold" colspan="2" style="padding-left: 5px;">{{ $sub }}</td>
                 </tr>
                 @endforeach
                 
                 {{-- Espacio separador entre productos --}}
-                <tr><td colspan="3" style="height: 6px;"></td></tr>
+                <tr><td colspan="3" style="height: 8px; border-bottom: 1px dashed #eee;"></td></tr>
             @endforeach
         </tbody>
     </table>

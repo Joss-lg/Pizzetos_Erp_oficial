@@ -300,7 +300,7 @@ class PuntoVentaController extends Controller
         }
     }
 
-   public function ticket(Request $request, $id)
+    public function ticket(Request $request, $id)
     {
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
@@ -313,153 +313,122 @@ class PuntoVentaController extends Controller
             foreach($partes as $p) {
                 $p = trim($p);
                 if (!str_contains($p, 'Atendió:') && !str_contains($p, 'ENTREGADO') && !str_contains($p, 'EN CAMINO') && !str_contains($p, 'CANCELADO')) {
-                    if(!empty($p)) {
-                        $comentarios_limpios[] = $p;
-                    }
+                    if(!empty($p)) $comentarios_limpios[] = $p;
                 }
             }
         }
         $venta->comentarios = count($comentarios_limpios) > 0 ? "Nota: " . implode(" | ", $comentarios_limpios) : null;
 
         $detalles = DB::table('DetalleVenta')->where('id_venta', $id)->get();
-        
-        $pizzas_to_pair = [];
         $other_items = [];
 
         foreach($detalles as $det) {
             $nombre = "Producto";
             $sub = [];
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
-            
-            if ($request->has('solo_nuevos') && $request->solo_nuevos == 1) {
-                if ($ing && isset($ing->is_old) && $ing->is_old == true) continue; 
-            }
 
-            $is_pairable = false;
-            $clean_name = "";
+            // --- LÓGICA DE DESGLOSE PARA LOS 3 PAQUETES ---
+            if($det->id_paquete) {
+                $j = json_decode($det->id_paquete);
+                $id_paq = $j->id ?? 0;
+                $variante = mb_strtoupper($j->variante ?? '');
 
-            if($ing && isset($ing->piz_ing_tamano)) { 
-                $nombre = $ing->piz_ing_tamano; 
-                $is_pairable = true;
-                $clean_name = "PERSONALIZADA";
+                if ($id_paq == 1) {
+                    $nombre = "PIZZA GRANDE";
+                    // Casos: "2 HAWAIANAS" o "1 PEPPERONI / 1 HAWAIANA"
+                    $limpio = str_replace(['PIZZA GRANDE COMBINADA', 'COMBINADA', 'PIZZA GRANDE', '(2X1)', '+ 1 REFRESCO JARRITO.'], '', $variante);
+                    
+                    if (preg_match('/^(\d+)\s+(.+)$/', trim($limpio), $matches) && $matches[1] > 1) {
+                        $cant = $matches[1];
+                        $esp = trim(str_replace('HAWAIANAS', 'HAWAIANA', $matches[2]));
+                        for($i=0; $i<$cant; $i++) $sub[] = "1 " . $esp;
+                    } else {
+                        $mitades = preg_split('/[\/]| Y /', $limpio);
+                        foreach($mitades as $m) {
+                            $m = trim(str_replace(['1/2', '1 ', 'HAWAIANAS'], ['', '', 'HAWAIANA'], $m));
+                            if(!empty($m)) $sub[] = "1 " . $m;
+                        }
+                    }
+                    $sub[] = "1 REFRESCO JARRITO";
+                } 
+                elseif ($id_paq == 2) {
+                    $nombre = "PIZZA GRANDE";
+                    $partes = explode('+', $variante);
+                    foreach($partes as $p) {
+                        $p = trim(str_replace(['1 ', 'PIZZA GRANDE'], ['', ''], $p));
+                        if(!empty($p)) $sub[] = "1 " . $p;
+                    }
+                } 
+                elseif ($id_paq == 3) {
+                    $nombre = "3 PIZZAS GRANDES";
+                    $limpio = str_replace(['+ 1 REFRESCO JARRITO.', '3 PIZZAS GRANDES'], '', $variante);
+                    $pizzas = explode(',', $limpio);
+                    foreach($pizzas as $p) {
+                        $p = trim($p);
+                        if(!empty($p)) $sub[] = (is_numeric(substr($p, 0, 1)) ? "" : "1 ") . $p;
+                    }
+                    $sub[] = "1 REFRESCO JARRITO";
+                }
+                else {
+                    $nombre = "PAQUETE " . $id_paq;
+                    if(!empty($variante)) $sub[] = $variante;
+                }
             }
+            // --- PIZZA MITAD Y MITAD DIRECTA ---
+            elseif($det->pizza_mitad) {
+                $j = json_decode($det->pizza_mitad); 
+                $nombre = "PIZZA " . mb_strtoupper($j->tamano ?? ''); 
+                $sub[] = "1 " . mb_strtoupper($j->mitad1 ?? '');
+                $sub[] = "1 " . mb_strtoupper($j->mitad2 ?? '');
+            }
+            // --- PRODUCTOS NORMALES ---
             elseif($det->id_pizza) {
                 $p = DB::table('Pizzas')->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')->join('TamanosPizza', 'Pizzas.id_tamano', '=', 'TamanosPizza.id_tamañop')->where('Pizzas.id_pizza', $det->id_pizza)->first();
-                if($p) { $nombre = "Pizza " . $p->tamano . " " . $p->nombre; $is_pairable = true; $clean_name = mb_strtoupper($p->nombre); }
+                if($p) $nombre = "PIZZA " . $p->tamano . " " . $p->nombre;
             }
             elseif($det->id_maris) {
                 $m = DB::table('PizzasMariscos')->join('TamanosPizza', 'PizzasMariscos.id_tamañop', '=', 'TamanosPizza.id_tamañop')->where('PizzasMariscos.id_maris', $det->id_maris)->first();
-                if($m) { $nombre = "Pizza Mariscos " . $m->tamano . " " . $m->nombre; $is_pairable = true; $clean_name = mb_strtoupper($m->nombre); }
+                if($m) $nombre = "MARISCOS " . $m->tamano . " " . $m->nombre;
             }
-            elseif($det->id_hamb) { $nombre = DB::table('Hamburguesas')->where('id_hamb', $det->id_hamb)->value('paquete'); }
-            elseif($det->id_cos) { $nombre = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
-            elseif($det->id_alis) { $nombre = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden'); }
-            elseif($det->id_spag) { $nombre = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden'); }
-            elseif($det->id_papa) { $nombre = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden'); }
             elseif($det->id_refresco) {
                 $r = DB::table('Refrescos')->join('TamanosRefrescos', 'Refrescos.id_tamano', '=', 'TamanosRefrescos.id_tamano')->where('Refrescos.id_refresco', $det->id_refresco)->first();
-                if($r) { $nombre = $r->nombre . " " . $r->tamano; }
+                if($r) $nombre = $r->nombre . " " . $r->tamano;
             }
             elseif($det->id_rec) {
-                $j = json_decode($det->id_rec); $nombre = "Pizza Rectangular";
-                if(isset($j->cuartos)) { $counts = array_count_values((array)$j->cuartos); $parts = []; foreach($counts as $k => $v) { $parts[] = "$v/4 $k"; } $sub[] = implode(", ", $parts); }
+                $j = json_decode($det->id_rec); $nombre = "PIZZA RECTANGULAR";
+                if(isset($j->cuartos)) { $counts = array_count_values((array)$j->cuartos); foreach($counts as $k => $v) { $sub[] = "$v/4 " . mb_strtoupper($k); } }
             }
             elseif($det->id_barr) {
-                $j = json_decode($det->id_barr); $nombre = "Pizza de Barra";
-                if(isset($j->medios)) { $counts = array_count_values((array)$j->medios); $parts = []; foreach($counts as $k => $v) { $parts[] = "$v/2 $k"; } $sub[] = implode(", ", $parts); }
+                $j = json_decode($det->id_barr); $nombre = "PIZZA DE BARRA";
+                if(isset($j->medios)) { $counts = array_count_values((array)$j->medios); foreach($counts as $k => $v) { $sub[] = "$v/2 " . mb_strtoupper($k); } }
             }
             elseif($det->id_magno) {
-                $j = json_decode($det->id_magno); $nombre = "Magno";
-                if(isset($j->medios)) { $counts = array_count_values((array)$j->medios); $parts = []; foreach($counts as $k => $v) { $parts[] = "$v/2 $k"; } $sub[] = implode(" / ", $parts); $sub[] = '1 Refresco de 2L'; }
+                $j = json_decode($det->id_magno); $nombre = "MAGNO";
+                if(isset($j->medios)) { $counts = array_count_values((array)$j->medios); foreach($counts as $k => $v) { $sub[] = "$v/2 " . mb_strtoupper($k); } $sub[] = '1 REFRESCO DE 2L'; }
             }
-            elseif($det->id_paquete) {
-                $j = json_decode($det->id_paquete); $nombre = "Paquete " . ($j->id ?? '');
-                if(isset($j->variante)) { $vars = explode("\n", str_replace(" / ", "\n", $j->variante)); foreach($vars as $v) { $sub[] = $v; } }
-            }
-            elseif($det->pizza_mitad) {
-                $j = json_decode($det->pizza_mitad); 
-                
-                // 1. Que se llame "Pizza" para que el sistema sepa cómo agruparla por tamaño (CHICA, GRANDE, etc)
-                $nombre = "Pizza " . ($j->tamano ?? ''); 
-                $is_pairable = true;
-                
-                // 2. Aquí armamos directamente la frase limpia "1/2 ESPECIALIDAD Y 1/2 OTRA"
-                $clean_name = mb_strtoupper("1/2 " . ($j->mitad1 ?? '') . " Y 1/2 " . ($j->mitad2 ?? ''));
+            else {
+                if($det->id_hamb) $nombre = DB::table('Hamburguesas')->where('id_hamb', $det->id_hamb)->value('paquete');
+                elseif($det->id_cos) $nombre = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden');
+                elseif($det->id_alis) $nombre = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden');
+                elseif($det->id_spag) $nombre = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden');
+                elseif($det->id_papa) $nombre = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden');
             }
 
-            if ($det->queso && $det->queso > 0 && !$is_pairable) { 
-                $sub[] = ($det->queso > 1 ? $det->queso . ' ' : '') . 'ORILLA RELLENA'; 
-            }
-            if ($ing && isset($ing->extras) && count($ing->extras) > 0) { 
-                $sub[] = 'EXTRAS: ' . implode(", ", $ing->extras); 
-            }
+            if ($det->queso > 0) $sub[] = "ORILLA RELLENA";
+            if ($ing && isset($ing->extras)) { foreach($ing->extras as $ex) $sub[] = "EXTRA: " . mb_strtoupper($ex); }
 
-            if ($is_pairable) {
-                $raw = mb_strtolower($nombre);
-                $size = 'MEDIANA';
-                if(str_contains($raw, 'chica')) $size = 'CHICA';
-                if(str_contains($raw, 'mediana') || str_contains($raw, 'media')) $size = 'MEDIANA';
-                if(str_contains($raw, 'grande')) $size = 'GRANDE';
-                if(str_contains($raw, 'familiar')) $size = 'FAMILIAR';
-
-                for($i=0; $i<$det->cantidad; $i++) {
-                    $pizzas_to_pair[$size][] = [
-                        'clean_name' => $clean_name,
-                        'precio_final' => $det->precio_unitario,
-                        'orilla' => ($det->queso > 0),
-                        'subs' => $sub
-                    ];
-                }
-            } else {
-                $other_items[] = [
-                    'cantidad' => $det->cantidad . 'X',
-                    'nombre' => mb_strtoupper($nombre),
-                    'total' => $det->precio_unitario * $det->cantidad, 
-                    'subs' => $sub
-                ];
-            }
+            $other_items[] = [
+                'cantidad' => $det->cantidad . 'X',
+                'nombre' => mb_strtoupper($nombre),
+                'total' => $det->precio_unitario * $det->cantidad, 
+                'subs' => $sub
+            ];
         }
 
         $final_items = [];
-
-        foreach ($pizzas_to_pair as $size => $pizzas) {
-            $chunks = array_chunk($pizzas, 2);
-            foreach($chunks as $chunk) {
-                $qty = count($chunk);
-                $title = "PIZZA" . ($qty > 1 ? 'S' : '') . " " . $size;
-                $total = 0;
-                $subs = [];
-                
-                foreach($chunk as $p) {
-                    $total += $p['precio_final'];
-                    
-                    // 3. Quitamos la estorbosa "1 " que se ponía al principio
-                    $desc = $p['clean_name']; 
-                    
-                    // Si tiene orilla, se la sumamos a la misma línea
-                    if($p['orilla']) {
-                        $desc .= " + ORILLA RELLENA";
-                    }
-                    $subs[] = "> " . $desc;
-                    
-                    // Extras si los hay
-                    foreach($p['subs'] as $s) {
-                        $subs[] = "  " . mb_strtoupper($s);
-                    }
-                }
-
-                $final_items[] = (object)[
-                    'cantidad' => '',
-                    'nombre' => trim($title),
-                    'total' => $total,
-                    'subs' => $subs
-                ];
-            }
-        }
-
         foreach ($other_items as $item) {
             $formatted_subs = [];
-            foreach($item['subs'] as $s) $formatted_subs[] = "> " . mb_strtoupper($s);
+            foreach($item['subs'] as $s) $formatted_subs[] = "> " . $s;
 
             $final_items[] = (object)[
                 'cantidad' => $item['cantidad'],
@@ -470,7 +439,6 @@ class PuntoVentaController extends Controller
         }
 
         $pagos = DB::table('Pago')->leftJoin('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')->where('id_venta', $id)->get();
-            
         $domicilio = null;
         if ($venta->tipo_servicio == 3) {
             $domicilio = DB::table('PDomicilio')
@@ -483,7 +451,7 @@ class PuntoVentaController extends Controller
 
         return view('Ventas.ticket', compact('venta', 'final_items', 'pagos', 'domicilio'));
     }
-    
+
     public function historial(Request $request)
     {
         $id_sucursal = 1; 
@@ -525,7 +493,6 @@ class PuntoVentaController extends Controller
                 'comentarios' => $nuevoComentario
             ]);
 
-            // ELIMINAR LOS PAGOS para que no cuenten en los ingresos (corte de caja)
             DB::table('Pago')->where('id_venta', $request->id_venta)->delete();
 
             DB::commit();

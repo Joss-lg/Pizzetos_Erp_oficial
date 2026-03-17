@@ -20,10 +20,14 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        // Intentamos autenticar con nickName y validamos que el empleado esté activo (status = 1)
         if (Auth::attempt(['nickName' => $credentials['nickName'], 'password' => $credentials['password'], 'status' => 1])) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+            
+            if (Auth::user()->id_ca == 1) {
+                return redirect()->intended('dashboard');
+            } else {
+                return redirect()->intended('venta/flujo-caja');
+            }
         }
 
         return back()->withErrors([

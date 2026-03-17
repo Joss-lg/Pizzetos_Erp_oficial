@@ -1307,10 +1307,55 @@
                     }
                     this.actualizarCarrito();
                 },
-                addPaq1() { this.addPaq(1, this.paq1Opt); this.modalPaq1 = false; },
-                addPaq2() { this.addPaq(2, this.paq2Extra + ' + Pizza ' + this.paq2Pizza); this.modalPaq2 = false; },
-                addPaq3Esp(esp) { if(this.paq3Pizzas.length < 3) this.paq3Pizzas.push(esp); },
-                removePaq3Esp(index) { this.paq3Pizzas.splice(index, 1); },
+                addPaq1() { 
+                    let textoVariante = this.paq1Opt;
+                    if(textoVariante.includes('Combinado')) {
+                        textoVariante = '1 HAWAIANA / 1 PEPPERONI';
+                    } else if(textoVariante === '2 Hawaianas') {
+                        textoVariante = '2 HAWAIANA';
+                    } else if(textoVariante === '2 Pepperoni') {
+                        textoVariante = '2 PEPPERONI';
+                    }
+                    this.addPaq(1, textoVariante); 
+                    this.modalPaq1 = false; 
+                },
+                addPaq2() { 
+                    const varianteFinal = `1 PIZZA ${this.paq2Pizza} + 1 ${this.paq2Extra} + 1 REFRESCO JARRITO`;
+                    this.addPaq(2, varianteFinal.toUpperCase()); 
+                    this.modalPaq2 = false; 
+                },
+                addPaq3Esp(esp) { 
+                    if(this.paq3Pizzas.length < 3) {
+                        this.paq3Pizzas.push(esp);
+                    }
+                },
+                removePaq3Esp(index) { 
+                    this.paq3Pizzas.splice(index, 1); 
+                },
+                addPaq3() { 
+                    if (this.paq3Pizzas.length < 3) {
+                        alert("Por favor selecciona las 3 pizzas del paquete.");
+                        return;
+                    }
+                    let counts = {};
+                    this.paq3Pizzas.forEach(x => counts[x] = (counts[x] || 0) + 1);
+                    let parts = [];
+                    for(let k in counts) { 
+                        parts.push(counts[k] + ' ' + k); 
+                    }
+                    
+                    // 3. Construimos el string final
+                    const varianteFinal = (parts.join(', ') + '').toUpperCase();
+                    
+                    // 4. Agregamos al carrito
+                    this.addPaq(3, varianteFinal); 
+
+                    // 5. ¡ESTA ES LA CLAVE!: Limpiar el arreglo para que el modal esté vacío la próxima vez
+                    this.paq3Pizzas = []; 
+
+                    // 6. Cerrar modal
+                    this.modalPaq3 = false; 
+                },
                 formatearPaq3Preview() {
                     if(this.paq3Pizzas.length === 0) return 'Sin especialidades';
                     let counts = {};
@@ -1319,8 +1364,7 @@
                     for(let k in counts) { parts.push(counts[k] + ' ' + k); }
                     return parts.join(', ');
                 },
-                addPaq3() { this.addPaq(3, this.formatearPaq3Preview()); this.modalPaq3 = false; },
-
+                
                 incrementarOrillaPaq(uid) {
                     let idx = this.cart.findIndex(c => c.uid === uid);
                     if(idx > -1 && this.cart[idx].orillas_qty < this.cart[idx].max_orillas) {
