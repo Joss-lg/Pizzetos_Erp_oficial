@@ -48,7 +48,6 @@
 <body>
 
     <div class="text-center mb-1">
-        {{-- LOGO DE LA PIZZERÍA --}}
         <img src="{{ asset('pizzetos.png') }}" alt="Pizzetos Logo" class="ticket-logo">
         
         <div style="font-size: 12px;">TICKET DE VENTA</div>
@@ -70,7 +69,6 @@
         </div>
     </div>
 
-    {{-- DATOS DEL CLIENTE --}}
     @if($venta->tipo_servicio == 3 && $domicilio)
         <div class="mb-1" style="font-size: 11px; line-height: 1.4; margin-bottom: 5px;">
             <span class="font-bold" style="font-size: 13px;">CLIENTE:</span> {{ trim(($domicilio->cnombre ?? '') . ' ' . ($domicilio->capellido ?? '')) }} | 
@@ -100,45 +98,52 @@
         </thead>
         <tbody>
             @foreach($final_items as $item)
-                {{-- ENCABEZADO DEL PRODUCTO (Ej: GRANDE, PAQUETE 1, BARRA) --}}
                 <tr style="font-size: 16px; font-weight: 900; line-height: 1.1;">
                     <td style="white-space: nowrap; vertical-align: top; padding-top: 4px;">{{ $item->cantidad }}</td>
                     <td style="vertical-align: top; padding-top: 4px;">{{ $item->nombre }}</td>
-                    <td class="text-right" style="vertical-align: top; padding-top: 4px;">${{ number_format($item->total, 2) }}</td>
+                    <td class="text-right" style="vertical-align: top; padding-top: 4px;">
+                        @if($item->total !== null)
+                            ${{ number_format($item->total, 2) }}
+                        @endif
+                    </td>
                 </tr>
                 
-                {{-- DESGLOSE DE ESPECIALIDADES (Ej: 1 HAWAIANA, 1/2 PASTOR) --}}
                 @foreach($item->subs as $sub)
-                <tr class="sub-item">
-                    <td></td>
-                    <td colspan="2" style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">{{ $sub }}</td>
-                </tr>
+                    <tr class="sub-item">
+                        <td></td>
+                        @if(is_array($sub))
+                            <td style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">{{ $sub['texto'] }}</td>
+                            <td class="text-right" style="font-size: 14px; font-weight: bold; padding-bottom: 2px;">
+                                @if(isset($sub['precio']))
+                                    ${{ number_format($sub['precio'], 2) }}
+                                @elseif(isset($sub['precio_ext']) && $sub['precio_ext'] != '')
+                                    {{ $sub['precio_ext'] }}
+                                @endif
+                            </td>
+                        @else
+                            <td colspan="2" style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">{{ $sub }}</td>
+                        @endif
+                    </tr>
                 @endforeach
                 
-                {{-- ESPACIO SEPARADOR ENTRE PRODUCTOS (¡Ya sin la línea punteada!) --}}
                 <tr><td colspan="3" style="height: 12px;"></td></tr>
             @endforeach
         </tbody>
     </table>
 
-    {{-- SECCIÓN DE COMENTARIOS --}}
     @if($venta->comentarios)
         <div style="border-top: 1px dashed #000; margin-top: 5px;"></div>
         
         <div class="text-center" style="padding: 5px 0; font-size: 12px; font-weight: bold;">
             {{ $venta->comentarios }}
         </div>
-        
     @endif
 
-    {{-- ZONA DE TOTAL Y PAGOS --}}
     @if($venta->status == 0)
         <div class="text-center font-bold" style="border: 2px solid #000; padding: 5px; margin-top: 10px;">
             CUENTA ABIERTA<br>PENDIENTE DE PAGO
         </div>
     @else
-        
-        {{-- TOTAL A PAGAR  --}}
         <div style="border-top: 1px dashed #000; margin-top: 5px;"></div>
         
         <div style="padding: 5px 0;">
@@ -150,7 +155,6 @@
 
         <div style="border-top: 1px dashed #000; margin-bottom: 10px;"></div>
 
-        {{-- MÉTODOS DE PAGO LIBRES POR DEBAJO --}}
         <div>
             <div class="font-bold" style="font-size: 13px; margin-bottom: 5px;">MÉTODO DE PAGO:</div>
             
@@ -188,14 +192,12 @@
                 </div>
             @endforeach
         </div>
-
     @endif
 
     <div class="text-center mt-1 pt-1" style="margin-top: 20px; font-size: 12px; font-weight: bold;">
         ¡GRACIAS POR SU PREFERENCIA!
     </div>
 
-    {{-- LÓGICA DE AUTO-IMPRESIÓN Y AUTO-CIERRE DE POPUP --}}
     <script>
         window.onload = function() {
             window.print();

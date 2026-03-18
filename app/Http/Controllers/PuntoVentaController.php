@@ -352,7 +352,6 @@ public function ticket(Request $request, $id)
         foreach($detalles as $det) {
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
 
-
             if ($request->has('solo_nuevos') && $request->solo_nuevos == 1) {
                 if ($ing && isset($ing->is_old) && $ing->is_old == true) {
                     continue; 
@@ -362,13 +361,14 @@ public function ticket(Request $request, $id)
             $es_pizza = false;
             $size_clean = '';
             $linea = '';
+            $p_orilla = $ing->p_orilla ?? 0;
 
             if ($det->id_pizza) {
                 $p = DB::table('Pizzas')->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')->join('TamanosPizza', 'Pizzas.id_tamano', '=', 'TamanosPizza.id_tamañop')->where('Pizzas.id_pizza', $det->id_pizza)->first();
                 if($p) { 
                     $es_pizza = true; 
                     $size_clean = $cleanTamano($p->tamano); 
-                    $linea = "1 " . $cleanSabor($p->nombre); 
+                    $linea = "1 " . $cleanSabor($p->nombre);
                 }
             } 
             elseif ($det->id_maris) {
@@ -376,14 +376,14 @@ public function ticket(Request $request, $id)
                 if($m) { 
                     $es_pizza = true; 
                     $size_clean = $cleanTamano($m->tamano); 
-                    $linea = "1 " . $cleanSabor($m->nombre); 
+                    $linea = "1 " . $cleanSabor($m->nombre);
                 }
             } 
             elseif ($det->pizza_mitad) {
                 $j = json_decode($det->pizza_mitad);
                 $es_pizza = true; 
                 $size_clean = $cleanTamano($j->tamano ?? '');
-                $linea = "1 " . $cleanSabor($j->mitad1 ?? '') . "/" . $cleanSabor($j->mitad2 ?? '');
+                $linea = "1 " . $cleanSabor($j->mitad1 ?? '') . " / " . $cleanSabor($j->mitad2 ?? '');
             } 
             elseif (isset($ing->piz_ing_tamano)) {
                 $es_pizza = true; 
@@ -398,7 +398,9 @@ public function ticket(Request $request, $id)
                     $pizzas_flat[] = [
                         'size' => mb_strtoupper($size_clean),
                         'line' => $linea,
-                        'price' => $det->precio_unitario
+                        'price' => $det->precio_unitario,
+                        'p_orilla' => $p_orilla,
+                        'queso' => $det->queso
                     ];
                 }
             } 
@@ -408,31 +410,35 @@ public function ticket(Request $request, $id)
                 $name_comp = "";
                 
                 if($det->id_hamb) { $is_complemento = true; $cat_comp = "HAMBURGUESAS"; $name_comp = DB::table('Hamburguesas')->where('id_hamb', $det->id_hamb)->value('paquete'); }
-                elseif($det->id_cos) { $is_complemento = true; $cat_comp = "COSTILLAS"; $name_comp = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
-                elseif($det->id_alis) { $is_complemento = true; $cat_comp = "ALITAS"; $name_comp = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden'); }
-                elseif($det->id_spag) { $is_complemento = true; $cat_comp = "SPAGUETTY"; $name_comp = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden'); }
-                elseif($det->id_papa) { $is_complemento = true; $cat_comp = "PAPAS"; $name_comp = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden'); }
+                elseif($det->id_cos) { $is_complemento = true; $cat_comp = "ORD. COSTILLAS"; $name_comp = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
+                elseif($det->id_alis) { $is_complemento = true; $cat_comp = "ORD. ALITAS"; $name_comp = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden'); }
+                elseif($det->id_spag) { $is_complemento = true; $cat_comp = "ORD. SPAGUETTY"; $name_comp = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden'); }
+                elseif($det->id_papa) { $is_complemento = true; $cat_comp = "ORD. PAPAS"; $name_comp = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden'); }
 
                 if ($is_complemento) {
                     if (!isset($grouped_complementos[$cat_comp])) {
-                        $grouped_complementos[$cat_comp] = ['total' => 0, 'subs' => []];
+                        $grouped_complementos[$cat_comp] = ['total' => null, 'subs' => []];
                     }
-                    $grouped_complementos[$cat_comp]['total'] += ($det->precio_unitario * $det->cantidad);
                     
                     $clean_comp = trim(str_ireplace(['alitas', 'hamburguesas', 'hamburguesa', 'orden de', 'papas', 'costillas', 'spaguetty', 'paquete', 'orden', ' de '], '', mb_strtolower($name_comp)));
                     if (empty($clean_comp)) $clean_comp = mb_strtoupper($name_comp); 
                     else $clean_comp = mb_strtoupper($clean_comp);
                     
-                    $grouped_complementos[$cat_comp]['subs'][] = $det->cantidad . " " . $clean_comp;
+                    $grouped_complementos[$cat_comp]['subs'][] = [
+                        'texto' => $det->cantidad . " " . $clean_comp,
+                        'precio' => ($det->precio_unitario * $det->cantidad)
+                    ];
                 } 
                 elseif ($det->id_refresco) {
                     $r = DB::table('Refrescos')->join('TamanosRefrescos', 'Refrescos.id_tamano', '=', 'TamanosRefrescos.id_tamano')->where('Refrescos.id_refresco', $det->id_refresco)->first();
                     if($r) {
                         if (!isset($grouped_bebidas["BEBIDAS"])) {
-                            $grouped_bebidas["BEBIDAS"] = ['total' => 0, 'subs' => []];
+                            $grouped_bebidas["BEBIDAS"] = ['total' => null, 'subs' => []];
                         }
-                        $grouped_bebidas["BEBIDAS"]['total'] += ($det->precio_unitario * $det->cantidad);
-                        $grouped_bebidas["BEBIDAS"]['subs'][] = $det->cantidad . " " . mb_strtoupper($r->nombre . " " . $r->tamano);
+                        $grouped_bebidas["BEBIDAS"]['subs'][] = [
+                            'texto' => $det->cantidad . " " . mb_strtoupper($r->nombre . " " . $r->tamano),
+                            'precio' => ($det->precio_unitario * $det->cantidad)
+                        ];
                     }
                 }
                 else {
@@ -444,7 +450,6 @@ public function ticket(Request $request, $id)
                             $j = json_decode($det->id_paquete);
                             $id_paq = $j->id ?? 0;
                             $nombre = "PAQUETE " . $id_paq;
-                            $lineas = [];
 
                             if (isset($j->pizzas) && is_array($j->pizzas)) {
                                 $pizzas_agrupadas = [];
@@ -459,7 +464,9 @@ public function ticket(Request $request, $id)
                                     $lineas[] = $qty . " " . $nom;
                                 }
                                 if (!empty($j->extra)) {
-                                    $lineas[] = "1 " . mb_strtoupper($j->extra);
+                                    $nomExtra = mb_strtoupper($j->extra);
+                                    $nomExtra = str_replace(['ALITAS', 'COSTILLAS', 'PAPAS'], ['ORD. ALITAS', 'ORD. COSTILLAS', 'ORD. PAPAS'], $nomExtra);
+                                    $lineas[] = "1 " . $nomExtra;
                                 }
                                 $lineas[] = "1 REFRESCO JARRITO 2 LTS";
                             } 
@@ -530,7 +537,7 @@ public function ticket(Request $request, $id)
                             if(isset($j->medios)) { 
                                 $m = (array)$j->medios;
                                 if (count($m) >= 2) {
-                                    $str = $cleanSabor($m[0]) . "/" . $cleanSabor($m[1]);
+                                    $str = $cleanSabor($m[0]) . " / " . $cleanSabor($m[1]);
                                 } elseif (count($m) == 1) {
                                     $str = $cleanSabor($m[0]);
                                 }
@@ -564,14 +571,25 @@ public function ticket(Request $request, $id)
             foreach ($chunks as $chunk) {
                 $subs = [];
                 $total_chunk = 0;
+                $total_orillas = 0;
+                
                 foreach ($chunk as $pz) {
-                    $subs[] = $pz['line'];
+                    $extra_str = "";
+                    if ($pz['queso'] > 0 && $pz['p_orilla'] > 0) {
+                        $total_orillas += $pz['p_orilla'];
+                        $extra_str = "+$" . number_format($pz['p_orilla'], 2);
+                    }
+                    $subs[] = [
+                        'texto' => $pz['line'],
+                        'precio_ext' => $extra_str
+                    ];
                     $total_chunk += $pz['price'];
                 }
+                
                 $final_items[] = (object)[
-                    'cantidad' => 1,
+                    'cantidad' => '',
                     'nombre' => $size, 
-                    'total' => $total_chunk,
+                    'total' => ($total_chunk - $total_orillas),
                     'subs' => $subs
                 ];
             }
@@ -579,18 +597,18 @@ public function ticket(Request $request, $id)
 
         foreach ($grouped_complementos as $nombre => $data) {
             $final_items[] = (object)[
-                'cantidad' => 1, 
+                'cantidad' => '', 
                 'nombre' => $nombre, 
-                'total' => $data['total'],
+                'total' => null, 
                 'subs' => $data['subs'] 
             ];
         }
 
         foreach ($grouped_bebidas as $nombre => $data) {
             $final_items[] = (object)[
-                'cantidad' => 1, 
+                'cantidad' => '', 
                 'nombre' => $nombre, 
-                'total' => $data['total'],
+                'total' => null,
                 'subs' => $data['subs'] 
             ];
         }
