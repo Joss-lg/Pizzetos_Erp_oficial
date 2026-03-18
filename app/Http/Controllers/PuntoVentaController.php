@@ -393,7 +393,7 @@ public function ticket(Request $request, $id)
             }
 
             if ($es_pizza) {
-                if ($det->queso > 0) $linea .= " + ORILLA RELLENA";
+                if ($det->queso > 0) $linea .= " + ORILLA";
                 for ($i = 0; $i < $det->cantidad; $i++) {
                     $pizzas_flat[] = [
                         'size' => mb_strtoupper($size_clean),
