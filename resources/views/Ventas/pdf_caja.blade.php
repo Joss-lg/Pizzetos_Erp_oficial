@@ -87,7 +87,6 @@
 
     <h2 class="section-title" style="margin-top: 25px;">Desglose por Método de Pago</h2>
     <table class="table-bordered">
-        <tr><td style="width: 50%;">Efectivo</td><td class="text-right">$ {{ number_format($stats['efectivo'], 2) }}</td></tr>
         <tr><td>Tarjeta</td><td class="text-right">$ {{ number_format($stats['tarjeta'], 2) }}</td></tr>
         <tr><td>Transferencia</td><td class="text-right">$ {{ number_format($stats['transferencia'], 2) }}</td></tr>
     </table>

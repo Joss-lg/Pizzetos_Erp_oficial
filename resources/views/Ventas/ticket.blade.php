@@ -115,8 +115,8 @@
                 </tr>
                 @endforeach
                 
-                {{-- ESPACIO SEPARADOR ENTRE PRODUCTOS --}}
-                <tr><td colspan="3" style="height: 8px; border-bottom: 1px dashed #bbb;"></td></tr>
+                {{-- ESPACIO SEPARADOR ENTRE PRODUCTOS (¡Ya sin la línea punteada!) --}}
+                <tr><td colspan="3" style="height: 12px;"></td></tr>
             @endforeach
         </tbody>
     </table>
@@ -155,7 +155,7 @@
             <div class="font-bold" style="font-size: 13px; margin-bottom: 5px;">MÉTODO DE PAGO:</div>
             
             @foreach($pagos as $pago)
-                <div style="margin-bottom: 4px;">
+                <div style="margin-bottom: 5px;">
                     @if($pago->id_metpago == 1)
                         <div class="flex-between font-bold">
                             <span>TARJETA</span>
