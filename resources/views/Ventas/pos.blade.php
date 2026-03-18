@@ -247,12 +247,22 @@
                                     </template>
 
                                     <template x-if="group.item.tipo === 'paq'">
-                                        <div class="flex items-center justify-between mt-2 bg-white px-3 py-2 rounded border border-gray-200 shadow-sm">
-                                            <span class="text-[12px] text-[#495057] font-bold">Orillas Rellenas <span class="text-[#fd7e14]">(+$<span x-text="group.item.precio_orilla"></span> c/u)</span></span>
-                                            <div class="flex items-center bg-[#e9ecef] rounded border border-gray-200">
-                                                <button @click="decrementarOrillaPaq(group.item.uid)" class="w-6 h-6 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center leading-none">-</button>
-                                                <span class="w-6 h-6 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[12px]" x-text="group.item.orillas_qty"></span>
-                                                <button @click="incrementarOrillaPaq(group.item.uid)" class="w-6 h-6 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center leading-none">+</button>
+                                        <div class="mt-2 bg-[#f8f9fa] p-2.5 rounded-[8px] border border-gray-200 shadow-inner">
+                                            <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest block mb-2">Elegir Orilla Rellena (+$<span x-text="group.item.precio_orilla"></span>)</span>
+                                            
+                                            <div class="space-y-1.5">
+                                                {{-- Dibuja un checkbox por CADA pizza dentro del paquete --}}
+                                                <template x-for="(pz, pIdx) in group.item.pizzas_paq" :key="pIdx">
+                                                    <label class="flex items-center gap-2 text-[12px] font-bold text-gray-700 cursor-pointer bg-white px-2.5 py-2 rounded shadow-sm border border-gray-100 hover:border-amber-400 transition-colors">
+                                                        <input type="checkbox" x-model="pz.orilla" @change="recalcPaqOrillas(group.item)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                                        <span x-text="pz.nombre"></span>
+                                                    </label>
+                                                </template>
+                                            </div>
+                                    
+                                            {{-- Si el paquete trae un extra (ej. Alitas), lo mostramos aquí abajo --}}
+                                            <div x-show="group.item.extra_paq" class="mt-2 pt-2 border-t border-gray-200 text-[12px] font-bold text-slate-700 px-1">
+                                                <span class="text-amber-500 mr-1">+</span> <span x-text="group.item.extra_paq"></span>
                                             </div>
                                         </div>
                                     </template>
@@ -512,23 +522,74 @@
         </div>
 
         {{-- PAQUETES (1, 2 y 3) --}}
+        {{-- PAQUETE 1 --}}
         <div x-show="modalPaq1" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[400px] flex flex-col overflow-hidden" @click.away="modalPaq1 = false">
+            <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq1 = false">
                 <div class="p-6 pb-4 relative border-b border-gray-100 bg-[#ffc107]">
                     <button @click="modalPaq1 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
                     <h2 class="text-2xl font-black text-black mb-1">Paquete 1</h2>
                 </div>
-                <div class="p-6 bg-[#f8f9fa]">
-                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-5"><li>2 Pizzas Grandes</li><li>1 Refresco de 2L Jarrito</li></ul>
-                    <div class="space-y-3 mb-2">
-                        <button @click="paq1Opt = 'Combinado (1 Hawaiana y 1 Pepperoni)'" class="w-full text-left block border rounded-[8px] p-4" :class="paq1Opt === 'Combinado (1 Hawaiana y 1 Pepperoni)' ? 'bg-[#fff9c4] border-[#ffc107]' : 'bg-white'"> <span class="block font-bold">Combinado</span> <span class="block text-xs">1 Hawaiana y 1 Pepperoni</span> </button>
-                        <button @click="paq1Opt = '2 Hawaianas'" class="w-full text-left block border rounded-[8px] p-4 font-bold" :class="paq1Opt === '2 Hawaianas' ? 'bg-[#fff9c4] border-[#ffc107]' : 'bg-white'">2 Hawaianas</button>
-                        <button @click="paq1Opt = '2 Pepperoni'" class="w-full text-left block border rounded-[8px] p-4 font-bold" :class="paq1Opt === '2 Pepperoni' ? 'bg-[#fff9c4] border-[#ffc107]' : 'bg-white'">2 Pepperoni</button>
+                <div class="p-6 bg-[#f8f9fa] overflow-y-auto scrollbar-hide flex-1">
+                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-4 mt-0">
+                        <li>2 Pizzas Grandes (Haw/Pep)</li>
+                        <li>1 Refresco de 2L Jarrito</li>
+                    </ul>
+
+                    {{-- Checkbox Orilla Paq 1 --}}
+                    <label class="flex items-center gap-2 mt-2 mb-4 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm w-max">
+                        <input type="checkbox" x-model="paq1MitadesMode" @change="paq1Pizzas=[]; paq1Halves=[]" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                        <span class="text-[13px] font-bold text-gray-700">Armar Pizzas Mitad y Mitad</span>
+                    </label>
+
+                    {{-- MODO NORMAL (2 PIZZAS COMPLETAS) --}}
+                    <div x-show="!paq1MitadesMode">
+                        <div class="grid grid-cols-2 gap-2 mb-5">
+                            <template x-for="i in 2">
+                                <div class="border-2 rounded-[8px] p-2 text-center h-[55px] flex items-center justify-center relative" :class="paq1Pizzas[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                    <template x-if="paq1Pizzas[i-1]">
+                                        <div class="w-full flex justify-between items-center px-1">
+                                            <span class="text-[11px] font-bold text-[#212529]" x-text="paq1Pizzas[i-1]"></span>
+                                            <button @click="removePaq1Esp(i-1)" class="text-red-500 font-bold text-[12px]">&times;</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white">
+                            <button @click="addPaq1Esp('HAWAIANA')" :disabled="paq1Pizzas.length >= 2" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">HAWAIANA</button>
+                            <button @click="addPaq1Esp('PEPPERONI')" :disabled="paq1Pizzas.length >= 2" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">PEPPERONI</button>
+                        </div>
                     </div>
+
+                    {{-- MODO MITADES (4 MITADES = 2 PIZZAS) --}}
+                    <div x-show="paq1MitadesMode" x-cloak>
+                        <div class="grid grid-cols-2 gap-4 mb-5">
+                            <template x-for="piz in 2">
+                                <div class="bg-gray-100 border border-gray-200 rounded p-1.5 space-y-1">
+                                    <div class="text-center text-[11px] font-black text-gray-500 uppercase">Pizza <span x-text="piz"></span></div>
+                                    <template x-for="mit in 2">
+                                        <div class="border-2 rounded-[6px] p-1.5 h-[35px] flex items-center justify-center bg-white" :class="paq1Halves[((piz-1)*2) + (mit-1)] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300'">
+                                            <template x-if="paq1Halves[((piz-1)*2) + (mit-1)]">
+                                                <div class="w-full flex justify-between items-center px-1">
+                                                    <span class="text-[10px] font-bold text-black truncate" x-text="paq1Halves[((piz-1)*2) + (mit-1)]"></span>
+                                                    <button @click="removePaq1Esp(((piz-1)*2) + (mit-1))" class="text-red-500 font-black text-[12px] ml-1">&times;</button>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white">
+                            <button @click="addPaq1Esp('HAWAIANA')" :disabled="paq1Halves.length >= 4" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">HAWAIANA</button>
+                            <button @click="addPaq1Esp('PEPPERONI')" :disabled="paq1Halves.length >= 4" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">PEPPERONI</button>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="p-5 flex gap-3 border-t border-gray-100 bg-white items-center justify-between">
                     <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
-                    <button @click="addPaq1()" :disabled="!paq1Opt" :class="!paq1Opt ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
+                    <button @click="addPaq1()" :disabled="paq1MitadesMode ? paq1Halves.length !== 4 : paq1Pizzas.length !== 2" :class="(paq1MitadesMode ? paq1Halves.length !== 4 : paq1Pizzas.length !== 2) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
             </div>
         </div>
@@ -559,45 +620,116 @@
                             </button>
                         </template>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                    {{-- Checkbox Orilla Paq 2 --}}
+                    <label class="flex items-center gap-2 mt-4 mb-2 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm">
+                        <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                        <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
+                    </label>
+
+                    {{-- PIZZA NORMAL (1 SOLA) --}}
+                    <div x-show="!paq2MitadesMode" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-hide pb-2">
                         <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                            <button @click="paq2Pizza = esp.nombre" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-2.5 text-[12px] font-bold" x-text="esp.nombre"></button>
+                            <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400" x-text="esp.nombre"></button>
                         </template>
+                    </div>
+
+                    {{-- PIZZA MITAD Y MITAD (2 SELECCIONES) --}}
+                    <div x-show="paq2MitadesMode" x-cloak>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <template x-for="i in 2">
+                                <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative" :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                    <template x-if="paq2MitadesArr[i-1]">
+                                        <div class="w-full flex justify-between items-center px-1">
+                                            <span class="text-[11px] font-bold text-[#212529]" x-text="'1/2 ' + paq2MitadesArr[i-1]"></span>
+                                            <button @click="removePaq2Mitad(i-1)" class="text-red-500 font-bold text-[12px]">&times;</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50" x-text="esp.nombre"></button>
+                            </template>
+                        </div>
                     </div>
                 </div>
                 <div class="p-5 flex gap-3 border-t border-gray-100 bg-white justify-between items-center">
                     <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
-                    <button @click="addPaq2()" :disabled="!paq2Extra || !paq2Pizza" :class="(!paq2Extra || !paq2Pizza) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
+                    <button @click="addPaq2()" :disabled="!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)" :class="(!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
             </div>
         </div>
 
         <div x-show="modalPaq3" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq3 = false">
-                <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]"><h2 class="text-2xl font-black text-black mb-1">Paquete 3</h2><button @click="modalPaq3 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button></div>
+                <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]">
+                    <h2 class="text-2xl font-black text-black mb-1">Paquete 3</h2>
+                    <button @click="modalPaq3 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
+                </div>
                 <div class="p-6 overflow-y-auto flex-1 bg-[#f8f9fa] scrollbar-hide">
-                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-4 mt-0"><li>3 Pizzas Grandes</li><li>1 Refresco de 2L Jarrito</li></ul>
-                    <div class="grid grid-cols-3 gap-2 mb-5">
-                        <template x-for="i in 3">
-                            <div class="border-2 rounded-[8px] p-2 text-center h-[55px] flex items-center justify-center relative" :class="paq3Pizzas[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
-                                <template x-if="paq3Pizzas[i-1]">
-                                    <div class="w-full flex justify-between items-center px-1">
-                                        <span class="text-[11px] font-bold text-[#212529]" x-text="paq3Pizzas[i-1]"></span>
-                                        <button @click="removePaq3Esp(i-1)" class="text-red-500 font-bold text-[12px]">&times;</button>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
+                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-4 mt-0">
+                        <li>3 Pizzas Grandes</li>
+                        <li>1 Refresco de 2L Jarrito</li>
+                    </ul>
+
+                    {{-- Checkbox Orilla Paq 3 --}}
+                    <label class="flex items-center gap-2 mt-2 mb-4 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm w-max">
+                        <input type="checkbox" x-model="paq3MitadesMode" @change="paq3Pizzas=[]; paq3Halves=[]" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                        <span class="text-[13px] font-bold text-gray-700">Armar Pizzas Mitad y Mitad</span>
+                    </label>
+
+                    {{-- MODO NORMAL (3 PIZZAS COMPLETAS) --}}
+                    <div x-show="!paq3MitadesMode">
+                        <div class="grid grid-cols-3 gap-2 mb-5">
+                            <template x-for="i in 3">
+                                <div class="border-2 rounded-[8px] p-2 text-center h-[55px] flex items-center justify-center relative" :class="paq3Pizzas[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                    <template x-if="paq3Pizzas[i-1]">
+                                        <div class="w-full flex justify-between items-center px-1">
+                                            <span class="text-[11px] font-bold text-[#212529]" x-text="paq3Pizzas[i-1]"></span>
+                                            <button @click="removePaq3Esp(i-1)" class="text-red-500 font-bold text-[12px]">&times;</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white max-h-48 overflow-y-auto">
+                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Pizzas.length >= 3" class="border rounded-[8px] p-2.5 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
+                            </template>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white">
-                        <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                            <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Pizzas.length >= 3" class="border rounded-[8px] p-2.5 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
-                        </template>
+
+                    {{-- MODO MITADES (6 MITADES = 3 PIZZAS) --}}
+                    <div x-show="paq3MitadesMode" x-cloak>
+                        <div class="grid grid-cols-3 gap-3 mb-5">
+                            <template x-for="piz in 3">
+                                <div class="bg-gray-100 border border-gray-200 rounded p-1 space-y-1">
+                                    <div class="text-center text-[10px] font-black text-gray-500 uppercase">Pizza <span x-text="piz"></span></div>
+                                    <template x-for="mit in 2">
+                                        <div class="border-2 rounded-[6px] p-1 h-[35px] flex items-center justify-center bg-white" :class="paq3Halves[((piz-1)*2) + (mit-1)] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300'">
+                                            <template x-if="paq3Halves[((piz-1)*2) + (mit-1)]">
+                                                <div class="w-full flex justify-between items-center px-1">
+                                                    <span class="text-[9px] font-bold text-black truncate" x-text="paq3Halves[((piz-1)*2) + (mit-1)]"></span>
+                                                    <button @click="removePaq3Esp(((piz-1)*2) + (mit-1))" class="text-red-500 font-black text-[10px] ml-1">&times;</button>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white max-h-40 overflow-y-auto">
+                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Halves.length >= 6" class="border rounded-[8px] p-2.5 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
+                            </template>
+                        </div>
                     </div>
+
                 </div>
                 <div class="p-5 flex gap-3 border-t border-gray-100 bg-white justify-between items-center">
                     <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
-                    <button @click="addPaq3()" :disabled="paq3Pizzas.length !== 3" :class="paq3Pizzas.length !== 3 ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
+                    <button @click="addPaq3()" :disabled="paq3MitadesMode ? paq3Halves.length !== 6 : paq3Pizzas.length !== 3" :class="(paq3MitadesMode ? paq3Halves.length !== 6 : paq3Pizzas.length !== 3) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
             </div>
         </div>
@@ -944,9 +1076,9 @@
                 comentariosGenerales: '{{ $venta_edit->comentarios ?? '' }}', comentariosGeneralesTemp: '', modalComentarios: false,
                 modalOpc: false, opcItem: null,
 
-                modalPaq1: false, paq1Opt: 'Combinado (1 Hawaiana y 1 Pepperoni)', paqObj: null,
-                modalPaq2: false, paq2Tipo: 'hamb', paq2Extra: '', paq2Pizza: '',
-                modalPaq3: false, paq3Pizzas: [],
+                modalPaq1: false, paq1Pizzas: [], paq1MitadesMode: false, paq1Halves: [], paqObj: null,
+                modalPaq2: false, paq2Tipo: 'hamb', paq2Extra: '', paq2Pizza: '', paq2MitadesMode: false, paq2MitadesArr: [],
+                modalPaq3: false, paq3Pizzas: [], paq3MitadesMode: false, paq3Halves: [],
                 modalIngredientes: false, ingTam: null, ingSel: [], searchIng: '',
                 modalMitades: false, mitTam: null, mitSel: [],
                 modalRectangular: false, rectItem: null, rectSel: [],
@@ -1007,13 +1139,11 @@
                     let txt = this.searchClienteText.toLowerCase().trim();
                     
                     return listaSegura.filter(c => {
-                        // Obtenemos los valores blindados (checa todas las posibilidades de nombre de columna)
                         let nom = (c.nombre || c.Nombre || '').toLowerCase();
                         let ape = (c.apellido || c.Apellido || '').toLowerCase();
                         let tel = (c.telefono || c.Telefono || '').toLowerCase();
                         let full = (nom + ' ' + ape).trim();
                         
-                        // Comparamos contra el texto de búsqueda
                         return full.includes(txt) || tel.includes(txt);
                     });
                 },
@@ -1297,96 +1427,103 @@
 
                 abrirPaquete(id) {
                     this.paqObj = dbPaquetes.find(p => p.id_paquete === id);
-                    if(id === 1) { this.paq1Opt = 'Combinado (1 Hawaiana y 1 Pepperoni)'; this.modalPaq1 = true; }
-                    if(id === 2) { this.paq2Tipo = 'hamb'; this.paq2Extra = ''; this.paq2Pizza = ''; this.modalPaq2 = true; }
-                    if(id === 3) { this.paq3Pizzas = []; this.modalPaq3 = true; }
+                    if(id === 1) { this.paq1Pizzas = []; this.paq1MitadesMode = false; this.paq1Halves = []; this.modalPaq1 = true; }
+                    if(id === 2) { this.paq2Tipo = 'hamb'; this.paq2Extra = ''; this.paq2Pizza = ''; this.paq2MitadesMode = false; this.paq2MitadesArr = []; this.modalPaq2 = true; }
+                    if(id === 3) { this.paq3Pizzas = []; this.paq3MitadesMode = false; this.paq3Halves = []; this.modalPaq3 = true; }
                 },
-                addPaq(id, variante) {
+
+                addPaq(id, pizzas_arr, extra_str) {
                     let pb = parseFloat(this.paqObj.precio);
                     let maxPizzas = id === 1 ? 2 : (id === 2 ? 1 : 3);
-                    let idx = this.cart.findIndex(i => i.db_id === id && i.tipo === 'paq' && i.variante === variante && i.orillas_qty === 0);
                     
-                    if(idx > -1) { this.cart[idx].qty++; }
-                    else { 
-                        this.cart.push({ 
-                            db_id: id, col: 'id_paquete', tipo: 'paq', nombre_base: 'Paquete '+id, variante: variante, 
-                            precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(),
-                            orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande 
-                        }); 
-                    }
+                    this.cart.push({ 
+                        db_id: id, col: 'id_paquete', tipo: 'paq', nombre_base: 'Paquete '+id, 
+                        pizzas_paq: pizzas_arr, extra_paq: extra_str,   
+                        precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(),
+                        orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande 
+                    }); 
                     this.actualizarCarrito();
                 },
-                addPaq1() { 
-                    let textoVariante = this.paq1Opt;
-                    if(textoVariante.includes('Combinado')) {
-                        textoVariante = '1 HAWAIANA / 1 PEPPERONI';
-                    } else if(textoVariante === '2 Hawaianas') {
-                        textoVariante = '2 HAWAIANA';
-                    } else if(textoVariante === '2 Pepperoni') {
-                        textoVariante = '2 PEPPERONI';
+
+                // NUEVAS FUNCIONES PARA EL PAQUETE 1
+                addPaq1Esp(esp) {
+                    if(this.paq1MitadesMode) {
+                        if(this.paq1Halves.length < 4) this.paq1Halves.push(esp);
+                    } else {
+                        if(this.paq1Pizzas.length < 2) this.paq1Pizzas.push(esp);
                     }
-                    this.addPaq(1, textoVariante); 
+                },
+                removePaq1Esp(index) {
+                    if(this.paq1MitadesMode) this.paq1Halves.splice(index, 1);
+                    else this.paq1Pizzas.splice(index, 1);
+                },
+                addPaq1() { 
+                    let pizzasFinales = [];
+                    if(this.paq1MitadesMode) {
+                        if(this.paq1Halves.length < 4) return alert("Por favor selecciona las 4 mitades.");
+                        pizzasFinales = [
+                            {nombre: this.paq1Halves[0] + ' / ' + this.paq1Halves[1], orilla: false},
+                            {nombre: this.paq1Halves[2] + ' / ' + this.paq1Halves[3], orilla: false}
+                        ];
+                    } else {
+                        if(this.paq1Pizzas.length < 2) return alert("Por favor selecciona las 2 pizzas completas.");
+                        pizzasFinales = this.paq1Pizzas.map(p => ({nombre: p, orilla: false}));
+                    }
+                    this.addPaq(1, pizzasFinales, ''); 
+                    this.paq1Pizzas = []; this.paq1Halves = [];
                     this.modalPaq1 = false; 
                 },
+
+                addPaq2Esp(esp) {
+                    if (this.paq2MitadesMode) {
+                        if (this.paq2MitadesArr.length < 2) this.paq2MitadesArr.push(esp);
+                    } else {
+                        this.paq2Pizza = esp;
+                    }
+                },
+                removePaq2Mitad(index) { this.paq2MitadesArr.splice(index, 1); },
+                
                 addPaq2() { 
-                    const varianteFinal = `1 PIZZA ${this.paq2Pizza} + 1 ${this.paq2Extra} + 1 REFRESCO JARRITO`;
-                    this.addPaq(2, varianteFinal.toUpperCase()); 
+                    let nombrePizza = this.paq2MitadesMode ? (this.paq2MitadesArr[0] + ' / ' + this.paq2MitadesArr[1]) : this.paq2Pizza;
+                    let pizzas = [{nombre: nombrePizza, orilla: false}];
+                    this.addPaq(2, pizzas, this.paq2Extra); 
                     this.modalPaq2 = false; 
                 },
+
                 addPaq3Esp(esp) { 
-                    if(this.paq3Pizzas.length < 3) {
-                        this.paq3Pizzas.push(esp);
+                    if(this.paq3MitadesMode) {
+                        if(this.paq3Halves.length < 6) this.paq3Halves.push(esp);
+                    } else {
+                        if(this.paq3Pizzas.length < 3) this.paq3Pizzas.push(esp);
                     }
                 },
                 removePaq3Esp(index) { 
-                    this.paq3Pizzas.splice(index, 1); 
+                    if(this.paq3MitadesMode) this.paq3Halves.splice(index, 1);
+                    else this.paq3Pizzas.splice(index, 1); 
                 },
+
                 addPaq3() { 
-                    if (this.paq3Pizzas.length < 3) {
-                        alert("Por favor selecciona las 3 pizzas del paquete.");
-                        return;
-                    }
-                    let counts = {};
-                    this.paq3Pizzas.forEach(x => counts[x] = (counts[x] || 0) + 1);
-                    let parts = [];
-                    for(let k in counts) { 
-                        parts.push(counts[k] + ' ' + k); 
+                    let pizzasFinales = [];
+                    if(this.paq3MitadesMode) {
+                        if(this.paq3Halves.length < 6) return alert("Por favor selecciona las 6 mitades.");
+                        pizzasFinales = [
+                            {nombre: this.paq3Halves[0] + ' / ' + this.paq3Halves[1], orilla: false},
+                            {nombre: this.paq3Halves[2] + ' / ' + this.paq3Halves[3], orilla: false},
+                            {nombre: this.paq3Halves[4] + ' / ' + this.paq3Halves[5], orilla: false}
+                        ];
+                    } else {
+                        if (this.paq3Pizzas.length < 3) return alert("Por favor selecciona las 3 pizzas completas.");
+                        pizzasFinales = this.paq3Pizzas.map(p => ({nombre: p, orilla: false}));
                     }
                     
-                    // 3. Construimos el string final
-                    const varianteFinal = (parts.join(', ') + '').toUpperCase();
-                    
-                    // 4. Agregamos al carrito
-                    this.addPaq(3, varianteFinal); 
-
-                    // 5. ¡ESTA ES LA CLAVE!: Limpiar el arreglo para que el modal esté vacío la próxima vez
-                    this.paq3Pizzas = []; 
-
-                    // 6. Cerrar modal
+                    this.addPaq(3, pizzasFinales, ''); 
+                    this.paq3Pizzas = []; this.paq3Halves = [];
                     this.modalPaq3 = false; 
                 },
-                formatearPaq3Preview() {
-                    if(this.paq3Pizzas.length === 0) return 'Sin especialidades';
-                    let counts = {};
-                    this.paq3Pizzas.forEach(x => counts[x] = (counts[x] || 0) + 1);
-                    let parts = [];
-                    for(let k in counts) { parts.push(counts[k] + ' ' + k); }
-                    return parts.join(', ');
-                },
-                
-                incrementarOrillaPaq(uid) {
-                    let idx = this.cart.findIndex(c => c.uid === uid);
-                    if(idx > -1 && this.cart[idx].orillas_qty < this.cart[idx].max_orillas) {
-                        this.cart[idx].orillas_qty++;
-                        this.actualizarCarrito();
-                    }
-                },
-                decrementarOrillaPaq(uid) {
-                    let idx = this.cart.findIndex(c => c.uid === uid);
-                    if(idx > -1 && this.cart[idx].orillas_qty > 0) {
-                        this.cart[idx].orillas_qty--;
-                        this.actualizarCarrito();
-                    }
+
+                recalcPaqOrillas(item) {
+                    item.orillas_qty = item.pizzas_paq.filter(p => p.orilla).length;
+                    this.actualizarCarrito();
                 },
 
                 toggleMitad(nom) { let idx = this.mitSel.indexOf(nom); if(idx > -1) this.mitSel.splice(idx, 1); else if(this.mitSel.length < 2) this.mitSel.push(nom); },
@@ -1621,20 +1758,17 @@
                 }).then(res => {
                     if(res.success) { 
                         if (res.nuevo_cliente) {
-                        // Verificar si el cliente ya existe por ID
                         const existeClie = dbClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
                         if (!existeClie) {
                             dbClientes.push(res.nuevo_cliente);
                         }
                     }
                     if (res.nueva_direccion) {
-                        // Verificar si la dirección ya existe por ID
                         const existeDir = dbDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
                         if (!existeDir) {
                             dbDirecciones.push(res.nueva_direccion);
                         }
                     }
-                        // 1. Limpiar variables locales
                         this.cart = []; 
                         this.actualizarCarrito(); 
                         this.mesa = ''; 
@@ -1650,7 +1784,6 @@
                         this.clienteFormVisible = false;
                         this.dirFormVisible = false;
 
-                        // 2. CONFIGURACIÓN DEL POPUP PARA EL TICKET
                         let urlTicket = '/venta/pos/ticket/' + res.id_venta;
                         if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
 
@@ -1659,10 +1792,8 @@
                         const left = (window.screen.width / 2) - (width / 2);
                         const top = (window.screen.height / 2) - (height / 2);
 
-                        // ABRIR VENTANA PEQUEÑA
                         window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
                         
-                        // 3. Redirección o reset de estado
                         if(this.id_venta_edit) {
                             setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
                         } else {
