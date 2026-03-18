@@ -72,22 +72,20 @@
 
     {{-- DATOS DEL CLIENTE --}}
     @if($venta->tipo_servicio == 3 && $domicilio)
-        <div class="mb-1" style="font-size: 12px;">
-            <div class="font-bold" style="font-size: 14px;">CLIENTE:</div>
-            <div>{{ trim(($domicilio->cnombre ?? '') . ' ' . ($domicilio->capellido ?? '')) }}</div>
-            <div><span class="font-bold">TEL:</span> {{ $domicilio->telefono ?? 'S/N' }}</div>
-            <div class="mt-1"><span class="font-bold">DIR:</span> {{ $domicilio->calle ?? 'S/N' }}</div>
-            <div><span class="font-bold">COL:</span> {{ $domicilio->colonia ?? 'S/N' }}</div>
-            <div><span class="font-bold">MZ:</span> {{ $domicilio->manzana ?? '-' }} | <span class="font-bold">LT:</span> {{ $domicilio->lote ?? '-' }}</div>
+        <div class="mb-1" style="font-size: 11px; line-height: 1.4; margin-bottom: 5px;">
+            <span class="font-bold" style="font-size: 13px;">CLIENTE:</span> {{ trim(($domicilio->cnombre ?? '') . ' ' . ($domicilio->capellido ?? '')) }} | 
+            <span class="font-bold">TEL:</span> {{ $domicilio->telefono ?? 'S/N' }} | 
+            <span class="font-bold">DIR:</span> {{ $domicilio->calle ?? 'S/N' }}, 
+            <span class="font-bold">COL:</span> {{ $domicilio->colonia ?? 'S/N' }}, 
+            <span class="font-bold">MZ:</span> {{ $domicilio->manzana ?? '-' }}, <span class="font-bold">LT:</span> {{ $domicilio->lote ?? '-' }}
             @if(isset($domicilio->referencia) && $domicilio->referencia)
-                <div><span class="font-bold">REF:</span> {{ $domicilio->referencia }}</div>
+                | <span class="font-bold">REF:</span> {{ $domicilio->referencia }}
             @endif
         </div>
         <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
     @elseif($venta->tipo_servicio == 1 && $venta->nombreClie)
-        <div class="mb-1" style="font-size: 12px;">
-            <div class="font-bold">CLIENTE:</div>
-            <div>{{ $venta->nombreClie }}</div>
+        <div class="mb-1" style="font-size: 12px; line-height: 1.3;">
+            <span class="font-bold">CLIENTE:</span> {{ $venta->nombreClie }}
         </div>
         <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
     @endif
@@ -102,23 +100,23 @@
         </thead>
         <tbody>
             @foreach($final_items as $item)
-                <tr>
-                    {{-- Si no hay cantidad (como en pizzas agrupadas), no poner la X --}}
-                    <td class="font-bold" style="white-space: nowrap;">{{ $item->cantidad }}</td>
-                    <td class="font-bold">{{ $item->nombre }}</td>
-                    <td class="text-right font-bold">${{ number_format($item->total, 2) }}</td>
+                {{-- ENCABEZADO DEL PRODUCTO (Ej: GRANDE, PAQUETE 1, BARRA) --}}
+                <tr style="font-size: 16px; font-weight: 900; line-height: 1.1;">
+                    <td style="white-space: nowrap; vertical-align: top; padding-top: 4px;">{{ $item->cantidad }}</td>
+                    <td style="vertical-align: top; padding-top: 4px;">{{ $item->nombre }}</td>
+                    <td class="text-right" style="vertical-align: top; padding-top: 4px;">${{ number_format($item->total, 2) }}</td>
                 </tr>
                 
+                {{-- DESGLOSE DE ESPECIALIDADES (Ej: 1 HAWAIANA, 1/2 PASTOR) --}}
                 @foreach($item->subs as $sub)
                 <tr class="sub-item">
                     <td></td>
-                    {{-- Usamos font-bold y nos aseguramos de que cada sub-elemento sea una fila nueva --}}
-                    <td class="font-bold" colspan="2" style="padding-left: 5px;">{{ $sub }}</td>
+                    <td colspan="2" style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">{{ $sub }}</td>
                 </tr>
                 @endforeach
                 
-                {{-- Espacio separador entre productos --}}
-                <tr><td colspan="3" style="height: 8px; border-bottom: 1px dashed #eee;"></td></tr>
+                {{-- ESPACIO SEPARADOR ENTRE PRODUCTOS --}}
+                <tr><td colspan="3" style="height: 8px; border-bottom: 1px dashed #bbb;"></td></tr>
             @endforeach
         </tbody>
     </table>
