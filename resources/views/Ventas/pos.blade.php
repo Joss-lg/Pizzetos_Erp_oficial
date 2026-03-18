@@ -1144,13 +1144,22 @@
 
                 addBebida(opc) {
                     let nomFull = this.bebidaItem.nombre + ' ' + opc.tamano;
-                    let idx = this.cart.findIndex(i => i.db_id === opc.id && !i.es_pizza);
+                    let idx = this.cart.findIndex(i => i.db_id === opc.id && i.col === 'id_refresco');
+                    
                     if(idx > -1) { 
                         this.cart[idx].qty++; 
                     } else { 
                         this.cart.push({ 
-                            db_id: opc.id, col: 'id_refresco', tipo: 'directo', nombre_base: nomFull, variante: '', 
-                            precioBase: parseFloat(opc.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() 
+                            db_id: opc.id, 
+                            col: 'id_refresco', 
+                            tipo: 'directo', 
+                            nombre_base: nomFull, 
+                            variante: '', 
+                            precioBase: parseFloat(opc.precio), 
+                            qty: 1, 
+                            es_pizza: false, 
+                            is_magno: false, 
+                            uid: this.generateUID() 
                         }); 
                     }
                     this.actualizarCarrito();
