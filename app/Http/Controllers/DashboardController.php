@@ -10,20 +10,51 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $hoy = Carbon::today();
+        $id_sucursal = 1; 
 
-        // 1. Base de Ventas del día (Pagadas)
+        // 1. BUSCAMOS LA CAJA ABIERTA
+        $cajaAbierta = DB::table('Caja')
+            ->where('status', 1)
+            ->where('id_suc', $id_sucursal)
+            ->first();
+
+        // 2. SI LA CAJA ESTÁ CERRADA: MANDAMOS PUROS CEROS
+        if (!$cajaAbierta) {
+            $data = [
+                'ventasHoy' => 0,
+                'numVentas' => 0,
+                'gastosHoy' => 0,
+                'efectivoCaja' => 0,
+                'efectivoVentas' => 0,
+                'tarjetasHoy' => 0,
+                'transferenciasHoy' => 0,
+                'cajaAbierta' => false // Bandera para la vista
+            ];
+
+            if ($request->ajax()) {
+                return response()->json($data);
+            }
+
+            return view('dashboard', $data);
+        }
+
+        // ==============================================================
+        // 3. SI HAY CAJA ABIERTA: FILTRAMOS TODO POR $id_caja
+        // ==============================================================
+        $id_caja = $cajaAbierta->id_caja;
+
+        // A. Base de Ventas de la CAJA (Pagadas)
         $queryVentas = DB::table('Venta')
-            ->whereDate('fecha_hora', $hoy)
+            ->where('id_caja', $id_caja)
             ->where('status', 1);
 
         $ventasHoy = (float)($queryVentas->sum('total') ?? 0);
         $numVentas = (int)($queryVentas->count());
         
-        // 2. Desglose por Métodos: Leemos correctamente de la tabla 'Pago'
+        // B. Desglose por Métodos: Leemos de la tabla 'Pago' unidos por 'id_caja'
         $pagos = DB::table('Pago')
             ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
-            ->whereDate('Venta.fecha_hora', $hoy)
+            ->where('Venta.id_caja', $id_caja)
             ->where('Venta.status', 1) // Solo ventas concretadas
             ->select('Pago.id_metpago', DB::raw('SUM(Pago.monto) as total_monto'))
             ->groupBy('Pago.id_metpago')
@@ -39,14 +70,18 @@ class DashboardController extends Controller
             if ($pago->id_metpago == 3) $transferenciasHoy = (float)$pago->total_monto; // 3 = Transferencia
         }
 
-        // 3. Gastos del día (Usamos 'Gastos', 'fecha' y 'precio' según tu GastosController)
+        // C. Gastos de la CAJA
         try {
-            $gastosHoy = (float)(DB::table('Gastos')->whereDate('fecha', $hoy)->sum('precio') ?? 0);
+            $gastosHoy = (float)(DB::table('Gastos')
+                ->where('id_caja', $id_caja) 
+                ->sum('precio') ?? 0);
         } catch (\Exception $e) {
-            $gastosHoy = 0;
+            // Fallback por si la tabla gastos aún no tiene la columna id_caja
+            $gastosHoy = (float)(DB::table('Gastos')->whereDate('fecha', Carbon::today())->sum('precio') ?? 0);
         }
 
-        // 4. Dinero Real en Caja (Lo que entró en efectivo menos lo que salió en gastos)
+        // D. Dinero Real Generado (Ventas en efectivo - Gastos)
+        // Ya no tomamos en cuenta el monto inicial aquí.
         $efectivoCaja = $efectivoVentas - $gastosHoy;
 
         $data = [
@@ -57,6 +92,7 @@ class DashboardController extends Controller
             'efectivoVentas' => $efectivoVentas,
             'tarjetasHoy' => $tarjetasHoy,
             'transferenciasHoy' => $transferenciasHoy,
+            'cajaAbierta' => true
         ];
 
         if ($request->ajax()) {
