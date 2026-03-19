@@ -192,25 +192,53 @@
                                             </div>
                                         </td>
                                         <td class="px-8 py-6">
-                                            {{-- LÓGICA BLINDADA PARA LOS PAGOS Y CANCELADOS --}}
+                                            @php
+                                                $comentario = '';
+                                                if(isset($venta->comentarios)) {
+                                                    $comentario = strtoupper($venta->comentarios);
+                                                } else {
+                                                    $comentario_bd = DB::table('Venta')->where('id_venta', $venta->id_venta ?? 0)->value('comentarios');
+                                                    $comentario = strtoupper($comentario_bd ?? '');
+                                                }
+
+                                                $esCortesia100 = str_contains($comentario, 'CORTESÍA 100%') || str_contains($comentario, 'CORTESIA 100%');
+                                                $esCortesia40 = str_contains($comentario, 'CORTESÍA 40%') || str_contains($comentario, 'CORTESIA 40%');
+                                            @endphp
+
                                             @if($venta->status == 3)
                                                 <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border border-red-200">CANCELADO</span>
-                                            @elseif(empty($venta->montos_detalle))
-                                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border border-slate-200">PENDIENTE</span>
                                             @else
-                                                @foreach(explode(' + ', $venta->montos_detalle) as $detalle)
-                                                    @php
-                                                        $partes = explode(': ', $detalle);
-                                                        if(count($partes) < 2) continue; // Si viene roto de la BD, lo ignoramos
-                                                        $metodo = $partes[0];
-                                                        $monto = $partes[1];
-                                                        $clase = str_contains($metodo, 'Efectivo') ? 'bg-efectivo' : (str_contains($metodo, 'Tarjeta') ? 'bg-tarjeta' : 'bg-transf');
-                                                    @endphp
-                                                    <div class="pay-badge-split w-fit mb-1">
-                                                        <span class="pay-method {{ $clase }}">{{ $metodo }}</span>
-                                                        <span class="pay-amount">{{ $monto }}</span>
+                                                @if($esCortesia100)
+                                                    <div class="pay-badge-split w-fit mb-1 border-amber-200">
+                                                        <span class="pay-method bg-amber-500 text-white">CORTESÍA</span>
+                                                        <span class="pay-amount font-black text-amber-700 bg-amber-50">100%</span>
                                                     </div>
-                                                @endforeach
+                                                @endif
+
+                                                @if($esCortesia40)
+                                                    <div class="pay-badge-split w-fit mb-1 border-amber-200">
+                                                        <span class="pay-method bg-amber-500 text-white">CORTESÍA</span>
+                                                        <span class="pay-amount font-black text-amber-700 bg-amber-50">40%</span>
+                                                    </div>
+                                                @endif
+
+                                                @if(empty($venta->montos_detalle) && !$esCortesia100)
+                                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border border-slate-200">PENDIENTE</span>
+                                                @elseif(!empty($venta->montos_detalle))
+                                                    @foreach(explode(' + ', $venta->montos_detalle) as $detalle)
+                                                        @php
+                                                            $partes = explode(': ', $detalle);
+                                                            if(count($partes) < 2) continue;
+                                                            $metodo = $partes[0];
+                                                            $monto = $partes[1];
+                                                            $clase = str_contains($metodo, 'Efectivo') ? 'bg-efectivo' : (str_contains($metodo, 'Tarjeta') ? 'bg-tarjeta' : 'bg-transf');
+                                                        @endphp
+                                                        <div class="pay-badge-split w-fit mb-1">
+                                                            <span class="pay-method {{ $clase }}">{{ $metodo }}</span>
+                                                            <span class="pay-amount">{{ $monto }}</span>
+                                                        </div>
+                                                    @endforeach
+                                                @endif
                                             @endif
                                         </td>
                                         <td class="px-8 py-6 text-right font-black text-2xl tracking-tighter italic {{ $venta->status == 3 ? 'text-red-400 line-through' : 'text-slate-900' }}">

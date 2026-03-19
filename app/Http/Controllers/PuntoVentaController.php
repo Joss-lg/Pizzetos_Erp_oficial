@@ -156,7 +156,9 @@ class PuntoVentaController extends Controller
                 ]);
             }
 
-            $estado_venta = ($request->has('pagos') && count($request->pagos) > 0) ? 1 : 0;
+            // AQUI ESTÁ EL FIX DE LA CORTESÍA (Si el total es <= 0, cierra la cuenta automático)
+            $estado_venta = (($request->has('pagos') && count($request->pagos) > 0) || $request->total <= 0 || $request->tipo_servicio != 1) ? 1 : 0;
+            
             $nombreClienteMesa = ($request->tipo_servicio == 1) ? $request->nombre_cliente : null;
             $id_venta = $request->id_venta_edit ?? null;
 
@@ -260,11 +262,9 @@ class PuntoVentaController extends Controller
             $nuevoClient_resp = null;
             $nuevaDir_resp = null;
 
-            // Si se creó cliente, obtener sus datos
             if (isset($id_clie) && $request->has('nuevo_cliente')) {
                 $nuevoClient_resp = DB::table('Clientes')->where('id_clie', $id_clie)->first();
             }
-            // Si se creó dirección, obtener sus datos
             if (isset($id_dir) && $request->has('nueva_direccion')) {
                 $nuevaDir_resp = DB::table('Direcciones')->where('id_dir', $id_dir)->first();
             }
@@ -288,8 +288,22 @@ class PuntoVentaController extends Controller
         try {
             DB::beginTransaction();
             $id_venta = $request->id_venta;
+            $venta = DB::table('Venta')->where('id_venta', $id_venta)->first();
 
-            DB::table('Venta')->where('id_venta', $id_venta)->update(['status' => 1]); 
+            $updateData = ['status' => 1];
+
+            if ($request->has('cortesia') && $request->cortesia > 0) {
+                $updateData['total'] = $request->nuevo_total;
+                
+                $comentarios = $venta->comentarios ?? '';
+                $comentarios = preg_replace('/\|?\s*CORTESÍA \d+%/', '', $comentarios);
+                $comentarios = preg_replace('/CORTESÍA \d+%/', '', $comentarios);
+                $comentarios = trim($comentarios, ' |');
+
+                $updateData['comentarios'] = $comentarios . ($comentarios ? " | " : "") . "CORTESÍA " . $request->cortesia . "%";
+            }
+
+            DB::table('Venta')->where('id_venta', $id_venta)->update($updateData); 
 
             if ($request->has('pagos')) {
                 foreach($request->pagos as $pago) {
@@ -309,7 +323,7 @@ class PuntoVentaController extends Controller
         }
     }
 
-public function ticket(Request $request, $id)
+    public function ticket(Request $request, $id)
     {
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
@@ -413,14 +427,13 @@ public function ticket(Request $request, $id)
                 elseif($det->id_cos) { $is_complemento = true; $cat_comp = "ORD. COSTILLAS"; $name_comp = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
                 elseif($det->id_alis) { $is_complemento = true; $cat_comp = "ORD. ALITAS"; $name_comp = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden'); }
                 elseif($det->id_spag) { $is_complemento = true; $cat_comp = "ORD. SPAGUETTY"; $name_comp = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden'); }
-                elseif($det->id_papa) { $is_complemento = true; $cat_comp = "ORD. PAPAS"; $name_comp = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden'); }
 
                 if ($is_complemento) {
                     if (!isset($grouped_complementos[$cat_comp])) {
                         $grouped_complementos[$cat_comp] = ['total' => null, 'subs' => []];
                     }
                     
-                    $clean_comp = trim(str_ireplace(['alitas', 'hamburguesas', 'hamburguesa', 'orden de', 'papas', 'costillas', 'spaguetty', 'paquete', 'orden', ' de '], '', mb_strtolower($name_comp)));
+                    $clean_comp = trim(str_ireplace(['alitas', 'hamburguesas', 'hamburguesa', 'orden de', 'costillas', 'spaguetty', 'paquete', 'orden', ' de '], '', mb_strtolower($name_comp)));
                     if (empty($clean_comp)) $clean_comp = mb_strtoupper($name_comp); 
                     else $clean_comp = mb_strtoupper($clean_comp);
                     
@@ -429,6 +442,19 @@ public function ticket(Request $request, $id)
                         'precio' => ($det->precio_unitario * $det->cantidad)
                     ];
                 } 
+                elseif ($det->id_papa) {
+                    $name_comp = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden');
+                    $nombre_papa = mb_strtoupper($name_comp);
+                    $texto_papa = str_contains($nombre_papa, 'PAPAS') ? "ORD. " . $nombre_papa : "ORD. PAPAS " . $nombre_papa;
+                    
+                    for ($i = 0; $i < $det->cantidad; $i++) {
+                        $ungrouped_others[] = [
+                            'nombre' => $texto_papa, 
+                            'subs' => [], 
+                            'total' => $det->precio_unitario
+                        ];
+                    }
+                }
                 elseif ($det->id_refresco) {
                     $r = DB::table('Refrescos')->join('TamanosRefrescos', 'Refrescos.id_tamano', '=', 'TamanosRefrescos.id_tamano')->where('Refrescos.id_refresco', $det->id_refresco)->first();
                     if($r) {
@@ -692,6 +718,24 @@ public function ticket(Request $request, $id)
         try {
             DB::beginTransaction();
             $id_venta = $request->id_venta;
+            $venta = DB::table('Venta')->where('id_venta', $id_venta)->first();
+
+            $updateData = [];
+
+            if ($request->has('cortesia') && $request->cortesia > 0) {
+                $updateData['total'] = $request->nuevo_total;
+                
+                $comentarios = $venta->comentarios ?? '';
+                $comentarios = preg_replace('/\|?\s*CORTESÍA \d+%/', '', $comentarios);
+                $comentarios = preg_replace('/CORTESÍA \d+%/', '', $comentarios);
+                $comentarios = trim($comentarios, ' |');
+
+                $updateData['comentarios'] = $comentarios . ($comentarios ? " | " : "") . "CORTESÍA " . $request->cortesia . "%";
+            }
+            
+            if(!empty($updateData)){
+                DB::table('Venta')->where('id_venta', $id_venta)->update($updateData);
+            }
 
             DB::table('Pago')->where('id_venta', $id_venta)->delete();
 

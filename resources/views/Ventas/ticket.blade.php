@@ -112,7 +112,9 @@
                     <tr class="sub-item">
                         <td></td>
                         @if(is_array($sub))
-                            <td style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">{{ $sub['texto'] }}</td>
+                            <td style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">
+                                {!! str_replace(' / ', ' <span style="font-weight: 900; font-size: 16px; margin: 0 3px;">/</span> ', e($sub['texto'])) !!}
+                            </td>
                             <td class="text-right" style="font-size: 14px; font-weight: bold; padding-bottom: 2px;">
                                 @if(isset($sub['precio']))
                                     ${{ number_format($sub['precio'], 2) }}
@@ -121,7 +123,9 @@
                                 @endif
                             </td>
                         @else
-                            <td colspan="2" style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">{{ $sub }}</td>
+                            <td colspan="2" style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">
+                                {!! str_replace(' / ', ' <span style="font-weight: 900; font-size: 16px; margin: 0 3px;">/</span> ', e($sub)) !!}
+                            </td>
                         @endif
                     </tr>
                 @endforeach

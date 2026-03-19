@@ -9,7 +9,6 @@
 </style>
 
 @if(!$cajaAbierta)
-    {{-- Reemplaza TODO lo que esté aquí adentro por esto: --}}
     <div class="w-full flex flex-col items-center justify-center min-h-[70vh]" x-data="{ modalAbrir: true }">
         <div class="bg-white rounded-[45px] shadow-2xl border border-gray-100 p-12 text-center max-w-lg">
             <div class="bg-amber-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -58,10 +57,7 @@
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full min-h-0">
             
-            {{-- IZQUIERDA: BOTONES Y PRODUCTOS FIJOS --}}
             <div class="lg:col-span-8 flex flex-col gap-2 h-full min-h-0">
-                
-                {{-- BOTONES SUPERIORES --}}
                 <div class="flex flex-wrap gap-1.5 shrink-0">
                     <button @click="abrirPaquete(1)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
                     <button @click="abrirPaquete(2)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
@@ -70,7 +66,6 @@
                     <button @click="modalMitades = true; mitSel = []; mitTam = null;" class="bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
                 </div>
 
-                {{-- BARRA DE CATEGORÍAS --}}
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
                     <div class="flex flex-wrap gap-1 items-center w-full xl:w-auto">
                         <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
@@ -79,22 +74,14 @@
                         <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Rectangular</button>
                         <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Barra</button>
                         
-                        {{-- MENÚ EXTRAS --}}
                         <div class="relative">
                             <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
-                                Extras 
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                Extras <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
-                                
                                 <template x-for="catEx in dbCategoriasExtras" :key="catEx.id_cat">
-                                    <button @click="
-                                        cat = parseInt(catEx.id_cat); 
-                                        view = 'otros'; 
-                                        openExtras = false;
-                                    " class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50" x-text="catEx.descripcion"></button>
+                                    <button @click="cat = parseInt(catEx.id_cat); view = 'otros'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50" x-text="catEx.descripcion"></button>
                                 </template>
-
                                 <button @click="cat = 1; view = 'bebidas'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Refrescos</button>
                                 <button @click="abrirMagnoGeneral(); openExtras = false" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Magno</button>
                             </div>
@@ -109,10 +96,7 @@
                     </div>
                 </div>
 
-                {{-- GRID PRODUCTOS --}}
                 <div class="flex-1 overflow-y-auto scrollbar-hide pb-2 pt-1">
-                    
-                    {{-- Pizzas / Mariscos --}}
                     <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2">
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
                             <button @click="abrirOpciones(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
@@ -124,7 +108,6 @@
                         </template>
                     </div>
 
-                    {{-- Bebidas --}}
                     <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2" x-cloak>
                         <template x-for="b in getListaBebidas()" :key="'beb_'+b.nombre">
                             <button @click="abrirBebida(b)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
@@ -136,7 +119,6 @@
                         </template>
                     </div>
 
-                    {{-- Otros Productos (Hamburguesas, etc) --}}
                     <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start mt-1 pr-2" x-cloak>
                         <template x-for="p in getListaDirectos()" :key="p.id">
                             <button @click="addDirecto(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
@@ -147,11 +129,9 @@
                             </button>
                         </template>
                     </div>
-
                 </div>
             </div>
 
-            {{-- DERECHA: CARRITO --}}
             <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-full min-h-0">
                 <div class="p-5 pb-4 border-b border-gray-100 flex justify-between items-end shrink-0">
                     <div>
@@ -163,12 +143,8 @@
                 <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-hide bg-[#f8f9fa]">
                     <template x-for="(group, gIdx) in cartGroups" :key="group.id_grupo">
                         <div>
-                            
-                            {{-- NUEVO DISEÑO PARA PIZZAS AGRUPADAS --}}
                             <template x-if="group.type === 'pizza_pair'">
                                 <div class="bg-white border-2 border-amber-400 rounded-xl shadow-sm mb-4 overflow-hidden">
-                                    
-                                    {{-- HEADER DEL CUADRO --}}
                                     <div class="bg-amber-400 px-4 py-2.5 flex justify-between items-center">
                                         <div class="flex items-center gap-2">
                                             <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
@@ -179,23 +155,18 @@
                                         </button>
                                     </div>
                                     
-                                    {{-- PIZZAS INDEPENDIENTES ADENTRO --}}
                                     <div class="p-3 space-y-3">
                                         <template x-for="(p, idx) in group.items" :key="p.item.uid">
                                             <div class="relative border border-gray-200 bg-white rounded-lg p-3 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
-                                                
                                                 <div class="flex justify-between items-start mb-3">
                                                     <div class="pr-8 flex items-center gap-2">
                                                         <h4 class="font-black text-[#212529] text-[15px] leading-tight" x-text="p.item.variante || p.item.nombre_base"></h4>
                                                         <span x-show="p.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Enviado</span>
                                                     </div>
-
                                                     <button @click="eliminarItemByUid(p.item.uid)" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-1.5 rounded transition-colors absolute right-3 top-3">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                     </button>
                                                 </div>
-
-                                                {{-- CHECKBOX ORILLA INDEPENDIENTE --}}
                                                 <div class="flex justify-between items-center pt-2.5 border-t border-gray-100">
                                                     <label class="flex items-center gap-2 text-[13px] font-bold text-gray-600 cursor-pointer hover:text-[#fd7e14] transition-colors">
                                                         <input type="checkbox" :checked="p.item.orilla_queso" @change="toggleOrilla(p.item.uid, $event.target.checked)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
@@ -206,8 +177,6 @@
                                             </div>
                                         </template>
                                     </div>
-
-                                    {{-- TOTAL DEL GRUPO --}}
                                     <div class="px-4 py-3 bg-gray-50 text-right border-t border-gray-200">
                                         <span class="text-gray-500 text-[12px] font-bold uppercase mr-2 tracking-wider">Subtotal:</span>
                                         <span class="font-black text-[#212529] text-[20px]" x-text="'$' + group.subtotal.toFixed(2)"></span>
@@ -215,7 +184,6 @@
                                 </div>
                             </template>
 
-                            {{-- TARJETAS PARA OTROS PRODUCTOS NORMALES --}}
                             <template x-if="group.type === 'normal'">
                                 <div class="border border-gray-200 rounded-[8px] p-4 bg-white shadow-sm mb-4 relative" :class="group.item.is_old ? 'bg-gray-50' : ''">
                                     <div class="flex justify-between items-start mb-2">
@@ -249,9 +217,7 @@
                                     <template x-if="group.item.tipo === 'paq'">
                                         <div class="mt-2 bg-[#f8f9fa] p-2.5 rounded-[8px] border border-gray-200 shadow-inner">
                                             <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest block mb-2">Elegir Orilla Rellena (+$<span x-text="group.item.precio_orilla"></span>)</span>
-                                            
                                             <div class="space-y-1.5">
-                                                {{-- Dibuja un checkbox por CADA pizza dentro del paquete --}}
                                                 <template x-for="(pz, pIdx) in group.item.pizzas_paq" :key="pIdx">
                                                     <label class="flex items-center gap-2 text-[12px] font-bold text-gray-700 cursor-pointer bg-white px-2.5 py-2 rounded shadow-sm border border-gray-100 hover:border-amber-400 transition-colors">
                                                         <input type="checkbox" x-model="pz.orilla" @change="recalcPaqOrillas(group.item)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
@@ -259,8 +225,6 @@
                                                     </label>
                                                 </template>
                                             </div>
-                                    
-                                            {{-- Si el paquete trae un extra (ej. Alitas), lo mostramos aquí abajo --}}
                                             <div x-show="group.item.extra_paq" class="mt-2 pt-2 border-t border-gray-200 text-[12px] font-bold text-slate-700 px-1">
                                                 <span class="text-amber-500 mr-1">+</span> <span x-text="group.item.extra_paq"></span>
                                             </div>
@@ -277,11 +241,10 @@
                     </template>
                 </div>
 
-                {{-- ZONA COBRO FINAL Y SELECTOR DE SERVICIO DINAMICO --}}
                 <div class="p-4 border-t border-gray-200 bg-white rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0">
                     <div class="flex justify-between items-center font-black text-[#212529] mb-3">
                         <span class="text-[16px]">Total:</span>
-                        <span x-text="'$' + getTotal().toFixed(2)" class="text-[26px]"></span>
+                        <span x-text="'$' + getGranTotal().toFixed(2)" class="text-[26px]"></span>
                     </div>
 
                     <button @click="modalComentarios = true" class="w-full bg-[#f8f9fa] border border-gray-200 hover:bg-[#e9ecef] text-[#212529] py-2.5 rounded-[6px] font-bold text-[14px] flex justify-center items-center gap-2 mb-3 transition-colors">
@@ -295,7 +258,6 @@
                     </div>
 
                     <div class="flex h-[45px] relative">
-                        
                         <button @click="openServicio = !openServicio" class="w-[45%] h-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold text-[14px] flex justify-between items-center px-4 rounded-l-[6px] border-r border-[#e36b0c] transition-colors shadow-sm">
                             <div class="flex items-center gap-2">
                                 <svg x-show="servicio === 3" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
@@ -324,13 +286,12 @@
                         <button @click="procesarOrden()" :disabled="cart.length === 0" :class="cart.length === 0 ? 'bg-[#fd7e14]/60 text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white'" class="flex-1 font-black text-[15px] rounded-r-[6px] transition-colors shadow-sm">
                             <span x-text="id_venta_edit ? 'Guardar Cambios' : 'Enviar Orden'"></span>
                         </button>
-
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- MODALES DE PRODUCTOS Y PAGOS OCULTOS --}}
+        {{-- MODALES DE PRODUCTOS OCULTOS --}}
         
         <div x-show="modalComentarios" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[400px] flex flex-col overflow-hidden" @click.away="modalComentarios = false">
@@ -348,7 +309,6 @@
             </div>
         </div>
 
-        {{-- MODAL OPCIONES NORMAL --}}
         <div x-show="modalOpc" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
                 <div class="p-5 border-b border-gray-100 flex justify-between items-center">
@@ -366,7 +326,6 @@
             </div>
         </div>
 
-        {{-- MODAL BEBIDAS --}}
         <div x-show="modalBebida" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalBebida = false">
                 <div class="bg-[#17a2b8] p-5 flex justify-between items-center text-white">
@@ -384,7 +343,6 @@
             </div>
         </div>
 
-        {{-- MAGNO --}}
         <div x-show="modalMagno" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMagno = false">
                 <div class="bg-[#212529] p-5 flex justify-between items-center text-white">
@@ -433,7 +391,6 @@
             </div>
         </div>
 
-        {{-- RECTANGULAR --}}
         <div x-show="modalRectangular" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalRectangular = false">
                 <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white">
@@ -477,7 +434,6 @@
             </div>
         </div>
 
-        {{-- BARRA --}}
         <div x-show="modalBarra" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalBarra = false">
                 <div class="bg-[#17a2b8] p-5 flex justify-between items-center text-white">
@@ -521,8 +477,6 @@
             </div>
         </div>
 
-        {{-- PAQUETES (1, 2 y 3) --}}
-        {{-- PAQUETE 1 --}}
         <div x-show="modalPaq1" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq1 = false">
                 <div class="p-6 pb-4 relative border-b border-gray-100 bg-[#ffc107]">
@@ -535,13 +489,11 @@
                         <li>1 Refresco de 2L Jarrito</li>
                     </ul>
 
-                    {{-- Checkbox Orilla Paq 1 --}}
                     <label class="flex items-center gap-2 mt-2 mb-4 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm w-max">
                         <input type="checkbox" x-model="paq1MitadesMode" @change="paq1Pizzas=[]; paq1Halves=[]" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                         <span class="text-[13px] font-bold text-gray-700">Armar Pizzas Mitad y Mitad</span>
                     </label>
 
-                    {{-- MODO NORMAL (2 PIZZAS COMPLETAS) --}}
                     <div x-show="!paq1MitadesMode">
                         <div class="grid grid-cols-2 gap-2 mb-5">
                             <template x-for="i in 2">
@@ -561,7 +513,6 @@
                         </div>
                     </div>
 
-                    {{-- MODO MITADES (4 MITADES = 2 PIZZAS) --}}
                     <div x-show="paq1MitadesMode" x-cloak>
                         <div class="grid grid-cols-2 gap-4 mb-5">
                             <template x-for="piz in 2">
@@ -620,20 +571,17 @@
                             </button>
                         </template>
                     </div>
-                    {{-- Checkbox Orilla Paq 2 --}}
                     <label class="flex items-center gap-2 mt-4 mb-2 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm">
                         <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                         <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
                     </label>
 
-                    {{-- PIZZA NORMAL (1 SOLA) --}}
                     <div x-show="!paq2MitadesMode" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-hide pb-2">
                         <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
                             <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400" x-text="esp.nombre"></button>
                         </template>
                     </div>
 
-                    {{-- PIZZA MITAD Y MITAD (2 SELECCIONES) --}}
                     <div x-show="paq2MitadesMode" x-cloak>
                         <div class="grid grid-cols-2 gap-2 mb-3">
                             <template x-for="i in 2">
@@ -673,13 +621,11 @@
                         <li>1 Refresco de 2L Jarrito</li>
                     </ul>
 
-                    {{-- Checkbox Orilla Paq 3 --}}
                     <label class="flex items-center gap-2 mt-2 mb-4 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm w-max">
                         <input type="checkbox" x-model="paq3MitadesMode" @change="paq3Pizzas=[]; paq3Halves=[]" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                         <span class="text-[13px] font-bold text-gray-700">Armar Pizzas Mitad y Mitad</span>
                     </label>
 
-                    {{-- MODO NORMAL (3 PIZZAS COMPLETAS) --}}
                     <div x-show="!paq3MitadesMode">
                         <div class="grid grid-cols-3 gap-2 mb-5">
                             <template x-for="i in 3">
@@ -700,7 +646,6 @@
                         </div>
                     </div>
 
-                    {{-- MODO MITADES (6 MITADES = 3 PIZZAS) --}}
                     <div x-show="paq3MitadesMode" x-cloak>
                         <div class="grid grid-cols-3 gap-3 mb-5">
                             <template x-for="piz in 3">
@@ -734,7 +679,6 @@
             </div>
         </div>
 
-        {{-- MITAD Y MITAD --}}
         <div x-show="modalMitades" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[750px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMitades = false">
                 <div class="bg-[#dc3545] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Mitades</h2><button @click="modalMitades = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button></div>
@@ -773,7 +717,6 @@
             </div>
         </div>
 
-        {{-- POR INGREDIENTES CON BUSCADOR --}}
         <div x-show="modalIngredientes" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalIngredientes = false">
                 <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Por Ingrediente</h2><button @click="modalIngredientes = false" class="hover:text-orange-200 font-bold text-2xl leading-none">&times;</button></div>
@@ -821,7 +764,6 @@
             </div>
         </div>
 
-        {{-- MODAL DOMICILIO --}}
         <div x-show="modalCliente" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[900px] max-w-[95vw] flex flex-col max-h-[95vh] overflow-hidden">
                 <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
@@ -833,9 +775,7 @@
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-8 lg:p-10 bg-white space-y-8">
-                    
                     <div class="relative">
-                        
                         <div class="flex justify-between items-end mb-3">
                             <label class="block text-[18px] font-bold text-gray-700">Seleccionar Cliente *</label>
                             <button x-show="!clienteFormVisible && !clienteSeleccionado" @click="toggleFormNuevoCliente()" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-black px-6 py-2.5 rounded-[8px] text-[16px] flex items-center gap-2 shadow-sm whitespace-nowrap transition-colors">
@@ -844,7 +784,6 @@
                             </button>
                         </div>
 
-                        {{-- VISTA DE BÚSQUEDA Y LISTA --}}
                         <div x-show="!clienteSeleccionado && !clienteFormVisible" class="space-y-3">
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
@@ -857,7 +796,6 @@
                                        class="w-full border-2 border-gray-300 rounded-[8px] py-4 pl-12 pr-5 text-[20px] font-medium focus:border-[#fd7e14] focus:ring-4 focus:ring-orange-100 focus:outline-none transition-all">
                             </div>
                             
-                            {{-- LISTA DE CLIENTES PERMANENTE --}}
                             <div class="bg-white border border-gray-200 rounded-[8px] shadow-inner max-h-[300px] overflow-y-auto">
                                 <template x-if="getClientesFiltrados().length === 0">
                                     <div class="px-5 py-8 text-[16px] text-gray-500 italic text-center bg-gray-50">
@@ -874,7 +812,6 @@
                             </div>
                         </div>
 
-                        {{-- ESTADO CLIENTE SELECCIONADO --}}
                         <div x-show="clienteSeleccionado && !clienteFormVisible" class="bg-green-50 border border-green-200 p-6 rounded-[8px] flex justify-between items-center transition-all">
                             <div>
                                 <span class="text-[13px] font-bold text-green-600 uppercase tracking-wider mb-1 block">Cliente Seleccionado</span>
@@ -884,7 +821,6 @@
                             <button @click="clienteSeleccionado = null; direccionesCliente = []; dirSeleccionada = null; searchClienteText='';" class="text-red-600 bg-red-100 px-6 py-3 rounded-lg font-bold hover:bg-red-200 transition-colors text-[16px]">Cambiar Cliente</button>
                         </div>
 
-                        {{-- FORMULARIO NUEVO CLIENTE --}}
                         <div x-show="clienteFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4">
                             <div class="flex justify-between items-center border-b border-gray-200 pb-3">
                                 <h4 class="font-black text-[18px] text-gray-800">Registrar Nuevo Cliente</h4>
@@ -899,7 +835,6 @@
                                 <input type="text" x-model="nuevoClienteData.telefono" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                             </div>
                         </div>
-
                     </div>
 
                     <div x-show="clienteSeleccionado || clienteFormVisible" class="pt-6 border-t border-gray-200 transition-all">
@@ -958,7 +893,6 @@
                         </div>
 
                     </div>
-
                 </div>
 
                 <div class="p-6 flex gap-4 bg-gray-50 border-t border-gray-200 shrink-0">
@@ -968,7 +902,7 @@
             </div>
         </div>
 
-        {{-- MODAL MULTIPAGO --}}
+        {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
         <div x-show="modalPago" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
                 <div class="bg-[#ffc107] p-5 flex justify-between items-center text-black relative">
@@ -977,11 +911,26 @@
                 </div>
                 
                 <div class="p-6 text-center border-b border-gray-100 bg-white">
-                    <div class="font-black text-[#1a202c] text-[36px] leading-none mb-1" x-text="'$' + getTotal().toFixed(2)"></div>
+                    {{-- BOTONES DE CORTESÍA --}}
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Cortesía</button>
+                        <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Cortesía 40%</button>
+                        <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Cortesía 100%</button>
+                    </div>
+
+                    {{-- TOTAL PRINCIPAL --}}
+                    <div class="font-black text-[#1a202c] text-[40px] leading-none mb-1 tracking-tighter" x-text="'$' + getGranTotal().toFixed(2)"></div>
+                    
+                    {{-- SUBTOTAL TACHADO (Si hay cortesía) --}}
+                    <div x-show="cortesia > 0" class="text-sm font-bold text-amber-600 mb-2" x-cloak>
+                        Subtotal: <span class="line-through" x-text="'$' + getTotal().toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
+                    </div>
+
                     <div class="text-[14px] font-bold" :class="faltaPagar() === 0 ? 'text-green-500' : (faltaPagar() < 0 ? 'text-blue-500' : 'text-red-500')" x-text="faltaPagar() === 0 ? 'Monto completo asignado' : (faltaPagar() < 0 ? 'Cambio: $' + Math.abs(faltaPagar()).toFixed(2) : 'Falta asignar: $' + faltaPagar().toFixed(2))"></div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4">
+                {{-- OCULTA LOS PAGOS SI ES 100% CORTESÍA --}}
+                <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4" x-show="cortesia !== 100">
                     <p class="text-[13px] text-gray-500 mb-2">Selecciona métodos de pago (puedes elegir varios):</p>
                     
                     <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.transferencia.activo ? 'border-[#fd7e14]' : 'border-gray-200'">
@@ -1047,7 +996,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="p-5 bg-white border-t border-gray-100 flex flex-col gap-2">
@@ -1075,6 +1023,8 @@
                 id_venta_edit: {{ $venta_edit->id_venta ?? 'null' }},
                 comentariosGenerales: '{{ $venta_edit->comentarios ?? '' }}', comentariosGeneralesTemp: '', modalComentarios: false,
                 modalOpc: false, opcItem: null,
+
+                cortesia: 0, // VARIABLE DE CORTESIA (0, 40, 100)
 
                 modalPaq1: false, paq1Pizzas: [], paq1MitadesMode: false, paq1Halves: [], paqObj: null,
                 modalPaq2: false, paq2Tipo: 'hamb', paq2Extra: '', paq2Pizza: '', paq2MitadesMode: false, paq2MitadesArr: [],
@@ -1126,24 +1076,19 @@
                 getClienteNombre(cl) {
                     let nom = cl.nombre || cl.Nombre || '';
                     let ape = cl.apellido || cl.Apellido || '';
-                    
                     if (!nom && cl.cliente) nom = cl.cliente;
-                    
                     return (nom + ' ' + ape).trim() || 'Sin Nombre';
                 },
 
                 getClientesFiltrados() {
                     let listaSegura = Array.isArray(dbClientes) ? dbClientes : [];
                     if(!this.searchClienteText || this.searchClienteText.trim() === '') return listaSegura; 
-                    
                     let txt = this.searchClienteText.toLowerCase().trim();
-                    
                     return listaSegura.filter(c => {
                         let nom = (c.nombre || c.Nombre || '').toLowerCase();
                         let ape = (c.apellido || c.Apellido || '').toLowerCase();
                         let tel = (c.telefono || c.Telefono || '').toLowerCase();
                         let full = (nom + ' ' + ape).trim();
-                        
                         return full.includes(txt) || tel.includes(txt);
                     });
                 },
@@ -1193,14 +1138,11 @@
                             }
                         } else {
                             cItem.subtotalBase = cItem.precioBase * cItem.qty;
-                            
                             let extraOrillasPaq = (cItem.orillas_qty || 0) * (cItem.precio_orilla || 0) * cItem.qty;
                             let extraOrillaUnica = (cItem.orilla_queso ? cItem.precio_orilla * cItem.qty : 0);
-
                             cItem.subtotal = cItem.subtotalBase + extraOrillaUnica + extraOrillasPaq;
                             cItem.descuentoPromo = 0;
                             cItem.precioFinal = cItem.precioBase + (cItem.orilla_queso ? cItem.precio_orilla : 0) + ((cItem.orillas_qty || 0) * (cItem.precio_orilla || 0));
-                            
                             normals.push({ cartIndex: index, item: cItem });
                         }
                     });
@@ -1231,7 +1173,6 @@
                                 p2.item.subtotal -= p2.price;
                                 p2.item.precioCobrado = 0;
                                 p2.item.precioFinal = 0 + (p2.item.orilla_queso ? p2.item.precio_orilla : 0);
-
                                 subGroup += (p2.item.orilla_queso ? p2.item.precio_orilla : 0);
                                 groupItems.push(p2);
                                 this.cartGroups.push({ id_grupo: this.generateUID(), type: 'pizza_pair', size: this.cleanSize(size), items: groupItems, subtotal: subGroup });
@@ -1241,7 +1182,6 @@
                                 p1.item.subtotal -= desc;
                                 p1.item.precioCobrado = p1.price - desc;
                                 p1.item.precioFinal = p1.item.precioCobrado + (p1.item.orilla_queso ? p1.item.precio_orilla : 0);
-
                                 subGroup -= desc;
                                 this.cartGroups.push({ id_grupo: this.generateUID(), type: 'pizza_pair', size: this.cleanSize(size), items: groupItems, subtotal: subGroup });
                             }
@@ -1275,22 +1215,9 @@
                 addBebida(opc) {
                     let nomFull = this.bebidaItem.nombre + ' ' + opc.tamano;
                     let idx = this.cart.findIndex(i => i.db_id === opc.id && i.col === 'id_refresco');
-                    
-                    if(idx > -1) { 
-                        this.cart[idx].qty++; 
-                    } else { 
-                        this.cart.push({ 
-                            db_id: opc.id, 
-                            col: 'id_refresco', 
-                            tipo: 'directo', 
-                            nombre_base: nomFull, 
-                            variante: '', 
-                            precioBase: parseFloat(opc.precio), 
-                            qty: 1, 
-                            es_pizza: false, 
-                            is_magno: false, 
-                            uid: this.generateUID() 
-                        }); 
+                    if(idx > -1) { this.cart[idx].qty++; } 
+                    else { 
+                        this.cart.push({ db_id: opc.id, col: 'id_refresco', tipo: 'directo', nombre_base: nomFull, variante: '', precioBase: parseFloat(opc.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
                     }
                     this.actualizarCarrito();
                     this.modalBebida = false;
@@ -1318,13 +1245,7 @@
                     let idx = this.cart.findIndex(i => i.is_magno && i.variante === varianteFinal && !i.orilla_queso);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { 
-                        this.cart.push({ 
-                            db_id: null, col: 'id_magno', tipo: 'directo', 
-                            nombre_base: 'Magno', variante: varianteFinal, 
-                            medios: this.magnoSel, 
-                            precioBase: pb, qty: 1, es_pizza: false, is_magno: true, orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar,
-                            uid: this.generateUID()
-                        }); 
+                        this.cart.push({ db_id: null, col: 'id_magno', tipo: 'directo', nombre_base: 'Magno', variante: varianteFinal, medios: this.magnoSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: true, orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar, uid: this.generateUID() }); 
                     }
                     this.actualizarCarrito();
                     this.modalMagno = false;
@@ -1353,11 +1274,7 @@
                     let idx = this.cart.findIndex(i => i.db_id === this.rectItem.id && i.variante === varianteFinal);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { 
-                        this.cart.push({ 
-                            db_id: this.rectItem.id, col: this.rectItem.col, tipo: 'directo', 
-                            nombre_base: this.rectItem.nombre, variante: varianteFinal, cuartos: this.rectSel,
-                            precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID()
-                        }); 
+                        this.cart.push({ db_id: this.rectItem.id, col: this.rectItem.col, tipo: 'directo', nombre_base: this.rectItem.nombre, variante: varianteFinal, cuartos: this.rectSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
                     }
                     this.actualizarCarrito();
                     this.modalRectangular = false;
@@ -1386,11 +1303,7 @@
                     let idx = this.cart.findIndex(i => i.db_id === this.barraItem.id && i.variante === varianteFinal);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { 
-                        this.cart.push({ 
-                            db_id: this.barraItem.id, col: this.barraItem.col, tipo: 'directo', 
-                            nombre_base: this.barraItem.nombre, variante: varianteFinal, medios: this.barraSel,
-                            precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID()
-                        }); 
+                        this.cart.push({ db_id: this.barraItem.id, col: this.barraItem.col, tipo: 'directo', nombre_base: this.barraItem.nombre, variante: varianteFinal, medios: this.barraSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
                     }
                     this.actualizarCarrito();
                     this.modalBarra = false;
@@ -1400,27 +1313,10 @@
                     if(p.cat === 11) return this.abrirRectangularGeneral();
                     if(p.cat === 10) return this.abrirBarraGeneral();
 
-                    let idx = this.cart.findIndex(i => 
-                        i.db_id === p.id && 
-                        i.col === p.col && 
-                        !i.es_pizza
-                    );
-
-                    if(idx > -1) { 
-                        this.cart[idx].qty++; 
-                    } else { 
-                        this.cart.push({ 
-                            db_id: p.id, 
-                            col: p.col, 
-                            tipo: 'directo', 
-                            nombre_base: p.nombre, 
-                            variante: '', 
-                            precioBase: parseFloat(p.precio), 
-                            qty: 1, 
-                            es_pizza: false, 
-                            is_magno: false, 
-                            uid: this.generateUID() 
-                        }); 
+                    let idx = this.cart.findIndex(i => i.db_id === p.id && i.col === p.col && !i.es_pizza);
+                    if(idx > -1) { this.cart[idx].qty++; } 
+                    else { 
+                        this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
                     }
                     this.actualizarCarrito();
                 },
@@ -1435,23 +1331,13 @@
                 addPaq(id, pizzas_arr, extra_str) {
                     let pb = parseFloat(this.paqObj.precio);
                     let maxPizzas = id === 1 ? 2 : (id === 2 ? 1 : 3);
-                    
-                    this.cart.push({ 
-                        db_id: id, col: 'id_paquete', tipo: 'paq', nombre_base: 'Paquete '+id, 
-                        pizzas_paq: pizzas_arr, extra_paq: extra_str,   
-                        precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(),
-                        orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande 
-                    }); 
+                    this.cart.push({ db_id: id, col: 'id_paquete', tipo: 'paq', nombre_base: 'Paquete '+id, pizzas_paq: pizzas_arr, extra_paq: extra_str, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande }); 
                     this.actualizarCarrito();
                 },
 
-                // NUEVAS FUNCIONES PARA EL PAQUETE 1
                 addPaq1Esp(esp) {
-                    if(this.paq1MitadesMode) {
-                        if(this.paq1Halves.length < 4) this.paq1Halves.push(esp);
-                    } else {
-                        if(this.paq1Pizzas.length < 2) this.paq1Pizzas.push(esp);
-                    }
+                    if(this.paq1MitadesMode) { if(this.paq1Halves.length < 4) this.paq1Halves.push(esp); } 
+                    else { if(this.paq1Pizzas.length < 2) this.paq1Pizzas.push(esp); }
                 },
                 removePaq1Esp(index) {
                     if(this.paq1MitadesMode) this.paq1Halves.splice(index, 1);
@@ -1461,10 +1347,7 @@
                     let pizzasFinales = [];
                     if(this.paq1MitadesMode) {
                         if(this.paq1Halves.length < 4) return alert("Por favor selecciona las 4 mitades.");
-                        pizzasFinales = [
-                            {nombre: this.paq1Halves[0] + ' / ' + this.paq1Halves[1], orilla: false},
-                            {nombre: this.paq1Halves[2] + ' / ' + this.paq1Halves[3], orilla: false}
-                        ];
+                        pizzasFinales = [{nombre: this.paq1Halves[0] + ' / ' + this.paq1Halves[1], orilla: false}, {nombre: this.paq1Halves[2] + ' / ' + this.paq1Halves[3], orilla: false}];
                     } else {
                         if(this.paq1Pizzas.length < 2) return alert("Por favor selecciona las 2 pizzas completas.");
                         pizzasFinales = this.paq1Pizzas.map(p => ({nombre: p, orilla: false}));
@@ -1475,14 +1358,10 @@
                 },
 
                 addPaq2Esp(esp) {
-                    if (this.paq2MitadesMode) {
-                        if (this.paq2MitadesArr.length < 2) this.paq2MitadesArr.push(esp);
-                    } else {
-                        this.paq2Pizza = esp;
-                    }
+                    if (this.paq2MitadesMode) { if (this.paq2MitadesArr.length < 2) this.paq2MitadesArr.push(esp); } 
+                    else { this.paq2Pizza = esp; }
                 },
                 removePaq2Mitad(index) { this.paq2MitadesArr.splice(index, 1); },
-                
                 addPaq2() { 
                     let nombrePizza = this.paq2MitadesMode ? (this.paq2MitadesArr[0] + ' / ' + this.paq2MitadesArr[1]) : this.paq2Pizza;
                     let pizzas = [{nombre: nombrePizza, orilla: false}];
@@ -1491,31 +1370,22 @@
                 },
 
                 addPaq3Esp(esp) { 
-                    if(this.paq3MitadesMode) {
-                        if(this.paq3Halves.length < 6) this.paq3Halves.push(esp);
-                    } else {
-                        if(this.paq3Pizzas.length < 3) this.paq3Pizzas.push(esp);
-                    }
+                    if(this.paq3MitadesMode) { if(this.paq3Halves.length < 6) this.paq3Halves.push(esp); } 
+                    else { if(this.paq3Pizzas.length < 3) this.paq3Pizzas.push(esp); }
                 },
                 removePaq3Esp(index) { 
                     if(this.paq3MitadesMode) this.paq3Halves.splice(index, 1);
                     else this.paq3Pizzas.splice(index, 1); 
                 },
-
                 addPaq3() { 
                     let pizzasFinales = [];
                     if(this.paq3MitadesMode) {
                         if(this.paq3Halves.length < 6) return alert("Por favor selecciona las 6 mitades.");
-                        pizzasFinales = [
-                            {nombre: this.paq3Halves[0] + ' / ' + this.paq3Halves[1], orilla: false},
-                            {nombre: this.paq3Halves[2] + ' / ' + this.paq3Halves[3], orilla: false},
-                            {nombre: this.paq3Halves[4] + ' / ' + this.paq3Halves[5], orilla: false}
-                        ];
+                        pizzasFinales = [{nombre: this.paq3Halves[0] + ' / ' + this.paq3Halves[1], orilla: false}, {nombre: this.paq3Halves[2] + ' / ' + this.paq3Halves[3], orilla: false}, {nombre: this.paq3Halves[4] + ' / ' + this.paq3Halves[5], orilla: false}];
                     } else {
                         if (this.paq3Pizzas.length < 3) return alert("Por favor selecciona las 3 pizzas completas.");
                         pizzasFinales = this.paq3Pizzas.map(p => ({nombre: p, orilla: false}));
                     }
-                    
                     this.addPaq(3, pizzasFinales, ''); 
                     this.paq3Pizzas = []; this.paq3Halves = [];
                     this.modalPaq3 = false; 
@@ -1583,7 +1453,13 @@
 
                 abrirModalComentarios() { this.comentariosGeneralesTemp = this.comentariosGenerales; this.modalComentarios = true; },
                 guardarComentarios() { this.comentariosGenerales = this.comentariosGeneralesTemp; this.modalComentarios = false; },
+                
                 getTotal() { return this.cartGroups.reduce((s, g) => s + g.subtotal, 0); },
+                getGranTotal() {
+                    let t = this.getTotal();
+                    let descontado = t - (t * (this.cortesia / 100));
+                    return this.cortesia > 0 ? Math.ceil(descontado) : descontado;
+                },
                 
                 nomServicio() { 
                     if(this.servicio === 1) return 'Comer Aqui';
@@ -1638,7 +1514,6 @@
                     } else {
                         if(!this.clienteSeleccionado) return false;
                     }
-
                     if(this.dirFormVisible) {
                         if(!this.nuevaDirData.calle) return false;
                     } else {
@@ -1654,6 +1529,7 @@
                 },
 
                 abrirModalPago() {
+                    this.cortesia = 0; // Reiniciamos cortesía
                     this.pagos = {
                         efectivo: { activo: false, monto: null, entregado: null },
                         tarjeta: { activo: false, monto: null },
@@ -1671,6 +1547,17 @@
                         this.pagos[tipo].monto = null;
                     }
                 },
+                autoFillAfterCortesia() {
+                    if(this.cortesia === 100) {
+                        this.pagos.efectivo.activo = false; this.pagos.efectivo.monto = null; this.pagos.efectivo.entregado = null;
+                        this.pagos.tarjeta.activo = false; this.pagos.tarjeta.monto = null;
+                        this.pagos.transferencia.activo = false; this.pagos.transferencia.monto = null;
+                    } else {
+                        ['efectivo', 'tarjeta', 'transferencia'].forEach(t => {
+                            if(this.pagos[t].activo) this.autoFillPago(t);
+                        });
+                    }
+                },
                 getTotalPagarInputs() {
                     let pE = this.pagos.efectivo.activo ? parseFloat(this.pagos.efectivo.monto || 0) : 0;
                     let pT = this.pagos.tarjeta.activo ? parseFloat(this.pagos.tarjeta.monto || 0) : 0;
@@ -1678,11 +1565,12 @@
                     return pE + pT + pTr;
                 },
                 faltaPagar() {
-                    let diff = this.getTotal() - this.getTotalPagarInputs();
+                    let diff = this.getGranTotal() - this.getTotalPagarInputs();
                     return parseFloat(diff.toFixed(2));
                 },
                 pagosValidos() {
                     if(this.faltaPagar() !== 0) return false;
+                    if(this.getGranTotal() === 0) return true; // 100% Cortesía pasa
                     if(!this.pagos.efectivo.activo && !this.pagos.tarjeta.activo && !this.pagos.transferencia.activo) return false;
                     if(this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
                     return true;
@@ -1691,6 +1579,8 @@
                 procesarOrden() {
                     if(this.servicio === 1) {
                         if(!this.mesa || !this.nombreClienteMesa.trim()) return alert("El número de mesa y el nombre del cliente son obligatorios.");
+                        // OJO AQUÍ: Las mesas se mandan a cocina SIN PAGAR. 
+                        // Se cobran después desde la pantalla de Mesas editando el pedido.
                         this.procesarOrdenFinal(true); 
                     } else if(this.servicio === 2) {
                         this.abrirModalPago(); 
@@ -1700,114 +1590,122 @@
                 },
 
                 procesarOrdenFinal(esAbierta = false) {
-                if(!esAbierta && !this.pagosValidos()) return;
-                this.isProcessing = true;
+                    if(!esAbierta && !this.pagosValidos()) return;
+                    this.isProcessing = true;
 
-                let cartPayload = [];
-                this.cartGroups.forEach(g => {
-                    if(g.type === 'pizza_pair') {
-                        g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
-                    } else {
-                        cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
-                    }
-                });
-
-                let pagosToSend = [];
-                if(!esAbierta) {
-                    if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
-                        pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
-                    }
-                    if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
-                        pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
-                    }
-                    if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
-                        pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
-                    }
-                }
-
-                let reqBody = {
-                    _token: '{{ csrf_token() }}', 
-                    tipo_servicio: this.servicio, 
-                    mesa: this.mesa, 
-                    nombre_cliente: this.nombreClienteMesa,
-                    comentarios: this.comentariosGenerales, 
-                    total: this.getTotal(), 
-                    carrito: cartPayload, 
-                    pagos: pagosToSend,
-                    id_venta_edit: this.id_venta_edit
-                };
-
-                if(this.servicio === 3) {
-                    if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
-                    else reqBody.id_clie = this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie;
-
-                    if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
-                    else reqBody.id_dir = this.dirSeleccionada;
-                }
-
-                fetch("{{ route('ventas.pos.store') }}", {
-                    method: 'POST', 
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json' 
-                    },
-                    body: JSON.stringify(reqBody)
-                }).then(async r => {
-                    if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
-                    return r.json();
-                }).then(res => {
-                    if(res.success) { 
-                        if (res.nuevo_cliente) {
-                        const existeClie = dbClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
-                        if (!existeClie) {
-                            dbClientes.push(res.nuevo_cliente);
-                        }
-                    }
-                    if (res.nueva_direccion) {
-                        const existeDir = dbDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
-                        if (!existeDir) {
-                            dbDirecciones.push(res.nueva_direccion);
-                        }
-                    }
-                        this.cart = []; 
-                        this.actualizarCarrito(); 
-                        this.mesa = ''; 
-                        this.nombreClienteMesa = ''; 
-                        this.comentariosGenerales = '';
-                        this.comentariosGeneralesTemp = ''; 
-                        this.modalPago = false;
-                        
-                        this.clienteSeleccionado = null;
-                        this.searchClienteText = '';
-                        this.direccionesCliente = [];
-                        this.dirSeleccionada = null;
-                        this.clienteFormVisible = false;
-                        this.dirFormVisible = false;
-
-                        let urlTicket = '/venta/pos/ticket/' + res.id_venta;
-                        if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
-
-                        const width = 420;
-                        const height = 700;
-                        const left = (window.screen.width / 2) - (width / 2);
-                        const top = (window.screen.height / 2) - (height / 2);
-
-                        window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
-                        
-                        if(this.id_venta_edit) {
-                            setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
+                    let cartPayload = [];
+                    this.cartGroups.forEach(g => {
+                        if(g.type === 'pizza_pair') {
+                            g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
                         } else {
+                            cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
+                        }
+                    });
+
+                    let pagosToSend = [];
+                    if(!esAbierta) {
+                        if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
+                            pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
+                        }
+                        if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
+                            pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
+                        }
+                        if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
+                            pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+                        }
+                    }
+
+                    // Limpiamos la palabra cortesía vieja por si se está editando
+                    let baseComments = this.comentariosGenerales.replace(/ \| CORTESÍA \d+%/g, '').replace(/CORTESÍA \d+%/g, '').trim();
+                    if (baseComments.endsWith('|')) baseComments = baseComments.slice(0, -1).trim();
+                    
+                    // Añadimos la cortesía nueva si existe
+                    let finalComments = baseComments + (this.cortesia > 0 ? (baseComments ? " | " : "") + "CORTESÍA " + this.cortesia + "%" : "");
+
+                    let reqBody = {
+                        _token: '{{ csrf_token() }}', 
+                        tipo_servicio: this.servicio, 
+                        mesa: this.mesa, 
+                        nombre_cliente: this.nombreClienteMesa,
+                        comentarios: finalComments, 
+                        total: this.getGranTotal(), 
+                        carrito: cartPayload, 
+                        pagos: pagosToSend,
+                        id_venta_edit: this.id_venta_edit
+                    };
+
+                    if(this.servicio === 3) {
+                        if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
+                        else reqBody.id_clie = this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie;
+
+                        if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
+                        else reqBody.id_dir = this.dirSeleccionada;
+                    }
+
+                    fetch("{{ route('ventas.pos.store') }}", {
+                        method: 'POST', 
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json' 
+                        },
+                        body: JSON.stringify(reqBody)
+                    }).then(async r => {
+                        if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
+                        return r.json();
+                    }).then(res => {
+                        if(res.success) { 
+                            if (res.nuevo_cliente) {
+                            const existeClie = dbClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
+                            if (!existeClie) {
+                                dbClientes.push(res.nuevo_cliente);
+                            }
+                        }
+                        if (res.nueva_direccion) {
+                            const existeDir = dbDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
+                            if (!existeDir) {
+                                dbDirecciones.push(res.nueva_direccion);
+                            }
+                        }
+                            this.cart = []; 
+                            this.actualizarCarrito(); 
+                            this.mesa = ''; 
+                            this.nombreClienteMesa = ''; 
+                            this.comentariosGenerales = '';
+                            this.comentariosGeneralesTemp = ''; 
+                            this.cortesia = 0;
+                            this.modalPago = false;
+                            
+                            this.clienteSeleccionado = null;
+                            this.searchClienteText = '';
+                            this.direccionesCliente = [];
+                            this.dirSeleccionada = null;
+                            this.clienteFormVisible = false;
+                            this.dirFormVisible = false;
+
+                            let urlTicket = '/venta/pos/ticket/' + res.id_venta;
+                            if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
+
+                            const width = 420;
+                            const height = 700;
+                            const left = (window.screen.width / 2) - (width / 2);
+                            const top = (window.screen.height / 2) - (height / 2);
+
+                            window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
+                            
+                            if(this.id_venta_edit) {
+                                setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
+                            } else {
+                                this.isProcessing = false;
+                            }
+                        } else {
+                            alert("Error al guardar: " + res.message);
                             this.isProcessing = false;
                         }
-                    } else {
-                        alert("Error al guardar: " + res.message);
+                    }).catch(e => {
+                        alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
                         this.isProcessing = false;
-                    }
-                }).catch(e => {
-                    alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
-                    this.isProcessing = false;
-                });
-            }
+                    });
+                }
             }));
         });
     </script>

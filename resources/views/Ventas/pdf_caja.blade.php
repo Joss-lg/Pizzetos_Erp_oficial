@@ -154,9 +154,36 @@
                 <td class="text-center">{{ $v->refs && $v->refs != '-' ? $v->refs : 'N/A' }}</td>
                 <td>
                     @if(isset($v->status) && $v->status == 3)
-                        <span class="bold">CANCELADO</span>
+                        <span class="bold text-red">CANCELADO</span>
                     @else
-                        {!! $v->montos_detalle ?? $v->metodos !!}
+                        @php
+                            $comentario = '';
+                            if(isset($v->comentarios)) {
+                                $comentario = strtoupper($v->comentarios);
+                            } else {
+                                $comentario_bd = \Illuminate\Support\Facades\DB::table('Venta')->where('id_venta', $v->id_venta ?? $v->id ?? 0)->value('comentarios');
+                                $comentario = strtoupper($comentario_bd ?? '');
+                            }
+
+                            $esCortesia100 = str_contains($comentario, 'CORTESÍA 100%') || str_contains($comentario, 'CORTESIA 100%');
+                            $esCortesia40 = str_contains($comentario, 'CORTESÍA 40%') || str_contains($comentario, 'CORTESIA 40%');
+                            
+                            $pagos_texto = $v->montos_detalle ?? ($v->metodos ?? '');
+                        @endphp
+
+                        @if($esCortesia100)
+                            <span style="background-color: #fee2e2; color: #991b1b; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #f87171; display: inline-block; margin-bottom: 4px;">CORTESÍA 100%</span><br>
+                        @endif
+
+                        @if($esCortesia40)
+                            <span style="background-color: #fef3c7; color: #b45309; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #fbbf24; display: inline-block; margin-bottom: 4px;">CORTESÍA 40%</span><br>
+                        @endif
+
+                        @if(empty(trim($pagos_texto)) && !$esCortesia100)
+                            <span style="color: #64748b; font-weight: bold; font-size: 11px;">PENDIENTE</span>
+                        @elseif(!empty(trim($pagos_texto)))
+                            <div style="margin-top: 3px;">{!! $pagos_texto !!}</div>
+                        @endif
                     @endif
                 </td>
                 <td class="text-right bold">$ {{ number_format($v->total, 2) }}</td>

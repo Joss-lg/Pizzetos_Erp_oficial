@@ -173,7 +173,6 @@
                                         </button>
                                     @endif
 
-                                    {{-- BOTÓN REIMPRIMIR CON POPUP --}}
                                     <button @click="imprimirTicketPop({{ $venta->id_venta }})" title="Reimprimir" class="hover:scale-110 text-slate-400 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                     </button>
@@ -207,7 +206,7 @@
         </div>
     </div>
 
-    {{-- MODAL MULTIPAGO --}}
+    {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
     <div x-show="modalPago" x-cloak class="fixed inset-0 bg-slate-900/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-white rounded-[35px] shadow-2xl w-[450px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
             <div :class="es_edicion_pago ? 'bg-blue-600' : 'bg-green-600'" class="p-6 flex justify-between items-center text-white relative">
@@ -219,14 +218,28 @@
             </div>
             
             <div class="p-8 text-center bg-white border-b border-gray-50">
+                {{-- BOTONES DE CORTESÍA --}}
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Sin Cortesía</button>
+                    <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Cortesía 40%</button>
+                    <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Cortesía 100%</button>
+                </div>
+
                 <div class="text-[10px] font-black text-slate-400 uppercase italic mb-1 tracking-widest">Total a Cobrar</div>
-                <div class="font-black text-slate-900 text-5xl leading-none tracking-tighter italic" x-text="'$' + total_pago.toFixed(2)"></div>
+                <div class="font-black text-slate-900 text-5xl leading-none tracking-tighter italic" x-text="'$' + getGranTotal().toFixed(2)"></div>
+                
+                {{-- Muestra el subtotal tachado si hay cortesía --}}
+                <div x-show="cortesia > 0" class="text-sm font-bold text-amber-500 mt-2" x-cloak>
+                    Subtotal Original: <span class="line-through" x-text="'$' + total_pago.toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
+                </div>
+
                 <div class="mt-4 text-[11px] font-black uppercase italic inline-block px-4 py-1.5 rounded-full" 
                      :class="faltaPagar() === 0 ? 'bg-green-100 text-green-600' : (faltaPagar() < 0 ? 'bg-blue-100 text-blue-600' : 'bg-red-100 text-red-500')" 
-                     x-text="faltaPagar() === 0 ? 'Monto completo' : (faltaPagar() < 0 ? 'Cambio: $' + Math.abs(faltaPagar()).toFixed(2) : 'Faltante: $' + faltaPagar().toFixed(2))"></div>
+                     x-text="faltaPagar() === 0 ? 'Monto completo asignado' : (faltaPagar() < 0 ? 'Cambio: $' + Math.abs(faltaPagar()).toFixed(2) : 'Faltante: $' + faltaPagar().toFixed(2))"></div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-4">
+            {{-- OCULTA LOS PAGOS SI ES 100% CORTESÍA --}}
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-4" x-show="cortesia !== 100">
                 <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.efectivo.activo ? 'border-amber-400 shadow-lg shadow-amber-50' : 'border-slate-100'">
                     <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
                         <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-5 h-5 rounded-lg border-gray-300 text-amber-400 focus:ring-amber-400">
@@ -296,6 +309,7 @@
                 folio_virtual_pago: '',
                 folio_virtual_cancelar: '',
                 total_pago: 0,
+                cortesia: 0, // <-- VARIABLE PARA LA CORTESÍA
                 es_edicion_pago: false,
                 isProcessing: false,
                 motivo_cancelacion: '',
@@ -305,7 +319,6 @@
                     transferencia: { activo: false, monto: null, referencia: '' }
                 },
 
-                // FUNCIÓN PARA ABRIR EL TICKET EN POPUP
                 imprimirTicketPop(id) {
                     const width = 400;
                     const height = 650;
@@ -340,6 +353,7 @@
                     this.id_venta_pago = id;
                     this.folio_virtual_pago = folio;
                     this.total_pago = parseFloat(total);
+                    this.cortesia = 0; // Limpiar siempre al abrir
                     this.es_edicion_pago = esEdicion;
                     this.isProcessing = false;
                     this.pagos = {
@@ -348,6 +362,23 @@
                         transferencia: { activo: false, monto: null, referencia: '' }
                     };
                     this.modalPago = true;
+                },
+
+                getGranTotal() {
+                    let descontado = this.total_pago - (this.total_pago * (this.cortesia / 100));
+                    return this.cortesia > 0 ? Math.ceil(descontado) : descontado;
+                },
+
+                autoFillAfterCortesia() {
+                    if(this.cortesia === 100) {
+                        this.pagos.efectivo.activo = false; this.pagos.efectivo.monto = null; this.pagos.efectivo.entregado = null;
+                        this.pagos.tarjeta.activo = false; this.pagos.tarjeta.monto = null;
+                        this.pagos.transferencia.activo = false; this.pagos.transferencia.monto = null;
+                    } else {
+                        ['efectivo', 'tarjeta', 'transferencia'].forEach(t => {
+                            if(this.pagos[t].activo) this.autoFillPago(t);
+                        });
+                    }
                 },
 
                 autoFillPago(tipo) {
@@ -367,12 +398,13 @@
                 },
 
                 faltaPagar() { 
-                    return parseFloat((this.total_pago - this.getTotalPagarInputs()).toFixed(2)); 
+                    return parseFloat((this.getGranTotal() - this.getTotalPagarInputs()).toFixed(2)); 
                 },
                 
                 pagosValidos() { 
                     if (this.faltaPagar() !== 0) return false;
-                    if(!this.pagos.efectivo.activo && !this.pagos.tarjeta.activo && !this.pagos.transferencia.activo) return false;
+                    if (this.getGranTotal() === 0) return true; // 100% cortesía pasa
+                    if (!this.pagos.efectivo.activo && !this.pagos.tarjeta.activo && !this.pagos.transferencia.activo) return false;
                     if (this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
                     return true;
                 },
@@ -382,14 +414,17 @@
                     this.isProcessing = true;
 
                     let pagosToSend = [];
-                    if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
-                        pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
-                    }
-                    if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
-                        pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
-                    }
-                    if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
-                        pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+                    // Si la cortesía es 100, no enviamos pagos
+                    if(this.cortesia !== 100) {
+                        if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
+                            pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
+                        }
+                        if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
+                            pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
+                        }
+                        if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
+                            pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+                        }
                     }
 
                     let url = this.es_edicion_pago ? "{{ route('ventas.editar_pago') }}" : "{{ route('ventas.pagar') }}";
@@ -397,12 +432,17 @@
                     fetch(url, {
                         method: 'POST', 
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ _token: '{{ csrf_token() }}', id_venta: this.id_venta_pago, pagos: pagosToSend })
+                        body: JSON.stringify({ 
+                            _token: '{{ csrf_token() }}', 
+                            id_venta: this.id_venta_pago, 
+                            pagos: pagosToSend,
+                            cortesia: this.cortesia,
+                            nuevo_total: this.getGranTotal()
+                        })
                     }).then(r => r.json()).then(res => {
                         if(res.success) {
                             this.modalPago = false;
                             if(!this.es_edicion_pago) {
-                                // ABRIR TICKET EN POPUP AL COBRAR
                                 this.imprimirTicketPop(this.id_venta_pago);
                             }
                             setTimeout(() => { window.location.reload(); }, 1000);
