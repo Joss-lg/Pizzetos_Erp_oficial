@@ -362,6 +362,8 @@ class PuntoVentaController extends Controller
 
         $pizzas_flat = []; 
         $ungrouped_others = []; 
+        $grouped_complementos = []; 
+        $grouped_bebidas = []; 
 
         foreach($detalles as $det) {
             $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
@@ -382,8 +384,7 @@ class PuntoVentaController extends Controller
                 if($p) { 
                     $es_pizza = true; 
                     $size_clean = $cleanTamano($p->tamano); 
-                    // SE QUITARON LOS NÚMEROS "1 " DE AQUÍ EN ADELANTE
-                    $linea = $cleanSabor($p->nombre);
+                    $linea = "1 " . $cleanSabor($p->nombre);
                 }
             } 
             elseif ($det->id_maris) {
@@ -391,20 +392,20 @@ class PuntoVentaController extends Controller
                 if($m) { 
                     $es_pizza = true; 
                     $size_clean = $cleanTamano($m->tamano); 
-                    $linea = $cleanSabor($m->nombre);
+                    $linea = "1 " . $cleanSabor($m->nombre);
                 }
             } 
             elseif ($det->pizza_mitad) {
                 $j = json_decode($det->pizza_mitad);
                 $es_pizza = true; 
                 $size_clean = $cleanTamano($j->tamano ?? '');
-                $linea = $cleanSabor($j->mitad1 ?? '') . " / " . $cleanSabor($j->mitad2 ?? '');
+                $linea = "1 " . $cleanSabor($j->mitad1 ?? '') . " / " . $cleanSabor($j->mitad2 ?? '');
             } 
             elseif (isset($ing->piz_ing_tamano)) {
                 $es_pizza = true; 
                 $size_clean = $cleanTamano($ing->piz_ing_tamano);
                 $str = implode(", ", $ing->extras ?? []);
-                $linea = mb_strtoupper(trim($str));
+                $linea = "1 " . mb_strtoupper(trim($str));
             }
 
             if ($es_pizza) {
@@ -420,134 +421,161 @@ class PuntoVentaController extends Controller
                 }
             } 
             else {
-                // EXPANDIMOS LOS DEMÁS ARTÍCULOS 1 POR 1
-                for ($i = 0; $i < $det->cantidad; $i++) {
-                    $is_complemento = false;
-                    $name_comp = "";
-                    $nombre_final = "";
-                    $lineas_sub = [];
-                    $precio_unitario = $det->precio_unitario;
+                $is_complemento = false;
+                $cat_comp = "";
+                $name_comp = "";
 
-                    if($det->id_hamb) { $is_complemento = true; $name_comp = DB::table('Hamburguesas')->where('id_hamb', $det->id_hamb)->value('paquete'); }
-                    elseif($det->id_cos) { $is_complemento = true; $name_comp = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
-                    elseif($det->id_alis) { $is_complemento = true; $name_comp = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden'); }
-                    elseif($det->id_spag) { $is_complemento = true; $name_comp = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden'); }
+                if($det->id_hamb) { $is_complemento = true; $cat_comp = "HAMBURGUESAS"; $name_comp = DB::table('Hamburguesas')->where('id_hamb', $det->id_hamb)->value('paquete'); }
+                elseif($det->id_cos) { $is_complemento = true; $cat_comp = "ORD. COSTILLAS"; $name_comp = DB::table('Costillas')->where('id_cos', $det->id_cos)->value('orden'); }
+                elseif($det->id_alis) { $is_complemento = true; $cat_comp = "ORD. ALITAS"; $name_comp = DB::table('Alitas')->where('id_alis', $det->id_alis)->value('orden'); }
+                elseif($det->id_spag) { $is_complemento = true; $cat_comp = "ORD. SPAGUETTY"; $name_comp = DB::table('Spaguetty')->where('id_spag', $det->id_spag)->value('orden'); }
 
-                    if ($is_complemento) {
-                        $clean_comp = trim(str_ireplace(['alitas', 'hamburguesas', 'hamburguesa', 'orden de', 'costillas', 'spaguetty', 'paquete', 'orden', ' de '], '', mb_strtolower($name_comp)));
-                        if (empty($clean_comp)) $clean_comp = mb_strtoupper($name_comp); 
-                        else $clean_comp = mb_strtoupper($clean_comp);
-                        
-                        $nombre_final = $clean_comp;
-                    } 
-                    elseif ($det->id_papa) {
-                        $name_comp = DB::table('OrdenDePapas')->where('id_papa', $det->id_papa)->value('orden');
-                        $nombre_papa = mb_strtoupper($name_comp);
-                        $nombre_final = str_contains($nombre_papa, 'PAPAS') ? "ORD. " . $nombre_papa : "ORD. PAPAS " . $nombre_papa;
+                if ($is_complemento) {
+                    if (!isset($grouped_complementos[$cat_comp])) {
+                        $grouped_complementos[$cat_comp] = ['total' => null, 'subs' => []];
                     }
-                    elseif ($det->id_refresco) {
-                        $r = DB::table('Refrescos')->join('TamanosRefrescos', 'Refrescos.id_tamano', '=', 'TamanosRefrescos.id_tamano')->where('Refrescos.id_refresco', $det->id_refresco)->first();
-                        if($r) {
-                            $nombre_final = mb_strtoupper($r->nombre . " " . $r->tamano);
+                    $clean_comp = trim(str_ireplace(['alitas', 'hamburguesas', 'hamburguesa', 'orden de', 'costillas', 'spaguetty', 'paquete', 'orden', ' de '], '', mb_strtolower($name_comp)));
+                    if (empty($clean_comp)) $clean_comp = mb_strtoupper($name_comp); 
+                    else $clean_comp = mb_strtoupper($clean_comp);
+                    
+                    // Desglosamos 1 por 1 bajo su categoría
+                    for ($i = 0; $i < $det->cantidad; $i++) {
+                        $grouped_complementos[$cat_comp]['subs'][] = [
+                            'texto' => "1 " . $clean_comp,
+                            'precio' => $det->precio_unitario
+                        ];
+                    }
+                } 
+                elseif ($det->id_papa) {
+                    // LAS PAPAS SE VAN SIN CATEGORÍA (SOLAS)
+                    for ($i = 0; $i < $det->cantidad; $i++) {
+                        $ungrouped_others[] = [
+                            'nombre' => "ORD. PAPAS",
+                            'subs' => [],
+                            'total' => $det->precio_unitario
+                        ];
+                    }
+                }
+                elseif ($det->id_refresco) {
+                    $r = DB::table('Refrescos')->join('TamanosRefrescos', 'Refrescos.id_tamano', '=', 'TamanosRefrescos.id_tamano')->where('Refrescos.id_refresco', $det->id_refresco)->first();
+                    if($r) {
+                        if (!isset($grouped_bebidas["BEBIDAS"])) {
+                            $grouped_bebidas["BEBIDAS"] = ['total' => null, 'subs' => []];
+                        }
+                        // Desglosamos 1 por 1 bajo su categoría
+                        for ($i = 0; $i < $det->cantidad; $i++) {
+                            $grouped_bebidas["BEBIDAS"]['subs'][] = [
+                                'texto' => "1 " . mb_strtoupper($r->nombre . " " . $r->tamano),
+                                'precio' => $det->precio_unitario
+                            ];
                         }
                     }
-                    elseif ($det->id_paquete) {
-                        $j = json_decode($det->id_paquete);
-                        $id_paq = $j->id ?? 0;
-                        $nombre_final = "PAQUETE " . $id_paq;
+                }
+                else {
+                    // PAQUETES, BARRA, MAGNO, RECTANGULAR
+                    for ($i = 0; $i < $det->cantidad; $i++) {
+                        $nombre_final = "";
+                        $lineas_sub = [];
+                        $precio_unitario = $det->precio_unitario;
 
-                        if (isset($j->pizzas) && is_array($j->pizzas)) {
-                            foreach($j->pizzas as $pz) {
-                                $nom = mb_strtoupper($pz->nombre ?? '');
-                                if(isset($pz->orilla) && $pz->orilla == true) $nom .= " + ORILLA RELLENA";
-                                $lineas_sub[] = $nom;
-                            }
-                            if (!empty($j->extra)) {
-                                $nomExtra = mb_strtoupper($j->extra);
-                                $nomExtra = str_replace(['ALITAS', 'COSTILLAS', 'PAPAS'], ['ORD. ALITAS', 'ORD. COSTILLAS', 'ORD. PAPAS'], $nomExtra);
-                                $lineas_sub[] = $nomExtra;
-                            }
-                            $lineas_sub[] = "REFRESCO JARRITO 2 LTS";
-                        } 
-                        else {
-                            $variante = mb_strtoupper($j->variante ?? '');
-                            if ($id_paq == 1) {
-                                $limpio = trim(str_replace(['+ 1 REFRESCO JARRITO', 'PIZZA GRANDE'], '', $variante));
-                                if (str_contains($limpio, '2 HAWAIANA')) { $lineas_sub[] = "HAWAIANA"; $lineas_sub[] = "HAWAIANA"; } 
-                                elseif (str_contains($limpio, '2 PEPPERONI')) { $lineas_sub[] = "PEPPERONI"; $lineas_sub[] = "PEPPERONI"; } 
-                                else { $lineas_sub[] = "HAWAIANA"; $lineas_sub[] = "PEPPERONI"; }
-                                $lineas_sub[] = "REFRESCO JARRITO 2 LTS";
-                            } elseif ($id_paq == 2) {
-                                $limpio = trim(str_replace('+ 1 REFRESCO JARRITO', '', $variante));
-                                $partes = explode('+', $limpio);
-                                foreach($partes as $p) { 
-                                    $p = trim(str_replace(['1 PIZZA', '1 '], '', $p)); 
-                                    if(!empty($p)) $lineas_sub[] = $p; 
+                        if ($det->id_paquete) {
+                            $j = json_decode($det->id_paquete);
+                            $id_paq = $j->id ?? 0;
+                            $nombre_final = "PAQUETE " . $id_paq; 
+
+                            if (isset($j->pizzas) && is_array($j->pizzas)) {
+                                foreach($j->pizzas as $pz) {
+                                    $nom = mb_strtoupper($pz->nombre ?? '');
+                                    if(isset($pz->orilla) && $pz->orilla == true) $nom .= " + ORILLA RELLENA";
+                                    $lineas_sub[] = "1 " . $nom;
                                 }
-                                $lineas_sub[] = "REFRESCO JARRITO 2 LTS";
-                            } elseif ($id_paq == 3) {
-                                $limpio = trim(str_replace('+ 1 REFRESCO JARRITO', '', $variante));
-                                $pizzas = explode(',', $limpio);
-                                foreach($pizzas as $p) {
-                                    $p = trim($p);
-                                    if (preg_match('/^(\d+)\s+(.+)$/', $p, $matches)) { 
-                                        for($q=0; $q<$matches[1]; $q++) { $lineas_sub[] = $matches[2]; }
-                                    } 
-                                    else { $lineas_sub[] = $p; }
+                                if (!empty($j->extra)) {
+                                    $nomExtra = mb_strtoupper($j->extra);
+                                    $nomExtra = str_replace(['ALITAS', 'COSTILLAS', 'PAPAS'], ['ORD. ALITAS', 'ORD. COSTILLAS', 'ORD. PAPAS'], $nomExtra);
+                                    $lineas_sub[] = "1 " . $nomExtra;
                                 }
-                                $lineas_sub[] = "REFRESCO JARRITO 2 LTS";
-                            } else { $lineas_sub[] = $variante; }
-                        }
-                        if ($det->queso > 0 && (!isset($j->pizzas) || !is_array($j->pizzas))) {
-                            $lineas_sub[] = "+ ORILLA RELLENA";
-                        }
-                    }
-                    elseif($det->id_rec) {
-                        $j = json_decode($det->id_rec); 
-                        $nombre_final = "RECTANGULAR";
-                        if(isset($j->cuartos)) { 
-                            $counts = array_count_values((array)$j->cuartos); 
-                            foreach($counts as $k => $v) { 
-                                if ($v == 4) $lineas_sub[] = mb_strtoupper($k);
-                                elseif ($v == 3) $lineas_sub[] = "3/4 " . mb_strtoupper($k);
-                                elseif ($v == 2) $lineas_sub[] = "1/2 " . mb_strtoupper($k);
-                                elseif ($v == 1) $lineas_sub[] = "1/4 " . mb_strtoupper($k);
+                                $lineas_sub[] = "1 REFRESCO JARRITO 2 LTS";
                             } 
-                        }
-                        if ($det->queso > 0) $lineas_sub[] = "+ ORILLA RELLENA";
-                    }
-                    elseif($det->id_barr) {
-                        $j = json_decode($det->id_barr); 
-                        $nombre_final = "BARRA";
-                        if(isset($j->medios)) { 
-                            $counts = array_count_values((array)$j->medios); 
-                            foreach($counts as $k => $v) { 
-                                if ($v == 2) $lineas_sub[] = mb_strtoupper($k);
-                                elseif ($v == 1) $lineas_sub[] = "1/2 " . mb_strtoupper($k);
-                            } 
-                        }
-                        if ($det->queso > 0) $lineas_sub[] = "+ ORILLA RELLENA";
-                    }
-                    elseif($det->id_magno) {
-                        $j = json_decode($det->id_magno); 
-                        $nombre_final = "MAGNO";
-                        $str = "";
-                        if(isset($j->medios)) { 
-                            $m = (array)$j->medios;
-                            if (count($m) >= 2) {
-                                $str = $cleanSabor($m[0]) . " / " . $cleanSabor($m[1]);
-                            } elseif (count($m) == 1) {
-                                $str = $cleanSabor($m[0]);
+                            else {
+                                $variante = mb_strtoupper($j->variante ?? '');
+                                if ($id_paq == 1) {
+                                    $limpio = trim(str_replace(['+ 1 REFRESCO JARRITO', 'PIZZA GRANDE'], '', $variante));
+                                    if (str_contains($limpio, '2 HAWAIANA')) { $lineas_sub[] = "1 HAWAIANA"; $lineas_sub[] = "1 HAWAIANA"; } 
+                                    elseif (str_contains($limpio, '2 PEPPERONI')) { $lineas_sub[] = "1 PEPPERONI"; $lineas_sub[] = "1 PEPPERONI"; } 
+                                    else { $lineas_sub[] = "1 HAWAIANA"; $lineas_sub[] = "1 PEPPERONI"; }
+                                    $lineas_sub[] = "1 REFRESCO JARRITO 2 LTS";
+                                } elseif ($id_paq == 2) {
+                                    $limpio = trim(str_replace('+ 1 REFRESCO JARRITO', '', $variante));
+                                    $partes = explode('+', $limpio);
+                                    foreach($partes as $p) { 
+                                        $p = trim(str_replace(['1 PIZZA', '1 '], '', $p)); 
+                                        if(!empty($p)) $lineas_sub[] = "1 " . $p; 
+                                    }
+                                    $lineas_sub[] = "1 REFRESCO JARRITO 2 LTS";
+                                } elseif ($id_paq == 3) {
+                                    $limpio = trim(str_replace('+ 1 REFRESCO JARRITO', '', $variante));
+                                    $pizzas = explode(',', $limpio);
+                                    foreach($pizzas as $p) {
+                                        $p = trim($p);
+                                        if (preg_match('/^(\d+)\s+(.+)$/', $p, $matches)) { 
+                                            for($q=0; $q<$matches[1]; $q++) { $lineas_sub[] = "1 " . $matches[2]; }
+                                        } 
+                                        else { $lineas_sub[] = "1 " . $p; }
+                                    }
+                                    $lineas_sub[] = "1 REFRESCO JARRITO 2 LTS";
+                                } else { $lineas_sub[] = "1 " . $variante; }
+                            }
+                            if ($det->queso > 0 && (!isset($j->pizzas) || !is_array($j->pizzas))) {
+                                $lineas_sub[] = "+ ORILLA RELLENA";
                             }
                         }
-                        if ($det->queso > 0) $str .= " + ORILLA RELLENA";
-                        
-                        $lineas_sub[] = trim($str);
-                        $lineas_sub[] = "REFRESCO JARRITO 2 LTS";
-                    }
+                        elseif($det->id_rec) {
+                            $j = json_decode($det->id_rec); 
+                            $nombre_final = "RECTANGULAR"; 
+                            if(isset($j->cuartos)) { 
+                                $counts = array_count_values((array)$j->cuartos); 
+                                foreach($counts as $k => $v) { 
+                                    if ($v == 4) $lineas_sub[] = "1 " . mb_strtoupper($k);
+                                    elseif ($v == 3) $lineas_sub[] = "3/4 " . mb_strtoupper($k);
+                                    elseif ($v == 2) $lineas_sub[] = "1/2 " . mb_strtoupper($k);
+                                    elseif ($v == 1) $lineas_sub[] = "1/4 " . mb_strtoupper($k);
+                                } 
+                            }
+                            if ($det->queso > 0) $lineas_sub[] = "+ ORILLA RELLENA";
+                        }
+                        elseif($det->id_barr) {
+                            $j = json_decode($det->id_barr); 
+                            $nombre_final = "BARRA"; 
+                            if(isset($j->medios)) { 
+                                $counts = array_count_values((array)$j->medios); 
+                                foreach($counts as $k => $v) { 
+                                    if ($v == 2) $lineas_sub[] = "1 " . mb_strtoupper($k);
+                                    elseif ($v == 1) $lineas_sub[] = "1/2 " . mb_strtoupper($k);
+                                } 
+                            }
+                            if ($det->queso > 0) $lineas_sub[] = "+ ORILLA RELLENA";
+                        }
+                        elseif($det->id_magno) {
+                            $j = json_decode($det->id_magno); 
+                            $nombre_final = "MAGNO"; 
+                            $str = "";
+                            if(isset($j->medios)) { 
+                                $m = (array)$j->medios;
+                                if (count($m) >= 2) {
+                                    $str = $cleanSabor($m[0]) . " / " . $cleanSabor($m[1]);
+                                } elseif (count($m) == 1) {
+                                    $str = $cleanSabor($m[0]);
+                                }
+                            }
+                            if ($det->queso > 0) $str .= " + ORILLA RELLENA";
+                            
+                            $lineas_sub[] = "1 " . trim($str);
+                            $lineas_sub[] = "1 REFRESCO JARRITO 2 LTS";
+                        }
 
-                    if (!empty($nombre_final)) {
-                        $ungrouped_others[] = ['nombre' => $nombre_final, 'subs' => $lineas_sub, 'total' => $precio_unitario];
+                        if (!empty($nombre_final)) {
+                            $ungrouped_others[] = ['nombre' => $nombre_final, 'subs' => $lineas_sub, 'total' => $precio_unitario];
+                        }
                     }
                 }
             }
@@ -585,7 +613,7 @@ class PuntoVentaController extends Controller
                 }
                 
                 $final_items[] = (object)[
-                    'cantidad' => '', // Ya no usamos cantidad
+                    'cantidad' => '', 
                     'nombre' => $size, 
                     'total' => ($total_chunk - $total_orillas),
                     'subs' => $subs
@@ -593,10 +621,30 @@ class PuntoVentaController extends Controller
             }
         }
 
-        // Agregamos todos los demás (Fantas, Papas, Paquetes) uno por uno
+        // COMPLEMENTOS (Hamburguesas, Costillas, Alitas, Spaguetty) AGRUPADOS CON TÍTULO
+        foreach ($grouped_complementos as $nombre => $data) {
+            $final_items[] = (object)[
+                'cantidad' => '', 
+                'nombre' => $nombre, 
+                'total' => null, 
+                'subs' => $data['subs'] 
+            ];
+        }
+
+        // BEBIDAS AGRUPADAS CON TÍTULO
+        foreach ($grouped_bebidas as $nombre => $data) {
+            $final_items[] = (object)[
+                'cantidad' => '', 
+                'nombre' => $nombre, 
+                'total' => null,
+                'subs' => $data['subs'] 
+            ];
+        }
+
+        // PAPAS Y LOS DEMÁS (Paquetes, Barra, Rectangular, Magno)
         foreach ($ungrouped_others as $item) {
             $final_items[] = (object)[
-                'cantidad' => '', // Ya no usamos cantidad
+                'cantidad' => '', 
                 'nombre' => $item['nombre'],
                 'total' => $item['total'],
                 'subs' => $item['subs']
