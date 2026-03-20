@@ -85,23 +85,42 @@
                             $usuarioVenta = 'Sistema';
                             $motivoCancelacion = '';
                             $repartidor = '-';
-                            $esCompletado = false;
+                            $esCortesia100 = false;
+                            $esCortesia40 = false;
 
                             if ($venta->comentarios) {
-                                if (str_contains($venta->comentarios, 'Atendió:')) {
-                                    $partes = explode('|', $venta->comentarios);
-                                    $usuarioVenta = trim(str_replace('Atendió:', '', $partes[0]));
-                                    foreach($partes as $p) {
-                                        if(str_contains($p, 'CANCELADO - Motivo:')) {
-                                            $motivoCancelacion = trim(str_replace('CANCELADO - Motivo:', '', $p));
-                                        }
+                                $comentarioUpper = strtoupper($venta->comentarios);
+                                $esCortesia100 = str_contains($comentarioUpper, 'CORTESÍA 100%') || str_contains($comentarioUpper, 'CORTESIA 100%');
+                                $esCortesia40 = str_contains($comentarioUpper, 'CORTESÍA 40%') || str_contains($comentarioUpper, 'CORTESIA 40%');
+
+                                $partes = explode('|', $venta->comentarios);
+                                foreach($partes as $p) {
+                                    $p = trim($p);
+                                    if (str_contains($p, 'Atendió:')) {
+                                        $usuarioVenta = trim(str_replace('Atendió:', '', $p));
+                                    } elseif (str_contains($p, 'CANCELADO - Motivo:')) {
+                                        $motivoCancelacion = trim(str_replace('CANCELADO - Motivo:', '', $p));
+                                    } elseif (preg_match('/Repartidor:\s*([^|]+)/i', $p, $matches)) {
+                                        $repartidor = trim($matches[1]);
                                     }
                                 }
-                                if (preg_match('/Repartidor:\s*([^|]+)/i', $venta->comentarios, $matches)) {
-                                    $repartidor = trim($matches[1]);
-                                }
-                                if (str_contains($venta->comentarios, 'ENTREGADO') || $venta->status == 2) {
-                                    $esCompletado = true;
+                            }
+
+                            // BUSCADOR BLINDADO DE NOMBRE DE CLIENTE
+                            $nClie = '';
+                            if ($venta->tipo_servicio == 1) {
+                                $nClie = ' - ' . $venta->cliente_display;
+                            } elseif ($venta->tipo_servicio == 3) {
+                                // Buscar nombre real por si el sistema traía "DOMICILIO" guardado por error
+                                $clie_real = \Illuminate\Support\Facades\DB::table('PDomicilio')
+                                    ->join('Clientes', 'PDomicilio.id_clie', '=', 'Clientes.id_clie')
+                                    ->where('PDomicilio.id_venta', $venta->id_venta)
+                                    ->select('Clientes.nombre', 'Clientes.apellido')
+                                    ->first();
+                                if ($clie_real && !empty(trim($clie_real->nombre))) {
+                                    $nClie = ' - ' . mb_strtoupper(trim($clie_real->nombre . ' ' . $clie_real->apellido));
+                                } else {
+                                    $nClie = ' - ' . $venta->cliente_display;
                                 }
                             }
                         @endphp
@@ -138,6 +157,12 @@
 
                             <td class="px-6 py-6 font-black text-lg {{ $venta->status == 3 ? 'text-red-400 line-through' : 'text-slate-900 tracking-tighter' }}">
                                 ${{ number_format($venta->total, 2) }}
+                                
+                                @if($esCortesia100)
+                                    <div class="text-[9px] bg-red-100 text-red-600 px-2 py-0.5 rounded mt-1 w-max uppercase tracking-widest border border-red-200">Cortesía 100%{{ $nClie }}</div>
+                                @elseif($esCortesia40)
+                                    <div class="text-[9px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded mt-1 w-max uppercase tracking-widest border border-amber-200">Cortesía 40%{{ $nClie }}</div>
+                                @endif
                             </td>
                             
                             <td class="px-6 py-6 text-center">
@@ -364,6 +389,7 @@
                     this.modalPago = true;
                 },
 
+                // CALCULO DEL GRAN TOTAL CON LA CORTESÍA REDONDEADA HACIA ARRIBA
                 getGranTotal() {
                     let descontado = this.total_pago - (this.total_pago * (this.cortesia / 100));
                     return this.cortesia > 0 ? Math.ceil(descontado) : descontado;

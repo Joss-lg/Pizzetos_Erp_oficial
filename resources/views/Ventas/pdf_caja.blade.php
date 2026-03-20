@@ -101,7 +101,6 @@
             <tr><td class="bold">Transferencia:</td><td class="text-right">$ {{ number_format($stats['transferencia'], 2) }}</td></tr>
             <tr>
                 <td class="bold" style="font-size: 16px; padding-top: 15px;">Efectivo Esperado (Caja):</td>
-                {{-- Efectivo de ventas MENOS Gastos (Ignoramos el fondo inicial) --}}
                 <td class="text-right bold" style="font-size: 16px; padding-top: 15px;">$ {{ number_format($stats['efectivo'] - $stats['total_gastos'], 2) }}</td>
             </tr>
         </table>
@@ -159,24 +158,37 @@
                         @php
                             $comentario = '';
                             if(isset($v->comentarios)) {
-                                $comentario = strtoupper($v->comentarios);
+                                $comentario = $v->comentarios;
                             } else {
-                                $comentario_bd = \Illuminate\Support\Facades\DB::table('Venta')->where('id_venta', $v->id_venta ?? $v->id ?? 0)->value('comentarios');
-                                $comentario = strtoupper($comentario_bd ?? '');
+                                $comentario = \Illuminate\Support\Facades\DB::table('Venta')->where('id_venta', $v->id_venta ?? $v->id ?? 0)->value('comentarios') ?? '';
                             }
 
-                            $esCortesia100 = str_contains($comentario, 'CORTESÍA 100%') || str_contains($comentario, 'CORTESIA 100%');
-                            $esCortesia40 = str_contains($comentario, 'CORTESÍA 40%') || str_contains($comentario, 'CORTESIA 40%');
+                            $comentarioUpper = strtoupper($comentario);
+                            $esCortesia100 = str_contains($comentarioUpper, 'CORTESÍA 100%') || str_contains($comentarioUpper, 'CORTESIA 100%');
+                            $esCortesia40 = str_contains($comentarioUpper, 'CORTESÍA 40%') || str_contains($comentarioUpper, 'CORTESIA 40%');
                             
                             $pagos_texto = $v->montos_detalle ?? ($v->metodos ?? '');
+
+                            // AGREGAMOS EL NOMBRE DEL CLIENTE BLINDADO CONTRA ERRORES
+                            $nClie = '';
+                            if (isset($v->tipo_servicio)) {
+                                if ($v->tipo_servicio == 1 || $v->tipo_servicio == 3) {
+                                    $nClie = ' - ' . $v->nombreClie;
+                                }
+                            } else {
+                                // Si por algo no viene "tipo_servicio", comprobamos con el nombre
+                                if (isset($v->nombreClie) && $v->nombreClie !== 'PARA LLEVAR') {
+                                    $nClie = ' - ' . $v->nombreClie;
+                                }
+                            }
                         @endphp
 
                         @if($esCortesia100)
-                            <span style="background-color: #fee2e2; color: #991b1b; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #f87171; display: inline-block; margin-bottom: 4px;">CORTESÍA 100%</span><br>
+                            <span style="background-color: #fee2e2; color: #991b1b; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #f87171; display: inline-block; margin-bottom: 4px;">CORTESÍA 100%{{ mb_strtoupper($nClie) }}</span><br>
                         @endif
 
                         @if($esCortesia40)
-                            <span style="background-color: #fef3c7; color: #b45309; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #fbbf24; display: inline-block; margin-bottom: 4px;">CORTESÍA 40%</span><br>
+                            <span style="background-color: #fef3c7; color: #b45309; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #fbbf24; display: inline-block; margin-bottom: 4px;">CORTESÍA 40%{{ mb_strtoupper($nClie) }}</span><br>
                         @endif
 
                         @if(empty(trim($pagos_texto)) && !$esCortesia100)

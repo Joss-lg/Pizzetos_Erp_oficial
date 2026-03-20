@@ -533,6 +533,7 @@ class PuntoVentaController extends Controller
                             if(isset($j->cuartos)) { 
                                 $counts = array_count_values((array)$j->cuartos); 
                                 foreach($counts as $k => $v) { 
+                                    // AQUI REGRESAN LAS CANTIDADES AL DESGLOSE
                                     if ($v == 4) $lineas_rec[] = "1 " . mb_strtoupper($k);
                                     elseif ($v == 3) $lineas_rec[] = "3/4 " . mb_strtoupper($k);
                                     elseif ($v == 2) $lineas_rec[] = "1/2 " . mb_strtoupper($k);
@@ -548,6 +549,7 @@ class PuntoVentaController extends Controller
                             if(isset($j->medios)) { 
                                 $counts = array_count_values((array)$j->medios); 
                                 foreach($counts as $k => $v) { 
+                                    // AQUI REGRESAN LAS CANTIDADES AL DESGLOSE
                                     if ($v == 2) $lineas_bar[] = "1 " . mb_strtoupper($k);
                                     elseif ($v == 1) $lineas_bar[] = "1/2 " . mb_strtoupper($k);
                                 } 
@@ -571,6 +573,7 @@ class PuntoVentaController extends Controller
                             
                             if ($det->queso > 0) $str .= " + ORILLA RELLENA";
                             
+                            // AQUI REGRESA EL "1" AL DESGLOSE Y AL REFRESCO
                             $lineas_magno[] = "1 " . trim($str);
                             $lineas_magno[] = "1 REFRESCO JARRITO 2 LTS";
                             
@@ -640,8 +643,11 @@ class PuntoVentaController extends Controller
         }
 
         foreach ($ungrouped_others as $item) {
+            // LÓGICA PARA OCULTAR EL "1" DE CANTIDAD EN MAGNO Y RECTANGULAR SOLO EN EL TÍTULO
+            $ocultar_cantidad = in_array($item['nombre'], ['MAGNO', 'RECTANGULAR', 'BARRA']);
+            
             $final_items[] = (object)[
-                'cantidad' => 1,
+                'cantidad' => $ocultar_cantidad ? '' : 1,
                 'nombre' => $item['nombre'],
                 'total' => $item['total'],
                 'subs' => $item['subs']

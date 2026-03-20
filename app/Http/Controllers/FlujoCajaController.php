@@ -54,18 +54,20 @@ class FlujoCajaController extends Controller
         }
         $total_gastos = $gastos_detalle->sum('precio');
 
-        // 2. VENTAS CON FOLIO VIRTUAL
-        // Se quitó el filtro de status != 3 para que los cancelados aparezcan en la vista del turno
+        // 2. VENTAS CON FOLIO VIRTUAL Y NOMBRE DE CLIENTE BLINDADO
         $ventas_detalle = DB::table('Venta')
             ->leftJoin('Pago', 'Venta.id_venta', '=', 'Pago.id_venta')
             ->leftJoin('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
+            ->leftJoin('PDomicilio', 'Venta.id_venta', '=', 'PDomicilio.id_venta')
+            ->leftJoin('Clientes', 'PDomicilio.id_clie', '=', 'Clientes.id_clie')
             ->where('Venta.id_caja', $cajaAbierta->id_caja)
             ->select(
                 'Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.status', 'Venta.mesa', 'Venta.tipo_servicio',
                 DB::raw("CASE 
                     WHEN Venta.tipo_servicio = 2 THEN 'PARA LLEVAR'
                     WHEN Venta.tipo_servicio = 1 THEN CONCAT('MESA ', COALESCE(Venta.mesa, ''), ' - ', COALESCE(Venta.nombreClie, 'CLIENTE'))
-                    ELSE COALESCE(Venta.nombreClie, 'DOMICILIO')
+                    WHEN Venta.tipo_servicio = 3 THEN COALESCE(NULLIF(TRIM(CONCAT(COALESCE(Clientes.nombre, ''), ' ', COALESCE(Clientes.apellido, ''))), ''), 'DOMICILIO')
+                    ELSE 'DOMICILIO'
                 END as nombre_cliente_formateado"),
                 DB::raw("GROUP_CONCAT(MetodosPago.metodo SEPARATOR ', ') as metodos_pago"),
                 DB::raw("GROUP_CONCAT(COALESCE(Pago.referencia, 'S/R') SEPARATOR ' / ') as referencias"),
@@ -73,12 +75,11 @@ class FlujoCajaController extends Controller
             )
             ->groupBy(
                 'Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.status', 
-                'Venta.nombreClie', 'Venta.mesa', 'Venta.tipo_servicio'
+                'Venta.nombreClie', 'Venta.mesa', 'Venta.tipo_servicio', 'Clientes.nombre', 'Clientes.apellido'
             )
             ->orderBy('Venta.id_venta', 'desc')
             ->get();
 
-        // Aplicar formato de Folio Virtual a cada venta para la vista SIN FECHA
         foreach($ventas_detalle as $v) {
             $v->folio_virtual = str_pad($v->id_venta, 5, '0', STR_PAD_LEFT);
         }
@@ -121,7 +122,6 @@ class FlujoCajaController extends Controller
 
         if (!$caja) abort(404);
 
-        // Folio virtual para el PDF SIN FECHA
         $caja->folio_virtual = str_pad($caja->id_caja, 5, '0', STR_PAD_LEFT);
 
         try {
@@ -144,33 +144,32 @@ class FlujoCajaController extends Controller
             });
         }
 
-        // VENTAS PARA EL PDF: SE QUITÓ EL ->where('Venta.status', '!=', 3) 
-        // Para que traiga absolutamente todos los tickets del turno
+        // VENTAS PARA EL PDF (Con Joins para extraer nombres exactos)
         $ventas = DB::table('Venta')
             ->leftJoin('Pago', 'Venta.id_venta', '=', 'Pago.id_venta')
             ->leftJoin('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
+            ->leftJoin('PDomicilio', 'Venta.id_venta', '=', 'PDomicilio.id_venta')
+            ->leftJoin('Clientes', 'PDomicilio.id_clie', '=', 'Clientes.id_clie')
             ->where('Venta.id_caja', $id)
             ->select(
-                'Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.status',
+                'Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.status', 'Venta.tipo_servicio',
                 DB::raw("CASE 
                     WHEN Venta.tipo_servicio = 2 THEN 'PARA LLEVAR'
                     WHEN Venta.tipo_servicio = 1 THEN CONCAT('MESA ', COALESCE(Venta.mesa, ''), ' - ', COALESCE(Venta.nombreClie, 'CLIENTE'))
-                    ELSE COALESCE(Venta.nombreClie, 'DOMICILIO')
+                    WHEN Venta.tipo_servicio = 3 THEN COALESCE(NULLIF(TRIM(CONCAT(COALESCE(Clientes.nombre, ''), ' ', COALESCE(Clientes.apellido, ''))), ''), 'DOMICILIO')
+                    ELSE 'DOMICILIO'
                 END as nombreClie"),
                 DB::raw("GROUP_CONCAT(MetodosPago.metodo SEPARATOR ', ') as metodos"),
                 DB::raw("GROUP_CONCAT(COALESCE(Pago.referencia, '-') SEPARATOR ' / ') as refs"),
-                // 👇 NUEVA LÍNEA AGREGADA PARA EL DESGLOSE EN EL PDF
                 DB::raw("GROUP_CONCAT(CONCAT(MetodosPago.metodo, ': $', Pago.monto) SEPARATOR '<br>') as montos_detalle")
             )
-            ->groupBy('Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.tipo_servicio', 'Venta.mesa', 'Venta.nombreClie', 'Venta.status')
+            ->groupBy('Venta.id_venta', 'Venta.fecha_hora', 'Venta.total', 'Venta.tipo_servicio', 'Venta.mesa', 'Venta.nombreClie', 'Venta.status', 'Clientes.nombre', 'Clientes.apellido')
             ->get();
 
-        // Aplicar folios virtuales a ventas en PDF SIN FECHA
         foreach($ventas as $v) {
             $v->folio_virtual = str_pad($v->id_venta, 5, '0', STR_PAD_LEFT);
         }
 
-        // TOTALES PARA EL PDF (Solo dinero real, se excluyen los cancelados status = 3)
         $pagos_pdf = DB::table('Pago')
             ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
             ->join('MetodosPago', 'Pago.id_metpago', '=', 'MetodosPago.id_metpago')
@@ -181,7 +180,6 @@ class FlujoCajaController extends Controller
 
         $stats = [
             'fondo' => $caja->monto_inicial,
-            // Se calcula el conteo y la suma usando la collection de Laravel, filtrando los no cancelados
             'num_ventas' => $ventas->where('status', '!=', 3)->count(),
             'venta_total' => $ventas->where('status', '!=', 3)->sum('total'),
             'total_gastos' => $gastos->sum('precio'),
@@ -208,7 +206,6 @@ class FlujoCajaController extends Controller
             ->orderBy('Caja.fecha_cierre', 'desc')
             ->paginate(15);
 
-        // Añadir folios virtuales al historial SIN FECHA
         foreach($cajas as $c) {
             $c->folio_virtual = str_pad($c->id_caja, 5, '0', STR_PAD_LEFT);
         }

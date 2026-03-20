@@ -60,11 +60,11 @@
         
         <div class="font-bold text-lg mt-1 mb-1 py-1" style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0;">
             @if($venta->tipo_servicio == 1)
-                * COMEDOR - MESA {{ $venta->mesa }} *
+                MESA {{ $venta->mesa }} - {{ mb_strtoupper($venta->nombreClie ?? 'SIN NOMBRE') }}
             @elseif($venta->tipo_servicio == 2)
-                * PARA LLEVAR *
+                PARA LLEVAR
             @elseif($venta->tipo_servicio == 3)
-                * SERVICIO A DOMICILIO *
+                DOMICILIO
             @endif
         </div>
     </div>
@@ -81,9 +81,9 @@
             @endif
         </div>
         <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
-    @elseif($venta->tipo_servicio == 1 && $venta->nombreClie)
+    @elseif($venta->tipo_servicio == 2 && $venta->nombreClie)
         <div class="mb-1" style="font-size: 12px; line-height: 1.3;">
-            <span class="font-bold">CLIENTE:</span> {{ $venta->nombreClie }}
+            <span class="font-bold">CLIENTE:</span> {{ mb_strtoupper($venta->nombreClie) }}
         </div>
         <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
     @endif
