@@ -101,7 +101,7 @@
                 <tr style="font-size: 16px; font-weight: 900; line-height: 1.1;">
                     <td style="white-space: nowrap; vertical-align: top; padding-top: 4px;">{{ $item->cantidad }}</td>
                     <td style="vertical-align: top; padding-top: 4px;">{{ $item->nombre }}</td>
-                    <td class="text-right" style="vertical-align: top; padding-top: 4px;">
+                    <td class="text-right" style="vertical-align: top; padding-top: 4px; {{ str_contains($item->nombre, 'PAPAS') ? 'font-size: 15px;' : '' }}">
                         @if($item->total !== null)
                             ${{ number_format($item->total, 2) }}
                         @endif

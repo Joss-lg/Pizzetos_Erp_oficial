@@ -156,7 +156,7 @@
                                     </div>
                                     
                                     <div class="p-3 space-y-3">
-                                        <template x-for="(p, idx) in group.items" :key="p.item.uid">
+                                        <template x-for="(p, idx) in group.items" :key="p.item.unique_key">
                                             <div class="relative border border-gray-200 bg-white rounded-lg p-3 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
                                                 <div class="flex justify-between items-start mb-3">
                                                     <div class="pr-8 flex items-center gap-2">
@@ -1133,7 +1133,9 @@
 
                             if (baseSize !== '') {
                                 for (let i = 0; i < cItem.qty; i++) {
-                                    pizzasFlat.push({ cartIndex: index, size: baseSize, price: cItem.precioBase, item: cItem });
+                                    // EL FIX MAESTRO: Hacemos un clon agregando un "unique_key"
+                                    let cloneUID = cItem.uid + '_' + i;
+                                    pizzasFlat.push({ cartIndex: index, size: baseSize, price: cItem.precioBase, item: { ...cItem, unique_key: cloneUID } });
                                 }
                             }
                         } else {
@@ -1432,13 +1434,28 @@
                 
                 eliminarItemByUid(uid) {
                     let idx = this.cart.findIndex(c => c.uid === uid);
-                    if(idx > -1) this.cart.splice(idx, 1);
+                    if(idx > -1) {
+                        // FIX: Solo resta 1 en lugar de borrar todas
+                        if (this.cart[idx].es_pizza && !this.cart[idx].is_magno && this.cart[idx].qty > 1) {
+                            this.cart[idx].qty--;
+                        } else {
+                            this.cart.splice(idx, 1);
+                        }
+                    }
                     this.actualizarCarrito();
                 },
 
                 eliminarGrupo(group) {
-                    let uidsToRemove = group.items.map(p => p.item.uid);
-                    this.cart = this.cart.filter(cItem => !uidsToRemove.includes(cItem.uid));
+                    group.items.forEach(p => {
+                        let idx = this.cart.findIndex(c => c.uid === p.item.uid);
+                        if (idx > -1) {
+                            if (this.cart[idx].qty > 1) {
+                                this.cart[idx].qty--;
+                            } else {
+                                this.cart.splice(idx, 1);
+                            }
+                        }
+                    });
                     this.actualizarCarrito();
                 },
 
