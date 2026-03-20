@@ -20,7 +20,7 @@ class PuntoVentaController extends Controller
 
     public function index(Request $request)
     {
-        $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
+        $id_sucursal = 1; 
         $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
 
         $pizzas_raw = DB::table('Pizzas')->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')->join('TamanosPizza', 'Pizzas.id_tamano', '=', 'TamanosPizza.id_tamañop')->select('Especialidades.nombre', 'TamanosPizza.tamano', 'TamanosPizza.precio', 'Pizzas.id_pizza')->get();
@@ -129,7 +129,7 @@ class PuntoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
-            $id_sucursal = 1; // <-- FORZAMOS SUCURSAL 1 (MIRAFLORES) PARA CAJA ÚNICA
+            $id_sucursal = 1; 
             $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
             if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
 
@@ -291,12 +291,10 @@ class PuntoVentaController extends Controller
 
             $updateData = ['status' => 1];
 
-            // APLICAR CORTESIA SI VIENE DESDE EL MODAL DEL HISTORIAL
             if ($request->has('cortesia') && $request->cortesia > 0) {
                 $updateData['total'] = $request->nuevo_total;
                 
                 $comentarios = $venta->comentarios ?? '';
-                // Limpiamos si por algún error ya traía cortesía antes, para no duplicar
                 $comentarios = preg_replace('/\|?\s*CORTESÍA \d+%/', '', $comentarios);
                 $comentarios = preg_replace('/CORTESÍA \d+%/', '', $comentarios);
                 $comentarios = trim($comentarios, ' |');
@@ -343,7 +341,6 @@ class PuntoVentaController extends Controller
         }
         $venta->comentarios = count($comentarios_limpios) > 0 ? " " . implode(" | ", $comentarios_limpios) : null;
 
-        // IMPORTANTE: Obtenemos los detalles respetando su ID de insersión (Orden original del POS)
         $detalles = DB::table('DetalleVenta')->where('id_venta', $id)->orderBy('id_detalle', 'asc')->get();
         
         $cleanTamano = function($str) {
@@ -438,7 +435,6 @@ class PuntoVentaController extends Controller
                     if (empty($clean_comp)) $clean_comp = mb_strtoupper($name_comp); 
                     else $clean_comp = mb_strtoupper($clean_comp);
                     
-                    // Desglosamos 1 por 1 bajo su categoría
                     for ($i = 0; $i < $det->cantidad; $i++) {
                         $grouped_complementos[$cat_comp]['subs'][] = [
                             'texto' => "1 " . $clean_comp,
@@ -447,7 +443,6 @@ class PuntoVentaController extends Controller
                     }
                 } 
                 elseif ($det->id_papa) {
-                    // LAS PAPAS SE VAN SIN CATEGORÍA (SOLAS)
                     for ($i = 0; $i < $det->cantidad; $i++) {
                         $ungrouped_others[] = [
                             'nombre' => "ORD. PAPAS",
@@ -462,7 +457,6 @@ class PuntoVentaController extends Controller
                         if (!isset($grouped_bebidas["BEBIDAS"])) {
                             $grouped_bebidas["BEBIDAS"] = ['total' => null, 'subs' => []];
                         }
-                        // Desglosamos 1 por 1 bajo su categoría
                         for ($i = 0; $i < $det->cantidad; $i++) {
                             $grouped_bebidas["BEBIDAS"]['subs'][] = [
                                 'texto' => "1 " . mb_strtoupper($r->nombre . " " . $r->tamano),
@@ -472,7 +466,6 @@ class PuntoVentaController extends Controller
                     }
                 }
                 else {
-                    // PAQUETES, BARRA, MAGNO, RECTANGULAR
                     for ($i = 0; $i < $det->cantidad; $i++) {
                         $nombre_final = "";
                         $lineas_sub = [];
@@ -591,7 +584,6 @@ class PuntoVentaController extends Controller
         }
 
         foreach ($grouped_pizzas as $size => $pizzas) {
-            // FIX MAESTRO: Se quitó usort para no romper los pares del 2x1 y no haya errores de 340, 204 y 0.
             
             $chunks = array_chunk($pizzas, 2);
             foreach ($chunks as $chunk) {
@@ -621,7 +613,6 @@ class PuntoVentaController extends Controller
             }
         }
 
-        // COMPLEMENTOS (Hamburguesas, Costillas, Alitas, Spaguetty) AGRUPADOS CON TÍTULO
         foreach ($grouped_complementos as $nombre => $data) {
             $final_items[] = (object)[
                 'cantidad' => '', 
@@ -631,7 +622,6 @@ class PuntoVentaController extends Controller
             ];
         }
 
-        // BEBIDAS AGRUPADAS CON TÍTULO
         foreach ($grouped_bebidas as $nombre => $data) {
             $final_items[] = (object)[
                 'cantidad' => '', 
@@ -641,7 +631,6 @@ class PuntoVentaController extends Controller
             ];
         }
 
-        // PAPAS Y LOS DEMÁS (Paquetes, Barra, Rectangular, Magno)
         foreach ($ungrouped_others as $item) {
             $final_items[] = (object)[
                 'cantidad' => '', 
