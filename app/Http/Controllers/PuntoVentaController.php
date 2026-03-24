@@ -457,9 +457,25 @@ class PuntoVentaController extends Controller
                         if (!isset($grouped_bebidas["BEBIDAS"])) {
                             $grouped_bebidas["BEBIDAS"] = ['total' => null, 'subs' => []];
                         }
+                        
+                        $nombre_bebida = mb_strtoupper($r->nombre);
+                        
+                        if (!str_contains($nombre_bebida, 'MALTEADA')) {
+                            $quitar = [
+                                'BEBIDAS CALIENTES', 'BEBIDA CALIENTE',
+                                'CAPPUCCINOS CON LICOR', 'CAPPUCCINO CON LICOR',
+                                'TÉS FRIOS O CALIENTES', 'TES FRIOS O CALIENTES', 'TÉS FRÍOS O CALIENTES', 'TÉS', 'TES',
+                                'BEBIDAS FRIAS', 'BEBIDAS FRÍAS', 'BEBIDA FRIA', 'BEBIDA FRÍA',
+                                'BEBIDAS PREPARADAS SIN ALCOHOL', 'BEBIDAS PREPARADAS CON ALCOHOL', 'BEBIDAS PREPARADAS'
+                            ];
+                            $nombre_bebida = trim(str_ireplace($quitar, '', $nombre_bebida));
+                            $nombre_bebida = ltrim($nombre_bebida, ' -:/|');
+                            $nombre_bebida = trim($nombre_bebida);
+                        }
+
                         for ($i = 0; $i < $det->cantidad; $i++) {
                             $grouped_bebidas["BEBIDAS"]['subs'][] = [
-                                'texto' => "1 " . mb_strtoupper($r->nombre . " " . $r->tamano),
+                                'texto' => "1 " . $nombre_bebida . " " . mb_strtoupper($r->tamano),
                                 'precio' => $det->precio_unitario
                             ];
                         }
@@ -584,7 +600,6 @@ class PuntoVentaController extends Controller
         }
 
         foreach ($grouped_pizzas as $size => $pizzas) {
-            
             $chunks = array_chunk($pizzas, 2);
             foreach ($chunks as $chunk) {
                 $subs = [];
