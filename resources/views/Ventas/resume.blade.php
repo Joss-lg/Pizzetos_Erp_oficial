@@ -90,8 +90,8 @@
 
                             if ($venta->comentarios) {
                                 $comentarioUpper = strtoupper($venta->comentarios);
-                                $esCortesia100 = str_contains($comentarioUpper, 'CORTESÍA 100%') || str_contains($comentarioUpper, 'CORTESIA 100%');
-                                $esCortesia40 = str_contains($comentarioUpper, 'CORTESÍA 40%') || str_contains($comentarioUpper, 'CORTESIA 40%');
+                                $esCortesia100 = str_contains($comentarioUpper, 'CORTESÍA 100%') || str_contains($comentarioUpper, 'CORTESIA 100%') || str_contains($comentarioUpper, 'DESCUENTO 100%');
+                                $esCortesia40 = str_contains($comentarioUpper, 'CORTESÍA 40%') || str_contains($comentarioUpper, 'CORTESIA 40%') || str_contains($comentarioUpper, 'DESCUENTO 40%');
 
                                 $partes = explode('|', $venta->comentarios);
                                 foreach($partes as $p) {
@@ -108,8 +108,16 @@
 
                             // BUSCADOR BLINDADO DE NOMBRE DE CLIENTE
                             $nClie = '';
+                            $nombreExtraLlevar = '';
+                            
                             if ($venta->tipo_servicio == 1) {
                                 $nClie = ' - ' . $venta->cliente_display;
+                            } elseif ($venta->tipo_servicio == 2) {
+                                // AGREGAMOS EL NOMBRE SI ES PARA LLEVAR
+                                if (isset($venta->nombreClie) && !empty(trim($venta->nombreClie))) {
+                                    $nClie = ' - ' . mb_strtoupper(trim($venta->nombreClie));
+                                    $nombreExtraLlevar = ' - ' . mb_strtoupper(trim($venta->nombreClie));
+                                }
                             } elseif ($venta->tipo_servicio == 3) {
                                 // Buscar nombre real por si el sistema traía "DOMICILIO" guardado por error
                                 $clie_real = \Illuminate\Support\Facades\DB::table('PDomicilio')
@@ -137,7 +145,7 @@
                             <td class="px-6 py-6 font-black text-blue-600 uppercase italic tracking-tighter text-xs">{{ $usuarioVenta }}</td>
 
                             <td class="px-6 py-6 text-slate-800 font-black uppercase text-xs tracking-tighter leading-tight">
-                                {{ $venta->cliente_display }}
+                                {{ $venta->cliente_display }}{{ $nombreExtraLlevar }}
                                 @if($venta->tipo_servicio == 3 && $repartidor != '-')
                                     <div class="mt-1 flex items-center gap-1 text-[9px] text-amber-600">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -159,9 +167,9 @@
                                 ${{ number_format($venta->total, 2) }}
                                 
                                 @if($esCortesia100)
-                                    <div class="text-[9px] bg-red-100 text-red-600 px-2 py-0.5 rounded mt-1 w-max uppercase tracking-widest border border-red-200">Cortesía 100%{{ $nClie }}</div>
+                                    <div class="text-[9px] bg-red-100 text-red-600 px-2 py-0.5 rounded mt-1 w-max uppercase tracking-widest border border-red-200">Descuento 100%{{ $nClie }}</div>
                                 @elseif($esCortesia40)
-                                    <div class="text-[9px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded mt-1 w-max uppercase tracking-widest border border-amber-200">Cortesía 40%{{ $nClie }}</div>
+                                    <div class="text-[9px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded mt-1 w-max uppercase tracking-widest border border-amber-200">Descuento 40%{{ $nClie }}</div>
                                 @endif
                             </td>
                             
@@ -243,11 +251,11 @@
             </div>
             
             <div class="p-8 text-center bg-white border-b border-gray-50">
-                {{-- BOTONES DE CORTESÍA --}}
+                {{-- BOTONES DE DESCUENTO --}}
                 <div class="grid grid-cols-3 gap-2 mb-4">
-                    <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Sin Cortesía</button>
-                    <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Cortesía 40%</button>
-                    <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Cortesía 100%</button>
+                    <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Sin Descuento</button>
+                    <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Descuento 40%</button>
+                    <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Descuento 100%</button>
                 </div>
 
                 <div class="text-[10px] font-black text-slate-400 uppercase italic mb-1 tracking-widest">Total a Cobrar</div>
@@ -334,7 +342,7 @@
                 folio_virtual_pago: '',
                 folio_virtual_cancelar: '',
                 total_pago: 0,
-                cortesia: 0, // <-- VARIABLE PARA LA CORTESÍA
+                cortesia: 0,
                 es_edicion_pago: false,
                 isProcessing: false,
                 motivo_cancelacion: '',
@@ -378,7 +386,7 @@
                     this.id_venta_pago = id;
                     this.folio_virtual_pago = folio;
                     this.total_pago = parseFloat(total);
-                    this.cortesia = 0; // Limpiar siempre al abrir
+                    this.cortesia = 0; 
                     this.es_edicion_pago = esEdicion;
                     this.isProcessing = false;
                     this.pagos = {
@@ -389,7 +397,6 @@
                     this.modalPago = true;
                 },
 
-                // CALCULO DEL GRAN TOTAL CON LA CORTESÍA REDONDEADA HACIA ARRIBA
                 getGranTotal() {
                     let descontado = this.total_pago - (this.total_pago * (this.cortesia / 100));
                     return this.cortesia > 0 ? Math.ceil(descontado) : descontado;
@@ -429,7 +436,7 @@
                 
                 pagosValidos() { 
                     if (this.faltaPagar() !== 0) return false;
-                    if (this.getGranTotal() === 0) return true; // 100% cortesía pasa
+                    if (this.getGranTotal() === 0) return true; 
                     if (!this.pagos.efectivo.activo && !this.pagos.tarjeta.activo && !this.pagos.transferencia.activo) return false;
                     if (this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
                     return true;
@@ -440,7 +447,6 @@
                     this.isProcessing = true;
 
                     let pagosToSend = [];
-                    // Si la cortesía es 100, no enviamos pagos
                     if(this.cortesia !== 100) {
                         if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
                             pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });

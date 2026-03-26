@@ -58,32 +58,34 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full min-h-0">
             
             <div class="lg:col-span-8 flex flex-col gap-2 h-full min-h-0">
-                <div class="flex flex-wrap gap-1.5 shrink-0">
-                    <button @click="abrirPaquete(1)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
-                    <button @click="abrirPaquete(2)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
-                    <button @click="abrirPaquete(3)" class="bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
-                    <button @click="abrirModalIngredientes()" class="bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
-                    <button @click="modalMitades = true; mitSel = []; mitTam = null;" class="bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
+                <div class="flex flex-row gap-2 overflow-x-auto w-full mb-4 pb-2" style="scrollbar-width: thin;">
+                    <button @click="abrirPaquete(1)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
+                    <button @click="abrirPaquete(2)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
+                    <button @click="abrirPaquete(3)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
+
+                    <button @click="abrirMagnoGeneral(); openExtras = false" class="whitespace-nowrap bg-[#343a40] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Magno</button>
+                    
+                    <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Rectangular</button>
+                    
+                    <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Barra</button>
+
+                    <button @click="abrirModalIngredientes()" class="whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
+                    <button @click="modalMitades = true; mitSel = []; mitTam = null;" class="whitespace-nowrap bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
                     <div class="flex flex-wrap gap-1 items-center w-full xl:w-auto">
                         <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
                         <button @click="cat = 2; view = 'pizzas'" :class="cat === 2 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
-                        
-                        <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Rectangular</button>
-                        <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Barra</button>
-                        
                         <div class="relative">
                             <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
-                                Extras <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                Snacks <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
                                 <template x-for="catEx in dbCategoriasExtras" :key="catEx.id_cat">
                                     <button @click="cat = parseInt(catEx.id_cat); view = 'otros'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50" x-text="catEx.descripcion"></button>
                                 </template>
                                 <button @click="cat = 1; view = 'bebidas'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Refrescos</button>
-                                <button @click="abrirMagnoGeneral(); openExtras = false" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Magno</button>
                             </div>
                         </div>
                     </div>
@@ -252,9 +254,9 @@
                         Agregar comentarios
                     </button>
 
-                    <div class="mb-3 h-10 flex gap-2" x-show="servicio === 1" x-cloak>
-                        <input type="number" x-model="mesa" placeholder="Mesa #" class="w-1/3 h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
-                        <input type="text" x-model="nombreClienteMesa" placeholder="Nombre cliente *" class="w-2/3 h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
+                    <div class="mb-3 h-10 flex gap-2" x-show="servicio === 1 || servicio === 2" x-cloak>
+                        <input type="number" x-show="servicio === 1" x-model="mesa" placeholder="Mesa #" class="w-1/3 h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
+                        <input type="text" x-model="nombreClienteMesa" :class="servicio === 1 ? 'w-2/3' : 'w-full'" placeholder="Nombre del cliente *" class="h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
                     </div>
 
                     <div class="flex h-[45px] relative">
@@ -717,10 +719,16 @@
             </div>
         </div>
 
-        <div x-show="modalIngredientes" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalIngredientes = false">
-                <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Por Ingrediente</h2><button @click="modalIngredientes = false" class="hover:text-orange-200 font-bold text-2xl leading-none">&times;</button></div>
-                <div class="flex-1 overflow-y-auto p-6 bg-[#f8f9fa] space-y-6 scrollbar-hide">
+       <div x-show="modalIngredientes" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalIngredientes = false">
+            <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white">
+                <h2 class="text-xl font-bold">Armar por Ingrediente</h2>
+                <button @click="modalIngredientes = false" class="hover:text-orange-200 font-bold text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 bg-[#f8f9fa] space-y-5 scrollbar-hide">
+                <div>
+                    <div class="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-2">1. Selecciona el tamaño</div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <template x-for="tam in dbTamanosBase" :key="tam.id_tamañop">
                             <button @click="ingTam = tam" :class="ingTam?.id_tamañop === tam.id_tamañop ? 'border-orange-500 bg-orange-50 shadow' : 'border-gray-200 bg-white'" class="border rounded-[8px] py-4 text-center transition-all">
@@ -728,41 +736,63 @@
                             </button>
                         </template>
                     </div>
-                    
-                    <div x-show="ingTam" class="mt-4">
-                        <div class="mb-3 relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </span>
-                            <input type="text" x-model="searchIng" placeholder="Buscar ingrediente..." class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-[8px] text-[13px] font-medium focus:outline-none focus:border-[#fd7e14]">
-                        </div>
-
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-[8px] p-4 shadow-sm max-h-[250px] overflow-y-auto scrollbar-hide">
-                            <template x-for="ing in getIngredientesFiltrados()" :key="ing.id_ingrediente">
-                                <label class="flex items-center gap-2 cursor-pointer text-[13px] text-[#495057] font-medium p-1.5 hover:bg-orange-50 rounded transition-colors">
-                                    <input type="checkbox" :value="ing.ingrediente" x-model="ingSel" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
-                                    <span x-text="ing.ingrediente"></span>
-                                </label>
-                            </template>
-                            <template x-if="getIngredientesFiltrados().length === 0">
-                                <div class="col-span-2 sm:col-span-3 text-center py-4 text-gray-400 text-xs font-bold">No se encontraron ingredientes.</div>
-                            </template>
-                        </div>
-                    </div>
-
                 </div>
-                <div class="p-5 flex gap-4 bg-white border-t border-gray-200 items-center justify-between">
-                    <div class="flex flex-col">
-                        <span class="text-[12px] text-gray-400 font-bold uppercase tracking-wider">Total</span>
-                        <span class="font-black text-[#28a745] text-[26px] leading-none" x-text="'$' + precioPizzaIngredientes().toFixed(2)"></span>
+
+                <div x-show="ingTam" x-transition>
+                    <div class="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-2">2. Elige los ingredientes</div>
+                    
+                    <div class="flex border-b border-gray-200 mb-4 bg-white rounded-t-lg overflow-hidden">
+                        <button @click="ingModo = 'completa'" :class="ingModo === 'completa' ? 'border-[#fd7e14] text-[#fd7e14] bg-orange-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'" class="flex-1 py-3 font-bold text-sm border-b-2 transition-all">Completa</button>
+                        <button @click="ingModo = 'mitad1'" :class="ingModo === 'mitad1' ? 'border-[#fd7e14] text-[#fd7e14] bg-orange-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'" class="flex-1 py-3 font-bold text-sm border-b-2 transition-all">Mitad 1</button>
+                        <button @click="ingModo = 'mitad2'" :class="ingModo === 'mitad2' ? 'border-[#fd7e14] text-[#fd7e14] bg-orange-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'" class="flex-1 py-3 font-bold text-sm border-b-2 transition-all">Mitad 2</button>
                     </div>
-                    <div class="flex gap-2">
-                        <button @click="modalIngredientes = false" class="bg-[#e9ecef] hover:bg-[#dee2e6] text-[#495057] font-bold px-6 py-3.5 rounded-[8px] text-[14px]">Cancelar</button>
-                        <button @click="addIng()" :disabled="!ingTam || ingSel.length === 0" :class="(!ingTam || ingSel.length === 0) ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white'" class="font-bold px-6 py-3.5 rounded-[8px] text-[14px]">Añadir</button>
+
+                    <div class="mb-3 relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" x-model="searchIng" placeholder="Buscar ingrediente..." class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-[8px] text-[13px] font-medium focus:outline-none focus:border-[#fd7e14]">
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-[8px] p-4 shadow-sm min-h-[150px] max-h-[220px] overflow-y-auto scrollbar-hide">
+                        <template x-for="ing in getIngredientesFiltrados()" :key="ing.id_ingrediente">
+                            <label class="flex items-center gap-2 cursor-pointer text-[13px] text-[#495057] font-medium p-1.5 hover:bg-orange-50 rounded transition-colors">
+                                <template x-if="ingModo === 'completa'">
+                                    <input type="checkbox" :value="ing.ingrediente" x-model="ingSel" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                </template>
+                                <template x-if="ingModo === 'mitad1'">
+                                    <input type="checkbox" :value="ing.ingrediente" x-model="ingMitad1" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                </template>
+                                <template x-if="ingModo === 'mitad2'">
+                                    <input type="checkbox" :value="ing.ingrediente" x-model="ingMitad2" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                </template>
+                                <span x-text="ing.ingrediente"></span>
+                            </label>
+                        </template>
+                    </div>
+
+                    <div x-show="ingModo !== 'completa'" class="mt-4 flex gap-3">
+                        <div class="flex-1 bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                            <div class="text-[10px] font-black text-gray-400 uppercase mb-1">Mitad 1</div>
+                            <div class="text-[12px] font-bold text-orange-600 leading-tight" x-text="ingMitad1.length > 0 ? ingMitad1.join(', ') : 'SÓLO QUESO'"></div>
+                        </div>
+                        <div class="flex-1 bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                            <div class="text-[10px] font-black text-gray-400 uppercase mb-1">Mitad 2</div>
+                            <div class="text-[12px] font-bold text-orange-600 leading-tight" x-text="ingMitad2.length > 0 ? ingMitad2.join(', ') : 'SÓLO QUESO'"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <div class="p-5 border-t border-gray-100 bg-white">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500 font-bold">Total a cobrar:</span>
+                    <span class="font-black text-[#28a745] text-2xl" x-text="'$' + (ingTam ? parseFloat(ingTam.precio).toFixed(2) : '0.00')"></span>
+                </div>
+                <button @click="addIngrediente()" :disabled="!ingresoValido()" :class="!ingresoValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md active:scale-95'" class="w-full font-black uppercase italic tracking-widest py-4 rounded-[8px] text-[13px] transition-all">Añadir a la Orden</button>
+            </div>
         </div>
+    </div>
 
         <div x-show="modalCliente" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[900px] max-w-[95vw] flex flex-col max-h-[95vh] overflow-hidden">
@@ -911,11 +941,11 @@
                 </div>
                 
                 <div class="p-6 text-center border-b border-gray-100 bg-white">
-                    {{-- BOTONES DE CORTESÍA --}}
+                    {{-- BOTONES DE DESCUENTO --}}
                     <div class="grid grid-cols-3 gap-2 mb-4">
-                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Cortesía</button>
-                        <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Cortesía 40%</button>
-                        <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Cortesía 100%</button>
+                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Descuento</button>
+                        <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Descuento 40%</button>
+                        <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Descuento 100%</button>
                     </div>
 
                     {{-- TOTAL PRINCIPAL --}}
@@ -1024,12 +1054,12 @@
                 comentariosGenerales: '{{ $venta_edit->comentarios ?? '' }}', comentariosGeneralesTemp: '', modalComentarios: false,
                 modalOpc: false, opcItem: null,
 
-                cortesia: 0, // VARIABLE DE CORTESIA (0, 40, 100)
+                cortesia: 0, 
 
                 modalPaq1: false, paq1Pizzas: [], paq1MitadesMode: false, paq1Halves: [], paqObj: null,
                 modalPaq2: false, paq2Tipo: 'hamb', paq2Extra: '', paq2Pizza: '', paq2MitadesMode: false, paq2MitadesArr: [],
                 modalPaq3: false, paq3Pizzas: [], paq3MitadesMode: false, paq3Halves: [],
-                modalIngredientes: false, ingTam: null, ingSel: [], searchIng: '',
+                modalIngredientes: false, ingTam: null, ingSel: [], searchIng: '',ingModo: 'completa',ingMitad1: [],ingMitad2: [],
                 modalMitades: false, mitTam: null, mitSel: [],
                 modalRectangular: false, rectItem: null, rectSel: [],
                 modalBarra: false, barraItem: null, barraSel: [],
@@ -1411,18 +1441,93 @@
                     let s = this.searchIng.toLowerCase().trim();
                     return dbIngredientes.filter(i => (i.ingrediente || '').toLowerCase().includes(s));
                 },
+
                 abrirModalIngredientes() {
                     this.ingTam = null;
                     this.ingSel = [];
+                    this.ingMitad1 = [];
+                    this.ingMitad2 = [];
+                    this.ingModo = 'completa';
                     this.searchIng = '';
                     this.modalIngredientes = true;
+                },
+
+                ingresoValido() {
+                    if (!this.ingTam) return false;
+                    if (this.ingModo === 'completa' && this.ingSel.length === 0) return false;
+                    if (this.ingModo !== 'completa' && this.ingMitad1.length === 0 && this.ingMitad2.length === 0) return false;
+                    return true;
+                },
+
+                addIngrediente() {
+                    if(!this.ingresoValido()) return;
+
+                    let strVariante = '';
+                    let extrasArray = [];
+
+                    if (this.ingModo === 'completa') {
+                        strVariante = this.ingSel.join(', ');
+                        extrasArray = this.ingSel;
+                    } else {
+                        let m1 = this.ingMitad1.length > 0 ? this.ingMitad1.join(', ') : 'QUESO';
+                        let m2 = this.ingMitad2.length > 0 ? this.ingMitad2.join(', ') : 'QUESO';
+                        
+                        strVariante = m1 + ' / ' + m2;
+                        extrasArray = [strVariante];
+                    }
+
+                    this.cart.push({
+                        tipo: 'piz_ing', 
+                        es_pizza: true,
+                        nombre_base: this.ingTam.tamano,
+                        variante: strVariante,
+                        precioBase: parseFloat(this.ingTam.precio), 
+                        qty: 1, 
+                        uid: this.generateUID(),
+                        orilla_queso: false, 
+                        precio_orilla: this.getPrecioOrilla(this.ingTam.tamano),
+                        ingredientes_extra: extrasArray
+                    });
+                    
+                    this.actualizarCarrito();
+                    this.modalIngredientes = false;
                 },
                 precioPizzaIngredientes() { return !this.ingTam ? 0 : parseFloat(this.ingTam.precio); }, 
                 addIng() {
                     let cTam = this.cleanSize(this.ingTam.tamano);
                     let nomFull = 'Personalizada ' + cTam;
-                    this.addPizzaToMainCart({ db_id: this.ingTam.id_tamañop, col: 'id_pizza', tipo: 'piz_ing', nombre_base: nomFull, variante: 'Ings: ' + this.ingSel.join(', '), precioBase: this.precioPizzaIngredientes(), es_pizza: true, is_magno: false, orilla_queso: false, precio_orilla: this.getPrecioOrilla(cTam), ingredientes_extra: this.ingSel });
-                    this.modalIngredientes = false; this.ingTam = null; this.ingSel = [];
+                    let varFinal = '';
+                    let arrExtra = [];
+
+                    if(this.ingModo === 'completa') {
+                        varFinal = 'Ings: ' + this.ingSel.join(', ');
+                        arrExtra = this.ingSel;
+                    } else {
+                        let m1 = this.ingMitad1.length > 0 ? this.ingMitad1.join(', ') : 'QUESO';
+                        let m2 = this.ingMitad2.length > 0 ? this.ingMitad2.join(', ') : 'QUESO';
+                        varFinal = m1 + ' / ' + m2;
+                        arrExtra = [varFinal];
+                    }
+
+                    this.addPizzaToMainCart({ 
+                        db_id: this.ingTam.id_tamañop, 
+                        col: 'id_pizza', 
+                        tipo: 'piz_ing', 
+                        nombre_base: nomFull, 
+                        variante: varFinal, 
+                        precioBase: this.precioPizzaIngredientes(), 
+                        es_pizza: true, 
+                        is_magno: false, 
+                        orilla_queso: false, 
+                        precio_orilla: this.getPrecioOrilla(cTam), 
+                        ingredientes_extra: arrExtra 
+                    });
+                    
+                    this.modalIngredientes = false; 
+                    this.ingTam = null; 
+                    this.ingSel = [];
+                    this.ingMitad1 = [];
+                    this.ingMitad2 = [];
                 },
 
                 recalc() { this.actualizarCarrito(); },
@@ -1596,10 +1701,9 @@
                 procesarOrden() {
                     if(this.servicio === 1) {
                         if(!this.mesa || !this.nombreClienteMesa.trim()) return alert("El número de mesa y el nombre del cliente son obligatorios.");
-                        // OJO AQUÍ: Las mesas se mandan a cocina SIN PAGAR. 
-                        // Se cobran después desde la pantalla de Mesas editando el pedido.
                         this.procesarOrdenFinal(true); 
                     } else if(this.servicio === 2) {
+                        if(!this.nombreClienteMesa.trim()) return alert("El nombre del cliente es obligatorio para llevar.");
                         this.abrirModalPago(); 
                     } else if(this.servicio === 3) {
                         this.abrirModalCliente(); 
@@ -1632,12 +1736,12 @@
                         }
                     }
 
-                    // Limpiamos la palabra cortesía vieja por si se está editando
-                    let baseComments = this.comentariosGenerales.replace(/ \| CORTESÍA \d+%/g, '').replace(/CORTESÍA \d+%/g, '').trim();
+                    // Limpiamos la palabra cortesía/descuento vieja por si se está editando
+                    let baseComments = this.comentariosGenerales.replace(/ \| CORTESÍA \d+%/ig, '').replace(/CORTESÍA \d+%/ig, '').replace(/ \| CORTESIA \d+%/ig, '').replace(/CORTESIA \d+%/ig, '').replace(/ \| DESCUENTO \d+%/ig, '').replace(/DESCUENTO \d+%/ig, '').trim();
                     if (baseComments.endsWith('|')) baseComments = baseComments.slice(0, -1).trim();
                     
-                    // Añadimos la cortesía nueva si existe
-                    let finalComments = baseComments + (this.cortesia > 0 ? (baseComments ? " | " : "") + "CORTESÍA " + this.cortesia + "%" : "");
+                    // Añadimos el descuento nuevo si existe
+                    let finalComments = baseComments + (this.cortesia > 0 ? (baseComments ? " | " : "") + "DESCUENTO " + this.cortesia + "%" : "");
 
                     let reqBody = {
                         _token: '{{ csrf_token() }}', 

@@ -164,8 +164,8 @@
                             }
 
                             $comentarioUpper = strtoupper($comentario);
-                            $esCortesia100 = str_contains($comentarioUpper, 'CORTESÍA 100%') || str_contains($comentarioUpper, 'CORTESIA 100%');
-                            $esCortesia40 = str_contains($comentarioUpper, 'CORTESÍA 40%') || str_contains($comentarioUpper, 'CORTESIA 40%');
+                            $esCortesia100 = str_contains($comentarioUpper, 'CORTESÍA 100%') || str_contains($comentarioUpper, 'CORTESIA 100%') || str_contains($comentarioUpper, 'DESCUENTO 100%');
+                            $esCortesia40 = str_contains($comentarioUpper, 'CORTESÍA 40%') || str_contains($comentarioUpper, 'CORTESIA 40%') || str_contains($comentarioUpper, 'DESCUENTO 40%');
                             
                             $pagos_texto = $v->montos_detalle ?? ($v->metodos ?? '');
 
@@ -184,17 +184,40 @@
                         @endphp
 
                         @if($esCortesia100)
-                            <span style="background-color: #fee2e2; color: #991b1b; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #f87171; display: inline-block; margin-bottom: 4px;">CORTESÍA 100%{{ mb_strtoupper($nClie) }}</span><br>
+                            <span style="background-color: #fee2e2; color: #991b1b; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #f87171; display: inline-block; margin-bottom: 4px;">DESCUENTO 100%{{ mb_strtoupper($nClie) }}</span><br>
                         @endif
 
                         @if($esCortesia40)
-                            <span style="background-color: #fef3c7; color: #b45309; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #fbbf24; display: inline-block; margin-bottom: 4px;">CORTESÍA 40%{{ mb_strtoupper($nClie) }}</span><br>
+                            <span style="background-color: #fef3c7; color: #b45309; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; border: 1px solid #fbbf24; display: inline-block; margin-bottom: 4px;">DESCUENTO 40%{{ mb_strtoupper($nClie) }}</span><br>
                         @endif
 
                         @if(empty(trim($pagos_texto)) && !$esCortesia100)
                             <span style="color: #64748b; font-weight: bold; font-size: 11px;">PENDIENTE</span>
                         @elseif(!empty(trim($pagos_texto)))
-                            <div style="margin-top: 3px;">{!! $pagos_texto !!}</div>
+                            @php
+                                $pagos_array = explode('<br>', $pagos_texto);
+                                $pagos_formateados = [];
+                                foreach($pagos_array as $pago) {
+                                    $pago_limpio = trim($pago);
+                                    if(empty($pago_limpio)) continue;
+                                    
+                                    $pagoUpper = mb_strtoupper($pago_limpio);
+                                    if (str_contains($pagoUpper, 'EFECTIVO')) {
+                                        // Verde para Efectivo
+                                        $pagos_formateados[] = '<span style="color: #16a34a; font-weight: bold;">' . $pago_limpio . '</span>';
+                                    } elseif (str_contains($pagoUpper, 'TARJETA')) {
+                                        // Morado para Tarjeta
+                                        $pagos_formateados[] = '<span style="color: #9333ea; font-weight: bold;">' . $pago_limpio . '</span>';
+                                    } elseif (str_contains($pagoUpper, 'TRANSFERENCIA')) {
+                                        // Azul para Transferencia
+                                        $pagos_formateados[] = '<span style="color: #2563eb; font-weight: bold;">' . $pago_limpio . '</span>';
+                                    } else {
+                                        $pagos_formateados[] = '<span>' . $pago_limpio . '</span>';
+                                    }
+                                }
+                                $pagos_html = implode('<br>', $pagos_formateados);
+                            @endphp
+                            <div style="margin-top: 3px;">{!! $pagos_html !!}</div>
                         @endif
                     @endif
                 </td>

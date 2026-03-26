@@ -158,7 +158,7 @@ class PuntoVentaController extends Controller
 
             $estado_venta = (($request->has('pagos') && count($request->pagos) > 0) || $request->total <= 0 || $request->tipo_servicio != 1) ? 1 : 0;
             
-            $nombreClienteMesa = ($request->tipo_servicio == 1) ? $request->nombre_cliente : null;
+            $nombreClienteMesa = in_array($request->tipo_servicio, [1, 2]) ? $request->nombre_cliente : null;
             $id_venta = $request->id_venta_edit ?? null;
 
             $nombreCajero = Auth::check() ? (Auth::user()->nickName ?? 'Usuario') : 'Sistema';
@@ -293,13 +293,19 @@ class PuntoVentaController extends Controller
 
             if ($request->has('cortesia') && $request->cortesia > 0) {
                 $updateData['total'] = $request->nuevo_total;
-                
                 $comentarios = $venta->comentarios ?? '';
-                $comentarios = preg_replace('/\|?\s*CORTESÍA \d+%/', '', $comentarios);
-                $comentarios = preg_replace('/CORTESÍA \d+%/', '', $comentarios);
-                $comentarios = trim($comentarios, ' |');
-
-                $updateData['comentarios'] = $comentarios . ($comentarios ? " | " : "") . "CORTESÍA " . $request->cortesia . "%";
+                
+                $partes = explode('|', $comentarios);
+                $limpios = [];
+                foreach($partes as $p) {
+                    $p = trim($p);
+                    $pUpper = mb_strtoupper($p);
+                    if (!str_contains($pUpper, 'CORTESÍA') && !str_contains($pUpper, 'CORTESIA') && !str_contains($pUpper, 'DESCUENTO')) {
+                        if (!empty($p)) $limpios[] = $p;
+                    }
+                }
+                $comentarios_limpios = implode(' | ', $limpios);
+                $updateData['comentarios'] = $comentarios_limpios . ($comentarios_limpios ? " | " : "") . "DESCUENTO " . $request->cortesia . "%";
             }
 
             DB::table('Venta')->where('id_venta', $id_venta)->update($updateData); 
@@ -316,6 +322,55 @@ class PuntoVentaController extends Controller
             DB::commit();
             return response()->json(['success' => true, 'id_venta' => $id_venta]);
 
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function editarPago(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $id_venta = $request->id_venta;
+            $venta = DB::table('Venta')->where('id_venta', $id_venta)->first();
+
+            $updateData = [];
+
+            if ($request->has('cortesia') && $request->cortesia > 0) {
+                $updateData['total'] = $request->nuevo_total;
+                $comentarios = $venta->comentarios ?? '';
+                
+                $partes = explode('|', $comentarios);
+                $limpios = [];
+                foreach($partes as $p) {
+                    $p = trim($p);
+                    $pUpper = mb_strtoupper($p);
+                    if (!str_contains($pUpper, 'CORTESÍA') && !str_contains($pUpper, 'CORTESIA') && !str_contains($pUpper, 'DESCUENTO')) {
+                        if (!empty($p)) $limpios[] = $p;
+                    }
+                }
+                $comentarios_limpios = implode(' | ', $limpios);
+                $updateData['comentarios'] = $comentarios_limpios . ($comentarios_limpios ? " | " : "") . "DESCUENTO " . $request->cortesia . "%";
+            }
+            
+            if(!empty($updateData)){
+                DB::table('Venta')->where('id_venta', $id_venta)->update($updateData);
+            }
+
+            DB::table('Pago')->where('id_venta', $id_venta)->delete();
+
+            if ($request->has('pagos')) {
+                foreach($request->pagos as $pago) {
+                    $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];
+                    if (isset($pago['referencia'])) $datosPago['referencia'] = $pago['referencia'];
+                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado'];
+                    DB::table('Pago')->insert($datosPago);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
@@ -711,50 +766,6 @@ class PuntoVentaController extends Controller
             ]);
 
             DB::table('Pago')->where('id_venta', $request->id_venta)->delete();
-
-            DB::commit();
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
-        }
-    }
-
-    public function editarPago(Request $request)
-    {
-        try {
-            DB::beginTransaction();
-            $id_venta = $request->id_venta;
-            $venta = DB::table('Venta')->where('id_venta', $id_venta)->first();
-
-            $updateData = [];
-
-            // APLICAR CORTESIA SI SE ESTÁ EDITANDO EL PAGO
-            if ($request->has('cortesia') && $request->cortesia > 0) {
-                $updateData['total'] = $request->nuevo_total;
-                
-                $comentarios = $venta->comentarios ?? '';
-                $comentarios = preg_replace('/\|?\s*CORTESÍA \d+%/', '', $comentarios);
-                $comentarios = preg_replace('/CORTESÍA \d+%/', '', $comentarios);
-                $comentarios = trim($comentarios, ' |');
-
-                $updateData['comentarios'] = $comentarios . ($comentarios ? " | " : "") . "CORTESÍA " . $request->cortesia . "%";
-            }
-            
-            if(!empty($updateData)){
-                DB::table('Venta')->where('id_venta', $id_venta)->update($updateData);
-            }
-
-            DB::table('Pago')->where('id_venta', $id_venta)->delete();
-
-            if ($request->has('pagos')) {
-                foreach($request->pagos as $pago) {
-                    $datosPago = ['id_venta' => $id_venta, 'id_metpago' => $pago['id_metpago'], 'monto' => $pago['monto']];
-                    if (isset($pago['referencia'])) $datosPago['referencia'] = $pago['referencia'];
-                    if (isset($pago['entregado'])) $datosPago['referencia'] = $pago['entregado'];
-                    DB::table('Pago')->insert($datosPago);
-                }
-            }
 
             DB::commit();
             return response()->json(['success' => true]);
