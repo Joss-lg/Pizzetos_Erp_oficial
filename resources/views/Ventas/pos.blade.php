@@ -75,6 +75,7 @@
                     <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Barra</button>
 
                     <button @click="abrirModalIngredientes()" class="whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
+
                     <button @click="modalMitades = true; mitSel = []; mitTam = null; showIngs = false; tempIngs = [];" class="whitespace-nowrap bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
                 </div>
 
