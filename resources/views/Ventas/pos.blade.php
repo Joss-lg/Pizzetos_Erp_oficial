@@ -1106,135 +1106,121 @@
             </div>
         </div>
 
-        {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
-        <div x-show="modalPago" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[500px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
-                <div class="bg-[#ffc107] p-5 flex justify-between items-center text-black relative">
-                    <h2 class="text-xl font-black" x-text="'Cobro - ' + nomServicio()"></h2>
-                    <button @click="modalPago = false" class="hover:text-gray-800 font-black text-2xl leading-none">&times;</button>
-                </div>
+       {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
+<div x-show="modalPago" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-[35px] shadow-2xl w-[500px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
+        
+        <div class="bg-[#ffc107] p-5 flex justify-between items-center text-black relative">
+            <h2 class="text-xl font-black italic uppercase" x-text="'Cobro - ' + nomServicio()"></h2>
+            <button @click="modalPago = false" class="hover:rotate-90 transition-transform font-black text-2xl leading-none">&times;</button>
+        </div>
+        
+        <div class="p-8 text-center border-b border-gray-100 bg-white">
+            {{-- BOTONES DE DESCUENTO --}}
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Desc.</button>
+                <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 40%</button>
+                <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 100%</button>
+            </div>
+
+            <div class="text-[12px] font-black text-slate-400 uppercase italic tracking-widest mb-1">Total del Pedido</div>
+            <div class="font-black text-[#1a202c] text-[45px] leading-none tracking-tighter" x-text="'$' + getGranTotal().toFixed(2)"></div>
+            
+            <div x-show="cortesia > 0" class="text-sm font-bold text-amber-600 mt-1" x-cloak>
+                Subtotal Original: <span class="line-through" x-text="'$' + getTotal().toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
+            </div>
+
+            {{-- Badge Dinámico de Estado --}}
+            <div class="mt-4 text-[14px] font-black uppercase tracking-wider p-2.5 rounded-full inline-block px-6" 
+                 :class="faltaPagar() === 0 ? 'bg-green-100 text-green-700' : (faltaPagar() < 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600')" 
+                 x-text="faltaPagar() === 0 ? 'Monto completo cubierto' : (faltaPagar() < 0 ? 'Cambio: $' + Math.abs(faltaPagar()).toFixed(2) : 'Faltan: $' + faltaPagar().toFixed(2))">
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4" x-show="cortesia !== 100">
+            
+            <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.efectivo.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
+                <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
+                    <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
+                    <span class="font-black text-[18px] text-[#212529] italic uppercase">Efectivo</span>
+                </label>
                 
-                <div class="p-6 text-center border-b border-gray-100 bg-white">
-                    {{-- BOTONES DE DESCUENTO --}}
-                    <div class="grid grid-cols-3 gap-2 mb-4">
-                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Desc.</button>
-                        <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 40%</button>
-                        <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 100%</button>
-                    </div>
-
-                    {{-- TOTAL PRINCIPAL --}}
-                    <div class="text-[12px] font-black text-slate-400 uppercase italic tracking-widest mb-1">Total del Pedido</div>
-                    <div class="font-black text-[#1a202c] text-[45px] leading-none tracking-tighter" x-text="'$' + getGranTotal().toFixed(2)"></div>
-                    
-                    {{-- SUBTOTAL TACHADO (Si hay cortesía) --}}
-                    <div x-show="cortesia > 0" class="text-sm font-bold text-amber-600 mt-1" x-cloak>
-                        Subtotal Original: <span class="line-through" x-text="'$' + getTotal().toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
-                    </div>
-
-                    {{-- MUESTRA CUÁNTO YA SE HABÍA PAGADO --}}
-                    <template x-if="total_pagado_previamente > 0">
-                        <div class="mt-3 bg-green-50 text-green-700 border border-green-200 rounded-lg p-3 flex justify-between items-center text-sm font-bold shadow-sm">
-                            <span class="uppercase tracking-wide text-[12px]">Abonado previamente:</span>
-                            <span class="text-xl font-black" x-text="'- $' + total_pagado_previamente.toFixed(2)"></span>
-                        </div>
-                    </template>
-
-                    <div class="mt-3 text-[14px] font-black uppercase tracking-wider p-2.5 rounded-lg" 
-                         :class="faltaPagar() === 0 ? 'bg-green-100 text-green-700' : (faltaPagar() < 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600')" 
-                         x-text="faltaPagar() === 0 ? 'Monto completo cubierto' : (faltaPagar() < 0 ? 'Cambio a devolver: $' + Math.abs(faltaPagar()).toFixed(2) : 'Falta cobrar: $' + faltaPagar().toFixed(2))"></div>
-                </div>
-
-                {{-- OCULTA LOS PAGOS SI YA ESTÁ CUBIERTO 100% --}}
-                <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4" x-show="faltaPagar() > 0">
-                    <p class="text-[13px] text-gray-500 font-bold mb-2">Método de Pago:</p>
-                    
-                    <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.efectivo.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
-                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
-                            <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            <span class="font-black text-[18px] text-[#212529]">Efectivo</span>
-                        </label>
-                        <div x-show="pagos.efectivo.activo" class="p-5 border-t border-gray-200 space-y-4">
-                            
-                            <div>
-                                <div class="flex justify-between items-end mb-1">
-                                    <label class="block text-[13px] font-bold text-gray-500">Monto a Cobrar</label>
-                                    <button type="button" @click="pagos.efectivo.monto = faltaPagar(); pagos.efectivo.entregado = faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[12px] font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded">Autocompletar</button>
-                                </div>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
-                                    <input type="number" step="0.01" min="0" x-model="pagos.efectivo.monto" class="w-full pl-9 pr-4 py-3 border-2 border-slate-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14] bg-white">
-                                </div>
-                            </div>
-
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <label class="block text-[14px] text-green-700 font-black mb-2">Paga con (Recibido):</label>
-                                <div class="relative mb-3">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-green-700 font-black text-2xl">$</span>
-                                    <input type="number" step="0.01" min="0" x-model="pagos.efectivo.entregado" placeholder="0.00" class="w-full pl-11 pr-4 py-3 border-2 border-green-400 bg-white rounded-xl text-2xl font-black text-green-800 focus:outline-none focus:ring-4 focus:ring-green-100">
-                                </div>
-                                
-                                <div x-show="parseFloat(pagos.efectivo.entregado) > 0 && (parseFloat(pagos.efectivo.entregado) - parseFloat(pagos.efectivo.monto)) >= 0" class="flex justify-between items-center bg-[#212529] text-white p-4 rounded-lg shadow-inner mt-2 transition-all">
-                                    <span class="text-[16px] font-bold uppercase tracking-widest text-gray-300">Su cambio:</span>
-                                    <span class="text-[28px] font-black text-[#ffc107] leading-none">$<span x-text="(parseFloat(pagos.efectivo.entregado) - parseFloat(pagos.efectivo.monto)).toFixed(2)"></span></span>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="border-2 rounded-[12px] overflow-hidden transition-all bg-white" :class="pagos.tarjeta.activo ? 'border-[#fd7e14] shadow-md' : 'border-gray-200'">
-                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
-                            <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-6 h-6 rounded-lg border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                            <span class="font-black text-[18px] text-[#212529]">Tarjeta</span>
-                        </label>
-                        <div x-show="pagos.tarjeta.activo" class="p-5 border-t border-gray-200">
-                            <div class="flex justify-between items-end mb-1">
-                                <label class="block text-[13px] font-bold text-gray-500">Monto a Cobrar</label>
-                                <button type="button" @click="pagos.tarjeta.monto = (parseFloat(pagos.tarjeta.monto) || 0) + faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[12px] font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded">Autocompletar</button>
-                            </div>
+                <div x-show="pagos.efectivo.activo" class="px-5 pb-5 pt-1 space-y-4" x-transition>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 italic">Monto a abonar</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
-                                <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-[8px] text-[18px] font-black focus:outline-none focus:border-[#fd7e14] bg-white">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                                <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.monto" 
+                                    class="w-full pl-7 pr-4 py-3 border-2 border-slate-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14]">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="border-2 rounded-[12px] overflow-hidden transition-all bg-white" :class="pagos.transferencia.activo ? 'border-[#fd7e14] shadow-md' : 'border-gray-200'">
-                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
-                            <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-6 h-6 rounded-lg border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                            <span class="font-black text-[18px] text-[#212529]">Transferencia</span>
-                        </label>
-                        <div x-show="pagos.transferencia.activo" class="p-5 border-t border-gray-200 space-y-4">
-                            <div>
-                                <div class="flex justify-between items-end mb-1">
-                                    <label class="block text-[13px] font-bold text-gray-500">Monto a Cobrar</label>
-                                    <button type="button" @click="pagos.transferencia.monto = (parseFloat(pagos.transferencia.monto) || 0) + faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[12px] font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded">Autocompletar</button>
-                                </div>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
-                                    <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-[8px] text-[18px] font-black focus:outline-none focus:border-[#fd7e14] bg-white">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[13px] text-blue-600 font-bold mb-1">Número de Referencia *</label>
-                                <input type="text" x-model="pagos.transferencia.referencia" placeholder="Últimos 4 dígitos o folio" class="w-full px-4 py-3 border-2 border-blue-200 bg-blue-50 rounded-[8px] text-[16px] font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-blue-900">
+                        <div>
+                            <label class="block text-[10px] font-black text-green-600 uppercase mb-1 italic text-right">Recibido (Paga con)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 font-bold">$</span>
+                                <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.entregado" placeholder="0.00"
+                                    class="w-full pl-7 pr-4 py-3 border-2 border-green-100 bg-green-50 rounded-xl text-lg font-black text-green-700 focus:outline-none focus:border-green-400">
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="p-5 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
-                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="(!pagosValidos() || isProcessing) ? 'bg-[#e9ecef] text-gray-400 cursor-not-allowed' : 'bg-[#212529] hover:bg-black text-white shadow-lg active:scale-95'" class="w-full font-black py-4 rounded-[10px] text-[18px] transition-all flex justify-center items-center gap-2 uppercase tracking-wide">
-                        <span x-show="!isProcessing">Confirmar Venta</span>
-                        <span x-show="isProcessing">Procesando...</span>
-                    </button>
-                    <p x-show="!pagosValidos()" class="text-[12px] text-red-500 text-center font-bold mt-2">Falta cubrir el monto total de la orden o añadir referencia.</p>
+            <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.tarjeta.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
+                <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
+                    <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
+                    <span class="font-black text-[18px] text-[#212529] italic uppercase">Tarjeta</span>
+                </label>
+                <div x-show="pagos.tarjeta.activo" class="p-5 border-t border-gray-100" x-transition>
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase italic">Monto Tarjeta</label>
+                        <button type="button" @click="pagos.tarjeta.monto = (parseFloat(pagos.tarjeta.monto) || 0) + faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[10px] font-black hover:underline uppercase bg-orange-50 px-2 py-0.5 rounded">Cobrar resto</button>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
+                        <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" 
+                            class="w-full pl-8 pr-4 py-3 border-2 border-gray-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14]">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.transferencia.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
+                <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
+                    <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
+                    <span class="font-black text-[18px] text-[#212529] italic uppercase">Transferencia</span>
+                </label>
+                <div x-show="pagos.transferencia.activo" class="p-5 border-t border-gray-100 space-y-4" x-transition>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 italic">Monto</label>
+                            <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" 
+                                class="w-full px-4 py-3 border-2 border-slate-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14]">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-blue-600 uppercase mb-1 italic">Referencia</label>
+                            <input type="text" x-model="pagos.transferencia.referencia" placeholder="Últimos 4 dígitos" 
+                                class="w-full px-4 py-3 border-2 border-blue-100 bg-blue-50 rounded-xl text-lg font-black focus:outline-none focus:border-blue-400 text-blue-900">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="p-6 bg-white border-t border-gray-100 shadow-inner">
+            <button @click="procesarOrdenFinal(false)" 
+                :disabled="!pagosValidos() || isProcessing" 
+                :class="(!pagosValidos() || isProcessing) ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-black hover:bg-slate-800 text-white shadow-xl'" 
+                class="w-full font-black py-4 rounded-[20px] text-[18px] transition-all flex justify-center items-center gap-2 uppercase italic tracking-tighter">
+                <span x-show="!isProcessing" x-text="id_venta_edit ? 'Actualizar Pedido' : 'Confirmar Venta'"></span>
+                <span x-show="isProcessing">Procesando...</span>
+            </button>
+            <p x-show="!pagosValidos() && cortesia !== 100" class="text-[11px] text-red-500 text-center font-bold mt-3 italic uppercase tracking-wider">
+                Revisar montos o falta referencia en transferencia
+            </p>
+        </div>
+    </div>
+</div>
 
     </div>
 
