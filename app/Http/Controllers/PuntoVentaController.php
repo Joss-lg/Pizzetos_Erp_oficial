@@ -57,10 +57,17 @@ class PuntoVentaController extends Controller
 
         $venta_edit = null;
         $cart_preloaded = [];
+        $pagos_edit = [];
+        $domicilio_edit = null;
 
         if ($request->has('edit')) {
             $venta_edit = DB::table('Venta')->where('id_venta', $request->edit)->first();
             if($venta_edit) {
+                $pagos_edit = DB::table('Pago')->where('id_venta', $venta_edit->id_venta)->get();
+                if ($venta_edit->tipo_servicio == 3) {
+                    $domicilio_edit = DB::table('PDomicilio')->where('id_venta', $venta_edit->id_venta)->first();
+                }
+
                 $detalles_edit = DB::table('DetalleVenta')->where('id_venta', $venta_edit->id_venta)->get();
                 foreach($detalles_edit as $det) {
                     $ing = $det->ingredientes ? json_decode($det->ingredientes) : null;
@@ -121,7 +128,8 @@ class PuntoVentaController extends Controller
             'ingredientes' => $ingredientes, 'tamanos_base' => $tamanos_base, 'especialidades_lista' => $especialidades_lista, 
             'categorias_extras' => $categorias_extras, 'clientes' => $clientes, 'direcciones' => $direcciones,
             'magno_precio' => $magno_precio, 'precios_orilla' => $this->getPreciosOrilla(),
-            'venta_edit' => $venta_edit, 'cart_preloaded' => $cart_preloaded
+            'venta_edit' => $venta_edit, 'cart_preloaded' => $cart_preloaded,
+            'pagos_edit' => $pagos_edit, 'domicilio_edit' => $domicilio_edit
         ]);
     }
 
@@ -139,6 +147,7 @@ class PuntoVentaController extends Controller
             if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
                 $id_clie = DB::table('Clientes')->insertGetId([
                     'nombre' => $request->nuevo_cliente['nombre'], 
+                    'apellido' => $request->nuevo_cliente['apellido'] ?? '', 
                     'telefono' => $request->nuevo_cliente['telefono'] ?? '', 
                     'status' => 1
                 ]);

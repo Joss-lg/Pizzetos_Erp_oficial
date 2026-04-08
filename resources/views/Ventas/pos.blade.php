@@ -69,8 +69,8 @@
                     
                     <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Barra</button>
 
-                    <button @click="abrirModalIngredientes()" class="whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
-                    <button @click="modalMitades = true; mitSel = []; mitTam = null;" class="whitespace-nowrap bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
+                    <button @click="abrirModalIngredientes()" class="whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Armar Completa</button>
+                    <button @click="modalMitades = true; mitSel = []; mitTam = null; showIngs = false; tempIngs = [];" class="whitespace-nowrap bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
@@ -345,6 +345,7 @@
             </div>
         </div>
 
+        {{-- MODAL MAGNO CON INGREDIENTES --}}
         <div x-show="modalMagno" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMagno = false">
                 <div class="bg-[#212529] p-5 flex justify-between items-center text-white">
@@ -352,24 +353,46 @@
                     <button @click="modalMagno = false" class="hover:text-gray-300 font-bold text-2xl leading-none">&times;</button>
                 </div>
                 <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 space-y-6 bg-[#f8f9fa] scrollbar-hide">
-                        <div class="grid grid-cols-2 gap-2 mb-6">
+                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 space-y-6 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                        <div class="grid grid-cols-2 gap-2 shrink-0">
                             <template x-for="i in 2">
                                 <div class="border-2 rounded-[8px] p-3 text-center transition-all h-[60px] flex items-center justify-center relative" 
                                      :class="magnoSel[i-1] ? 'border-[#212529] bg-gray-100' : 'border-dashed border-gray-300 bg-white'">
                                     <template x-if="magnoSel[i-1]">
                                         <div class="w-full flex justify-between items-center px-1">
-                                            <span class="text-[12px] font-bold text-[#212529]" x-text="magnoSel[i-1]"></span>
-                                            <button @click="removeMagnoEsp(i-1)" class="text-red-500 font-bold">&times;</button>
+                                            <span class="text-[12px] font-bold text-[#212529] truncate" x-text="magnoSel[i-1]"></span>
+                                            <button @click="removeMagnoEsp(i-1)" class="text-red-500 font-bold ml-1">&times;</button>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="addMagnoEsp(esp.nombre)" :disabled="magnoSel.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-black disabled:opacity-50" x-text="esp.nombre"></button>
-                            </template>
+                        
+                        <div class="flex-1 flex flex-col min-h-0 pt-4">
+                            <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                                <button @click="showIngs = false" :class="!showIngs ? 'bg-[#212529] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                                <button @click="showIngs = true" :class="showIngs ? 'bg-[#212529] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                            </div>
+                            
+                            <div x-show="!showIngs" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="addMagnoEsp(esp.nombre)" :disabled="magnoSel.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-black disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                            
+                            <div x-show="showIngs" x-cloak class="flex flex-col h-full overflow-hidden">
+                                <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide">
+                                    <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                        <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                            <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-black rounded border-gray-300 focus:ring-black">
+                                            <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                                <button @click="if(tempIngs.length > 0) { addMagnoEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || magnoSel.length >= 2" class="w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                    Añadir Personalizada
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="w-full md:w-[40%] bg-white p-6 flex flex-col justify-between">
@@ -393,6 +416,7 @@
             </div>
         </div>
 
+        {{-- MODAL RECTANGULAR CON INGREDIENTES --}}
         <div x-show="modalRectangular" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalRectangular = false">
                 <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white">
@@ -400,23 +424,43 @@
                     <button @click="modalRectangular = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button>
                 </div>
                 <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide">
-                        <div class="grid grid-cols-2 gap-2 mb-6">
+                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                        <div class="grid grid-cols-2 gap-2 shrink-0">
                             <template x-for="i in 4">
                                 <div class="border-2 rounded-[8px] p-3 text-center transition-all h-[60px] flex items-center justify-center relative" :class="rectSel[i-1] ? 'border-[#fd7e14] bg-orange-50' : 'border-dashed border-gray-300 bg-white'">
                                     <template x-if="rectSel[i-1]">
                                         <div class="w-full flex justify-between items-center px-1">
-                                            <span class="text-[12px] font-bold text-[#fd7e14]" x-text="rectSel[i-1]"></span>
-                                            <button @click="removeRectEsp(i-1)" class="text-red-500 font-bold">&times;</button>
+                                            <span class="text-[12px] font-bold text-[#fd7e14] truncate" x-text="rectSel[i-1]"></span>
+                                            <button @click="removeRectEsp(i-1)" class="text-red-500 font-bold ml-1">&times;</button>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="addRectEsp(esp.nombre)" :disabled="rectSel.length >= 4" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-orange-400 disabled:opacity-50" x-text="esp.nombre"></button>
-                            </template>
+
+                        <div class="flex-1 flex flex-col min-h-0 pt-4">
+                            <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                                <button @click="showIngs = false" :class="!showIngs ? 'bg-[#fd7e14] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                                <button @click="showIngs = true" :class="showIngs ? 'bg-[#fd7e14] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                            </div>
+                            <div x-show="!showIngs" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="addRectEsp(esp.nombre)" :disabled="rectSel.length >= 4" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-orange-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                            <div x-show="showIngs" x-cloak class="flex flex-col h-full overflow-hidden">
+                                <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide">
+                                    <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                        <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                            <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-[#fd7e14] rounded border-gray-300 focus:ring-[#fd7e14]">
+                                            <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                                <button @click="if(tempIngs.length > 0) { addRectEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || rectSel.length >= 4" class="w-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                    Añadir Personalizada
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="w-full md:w-[40%] bg-white p-6 flex flex-col justify-between">
@@ -436,6 +480,7 @@
             </div>
         </div>
 
+        {{-- MODAL BARRA CON INGREDIENTES --}}
         <div x-show="modalBarra" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalBarra = false">
                 <div class="bg-[#17a2b8] p-5 flex justify-between items-center text-white">
@@ -443,23 +488,43 @@
                     <button @click="modalBarra = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button>
                 </div>
                 <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide">
-                        <div class="grid grid-cols-2 gap-2 mb-6">
+                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                        <div class="grid grid-cols-2 gap-2 shrink-0">
                             <template x-for="i in 2">
                                 <div class="border-2 rounded-[8px] p-3 text-center transition-all h-[60px] flex items-center justify-center relative" :class="barraSel[i-1] ? 'border-[#17a2b8] bg-cyan-50' : 'border-dashed border-gray-300 bg-white'">
                                     <template x-if="barraSel[i-1]">
                                         <div class="w-full flex justify-between items-center px-1">
                                             <span class="text-[12px] font-bold text-[#17a2b8]" x-text="barraSel[i-1]"></span>
-                                            <button @click="removeBarraEsp(i-1)" class="text-red-500 font-bold">&times;</button>
+                                            <button @click="removeBarraEsp(i-1)" class="text-red-500 font-bold ml-1">&times;</button>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="addBarraEsp(esp.nombre)" :disabled="barraSel.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-[#17a2b8] disabled:opacity-50" x-text="esp.nombre"></button>
-                            </template>
+
+                        <div class="flex-1 flex flex-col min-h-0 pt-4">
+                            <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                                <button @click="showIngs = false" :class="!showIngs ? 'bg-[#17a2b8] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                                <button @click="showIngs = true" :class="showIngs ? 'bg-[#17a2b8] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                            </div>
+                            <div x-show="!showIngs" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="addBarraEsp(esp.nombre)" :disabled="barraSel.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-[#17a2b8] disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                            <div x-show="showIngs" x-cloak class="flex flex-col h-full overflow-hidden">
+                                <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide">
+                                    <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                        <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                            <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-[#17a2b8] rounded border-gray-300 focus:ring-[#17a2b8]">
+                                            <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                                <button @click="if(tempIngs.length > 0) { addBarraEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || barraSel.length >= 2" class="w-full bg-[#17a2b8] hover:bg-[#138496] text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                    Añadir Personalizada
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="w-full md:w-[40%] bg-white p-6 flex flex-col justify-between">
@@ -479,6 +544,68 @@
             </div>
         </div>
 
+        {{-- MODAL MITADES (STANDALONE) CON INGREDIENTES --}}
+        <div x-show="modalMitades" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-[750px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMitades = false">
+                <div class="bg-[#dc3545] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Mitades</h2><button @click="modalMitades = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button></div>
+                <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+                    <div class="w-full md:w-[65%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 shrink-0">
+                            <template x-for="tam in dbTamanosBase" :key="tam.id_tamañop">
+                                <button @click="mitTam = tam; mitSel = []" :class="mitTam?.id_tamañop === tam.id_tamañop ? 'border-red-500 bg-red-50 shadow' : 'border-gray-200 bg-white'" class="border rounded-[8px] py-4 text-center">
+                                    <span class="block font-bold text-black text-[14px]" x-text="cleanSize(tam.tamano)"></span>
+                                </button>
+                            </template>
+                        </div>
+                        
+                        <div x-show="mitTam" x-transition class="flex-1 flex flex-col min-h-0 pt-4 mt-2 border-t border-gray-200">
+                            <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                                <button @click="showIngs = false" :class="!showIngs ? 'bg-[#dc3545] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                                <button @click="showIngs = true" :class="showIngs ? 'bg-[#dc3545] text-white font-bold' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                            </div>
+                            
+                            <div x-show="!showIngs" class="grid grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="toggleMitad(esp.nombre)" :class="mitSel.includes(esp.nombre) ? 'border-red-500 bg-red-50 text-red-700' : 'bg-white border-gray-200 text-gray-700'" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left shadow-sm transition-colors" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                            
+                            <div x-show="showIngs" x-cloak class="flex flex-col h-full overflow-hidden">
+                                <div class="grid grid-cols-2 lg:grid-cols-3 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide">
+                                    <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                        <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                            <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-[#dc3545] rounded border-gray-300 focus:ring-[#dc3545]">
+                                            <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                                <button @click="if(tempIngs.length > 0) { addMitadEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || mitSel.length >= 2" class="w-full bg-[#dc3545] hover:bg-red-700 text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                    Añadir Personalizada
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-[35%] bg-white p-6 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-[18px] font-black text-black border-b border-gray-200 pb-3 mb-5">Resumen</h3>
+                            <div class="space-y-2">
+                                <div class="border rounded-[8px] p-3 text-[12px]" :class="!mitSel[0] ? 'text-gray-400 border-dashed bg-gray-50' : 'text-black font-bold border-gray-200 bg-white'" x-text="mitSel[0] ? '1/2 ' + mitSel[0] : 'Selecciona primera mitad'"></div>
+                                <div class="border rounded-[8px] p-3 text-[12px]" :class="!mitSel[1] ? 'text-gray-400 border-dashed bg-gray-50' : 'text-black font-bold border-gray-200 bg-white'" x-text="mitSel[1] ? '2/2 ' + mitSel[1] : 'Selecciona segunda mitad'"></div>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <div class="flex justify-between items-end mb-4">
+                                <span class="text-gray-500 text-[14px] font-bold">Total</span>
+                                <span class="font-black text-[#28a745] text-[26px] leading-none" x-text="'$' + (mitTam ? parseFloat(mitTam.precio).toFixed(2) : '0.00')"></span>
+                            </div>
+                            <button @click="addMitad()" :disabled="mitSel.length !== 2 || !mitTam" :class="(mitSel.length !== 2 || !mitTam) ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#dc3545] text-white hover:bg-red-700'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- MODAL PAQUETE 1 (SE DEJA INTACTO) --}}
         <div x-show="modalPaq1" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq1 = false">
                 <div class="p-6 pb-4 relative border-b border-gray-100 bg-[#ffc107]">
@@ -547,60 +674,87 @@
             </div>
         </div>
 
+        {{-- MODAL PAQUETE 2 CON INGREDIENTES --}}
         <div x-show="modalPaq2" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq2 = false">
                 <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]"><h2 class="text-2xl font-black text-black mb-1">Paquete 2</h2><button @click="modalPaq2 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button></div>
-                <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-[#f8f9fa] scrollbar-hide">
-                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-2 mt-0"><li>1 Hamburguesa o Alitas</li><li>1 Pizza Grande</li><li>1 Refresco de 2L Jarrito</li></ul>
-                    <div>
-                        <div class="flex rounded-md overflow-hidden border border-gray-300 bg-white">
+                <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-2 mt-0 shrink-0"><li>1 Hamburguesa o Alitas</li><li>1 Pizza Grande</li><li>1 Refresco de 2L Jarrito</li></ul>
+                    
+                    <div class="shrink-0">
+                        <div class="flex rounded-md overflow-hidden border border-gray-300 bg-white mb-2">
                             <button @click="paq2Tipo = 'hamb'; paq2Extra = ''" :class="paq2Tipo === 'hamb' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Hamburguesa</button>
                             <button @click="paq2Tipo = 'alitas'; paq2Extra = ''" :class="paq2Tipo === 'alitas' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Alitas</button>
                         </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <template x-for="p in dbDirectos.filter(d => {
-                            if (paq2Tipo === 'hamb') {
-                                return d.cat === 6 && d.nombre.toLowerCase().includes('sencilla');
-                            } else {
-                                return d.cat === 5;
-                            }
-                        })" :key="p.id">
-                            <button @click="paq2Extra = p.nombre" 
-                                    :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" 
-                                    class="border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]">
-                                <span x-text="p.nombre"></span>
-                            </button>
-                        </template>
-                    </div>
-                    <label class="flex items-center gap-2 mt-4 mb-2 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm">
-                        <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
-                        <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
-                    </label>
-
-                    <div x-show="!paq2MitadesMode" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-hide pb-2">
-                        <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                            <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400" x-text="esp.nombre"></button>
-                        </template>
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="p in dbDirectos.filter(d => { return paq2Tipo === 'hamb' ? (d.cat === 6 && d.nombre.toLowerCase().includes('sencilla')) : (d.cat === 5); })" :key="p.id">
+                                <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]"><span x-text="p.nombre"></span></button>
+                            </template>
+                        </div>
                     </div>
 
-                    <div x-show="paq2MitadesMode" x-cloak>
-                        <div class="grid grid-cols-2 gap-2 mb-3">
-                            <template x-for="i in 2">
-                                <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative" :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
-                                    <template x-if="paq2MitadesArr[i-1]">
-                                        <div class="w-full flex justify-between items-center px-1">
-                                            <span class="text-[11px] font-bold text-[#212529]" x-text="'1/2 ' + paq2MitadesArr[i-1]"></span>
-                                            <button @click="removePaq2Mitad(i-1)" class="text-red-500 font-bold text-[12px]">&times;</button>
+                    <div class="flex-1 flex flex-col min-h-0 pt-4 border-t border-gray-200">
+                        <label class="flex items-center gap-2 mb-3 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm shrink-0">
+                            <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                            <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
+                        </label>
+
+                        <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                            <button @click="showIngs = false" :class="!showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                            <button @click="showIngs = true" :class="showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                        </div>
+
+                        <div x-show="!showIngs" class="flex flex-col min-h-0 flex-1">
+                            <div x-show="!paq2MitadesMode" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                            <div x-show="paq2MitadesMode" x-cloak class="flex flex-col h-full min-h-0">
+                                <div class="grid grid-cols-2 gap-2 mb-3 shrink-0">
+                                    <template x-for="i in 2">
+                                        <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative" :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                            <template x-if="paq2MitadesArr[i-1]">
+                                                <div class="w-full flex justify-between items-center px-1">
+                                                    <span class="text-[11px] font-bold text-[#212529] truncate" x-text="'1/2 ' + paq2MitadesArr[i-1]"></span>
+                                                    <button @click="removePaq2Mitad(i-1)" class="text-red-500 font-bold text-[12px] ml-1">&times;</button>
+                                                </div>
+                                            </template>
                                         </div>
                                     </template>
                                 </div>
-                            </template>
+                                <div class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
+                                    <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                        <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-hide pb-2">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50" x-text="esp.nombre"></button>
-                            </template>
+
+                        <div x-show="showIngs" x-cloak class="flex flex-col h-full min-h-0">
+                            <div x-show="paq2MitadesMode" class="grid grid-cols-2 gap-2 mb-3 shrink-0">
+                                <template x-for="i in 2">
+                                    <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative" :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                        <template x-if="paq2MitadesArr[i-1]">
+                                            <div class="w-full flex justify-between items-center px-1">
+                                                <span class="text-[11px] font-bold text-[#212529] truncate" x-text="'1/2 ' + paq2MitadesArr[i-1]"></span>
+                                                <button @click="removePaq2Mitad(i-1)" class="text-red-500 font-bold text-[12px] ml-1">&times;</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide bg-white border border-gray-100 rounded-lg p-2">
+                                <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                    <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                        <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-amber-500 rounded border-gray-300 focus:ring-amber-500">
+                                        <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                    </label>
+                                </template>
+                            </div>
+                            <button @click="if(tempIngs.length > 0) { addPaq2Esp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || (paq2MitadesMode ? paq2MitadesArr.length >= 2 : false)" class="w-full bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                Añadir Personalizada
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -611,54 +765,99 @@
             </div>
         </div>
 
+        {{-- MODAL PAQUETE 3 CON INGREDIENTES --}}
         <div x-show="modalPaq3" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq3 = false">
                 <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]">
                     <h2 class="text-2xl font-black text-black mb-1">Paquete 3</h2>
                     <button @click="modalPaq3 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
                 </div>
-                <div class="p-6 overflow-y-auto flex-1 bg-[#f8f9fa] scrollbar-hide">
-                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-4 mt-0">
+                <div class="p-6 overflow-y-auto flex-1 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-4 mt-0 shrink-0">
                         <li>3 Pizzas Grandes</li>
                         <li>1 Refresco de 2L Jarrito</li>
                     </ul>
 
-                    <label class="flex items-center gap-2 mt-2 mb-4 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm w-max">
+                    <label class="flex items-center gap-2 mt-2 mb-4 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm w-max shrink-0">
                         <input type="checkbox" x-model="paq3MitadesMode" @change="paq3Pizzas=[]; paq3Halves=[]" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                         <span class="text-[13px] font-bold text-gray-700">Armar Pizzas Mitad y Mitad</span>
                     </label>
 
-                    <div x-show="!paq3MitadesMode">
-                        <div class="grid grid-cols-3 gap-2 mb-5">
+                    <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                        <button @click="showIngs = false" :class="!showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                        <button @click="showIngs = true" :class="showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                    </div>
+
+                    <div x-show="!showIngs" class="flex flex-col min-h-0 flex-1">
+                        <div x-show="!paq3MitadesMode" class="flex flex-col h-full">
+                            <div class="grid grid-cols-3 gap-2 mb-3 shrink-0">
+                                <template x-for="i in 3">
+                                    <div class="border-2 rounded-[8px] p-2 text-center h-[50px] flex items-center justify-center relative" :class="paq3Pizzas[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                        <template x-if="paq3Pizzas[i-1]">
+                                            <div class="w-full flex justify-between items-center px-1">
+                                                <span class="text-[10px] font-bold text-[#212529] truncate" x-text="paq3Pizzas[i-1]"></span>
+                                                <button @click="removePaq3Esp(i-1)" class="text-red-500 font-bold text-[12px] ml-0.5">&times;</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white overflow-y-auto flex-1 scrollbar-hide">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Pizzas.length >= 3" class="border rounded-[8px] p-2 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div x-show="paq3MitadesMode" x-cloak class="flex flex-col h-full">
+                            <div class="grid grid-cols-3 gap-3 mb-3 shrink-0">
+                                <template x-for="piz in 3">
+                                    <div class="bg-gray-100 border border-gray-200 rounded p-1 space-y-1">
+                                        <div class="text-center text-[10px] font-black text-gray-500 uppercase">Piz <span x-text="piz"></span></div>
+                                        <template x-for="mit in 2">
+                                            <div class="border-2 rounded-[4px] p-1 h-[25px] flex items-center justify-center bg-white" :class="paq3Halves[((piz-1)*2) + (mit-1)] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300'">
+                                                <template x-if="paq3Halves[((piz-1)*2) + (mit-1)]">
+                                                    <div class="w-full flex justify-between items-center px-0.5">
+                                                        <span class="text-[8px] font-bold text-black truncate" x-text="paq3Halves[((piz-1)*2) + (mit-1)]"></span>
+                                                        <button @click="removePaq3Esp(((piz-1)*2) + (mit-1))" class="text-red-500 font-black text-[10px] ml-0.5">&times;</button>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white overflow-y-auto flex-1 scrollbar-hide">
+                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                    <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Halves.length >= 6" class="border rounded-[8px] p-2 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div x-show="showIngs" x-cloak class="flex flex-col h-full min-h-0 flex-1">
+                        <div x-show="!paq3MitadesMode" class="grid grid-cols-3 gap-2 mb-3 shrink-0">
                             <template x-for="i in 3">
-                                <div class="border-2 rounded-[8px] p-2 text-center h-[55px] flex items-center justify-center relative" :class="paq3Pizzas[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                <div class="border-2 rounded-[8px] p-2 text-center h-[50px] flex items-center justify-center relative" :class="paq3Pizzas[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
                                     <template x-if="paq3Pizzas[i-1]">
                                         <div class="w-full flex justify-between items-center px-1">
-                                            <span class="text-[11px] font-bold text-[#212529]" x-text="paq3Pizzas[i-1]"></span>
-                                            <button @click="removePaq3Esp(i-1)" class="text-red-500 font-bold text-[12px]">&times;</button>
+                                            <span class="text-[10px] font-bold text-[#212529] truncate" x-text="paq3Pizzas[i-1]"></span>
+                                            <button @click="removePaq3Esp(i-1)" class="text-red-500 font-bold text-[12px] ml-0.5">&times;</button>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white max-h-48 overflow-y-auto">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Pizzas.length >= 3" class="border rounded-[8px] p-2.5 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div x-show="paq3MitadesMode" x-cloak>
-                        <div class="grid grid-cols-3 gap-3 mb-5">
+                        <div x-show="paq3MitadesMode" class="grid grid-cols-3 gap-3 mb-3 shrink-0">
                             <template x-for="piz in 3">
                                 <div class="bg-gray-100 border border-gray-200 rounded p-1 space-y-1">
-                                    <div class="text-center text-[10px] font-black text-gray-500 uppercase">Pizza <span x-text="piz"></span></div>
+                                    <div class="text-center text-[10px] font-black text-gray-500 uppercase">Piz <span x-text="piz"></span></div>
                                     <template x-for="mit in 2">
-                                        <div class="border-2 rounded-[6px] p-1 h-[35px] flex items-center justify-center bg-white" :class="paq3Halves[((piz-1)*2) + (mit-1)] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300'">
+                                        <div class="border-2 rounded-[4px] p-1 h-[25px] flex items-center justify-center bg-white" :class="paq3Halves[((piz-1)*2) + (mit-1)] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300'">
                                             <template x-if="paq3Halves[((piz-1)*2) + (mit-1)]">
-                                                <div class="w-full flex justify-between items-center px-1">
-                                                    <span class="text-[9px] font-bold text-black truncate" x-text="paq3Halves[((piz-1)*2) + (mit-1)]"></span>
-                                                    <button @click="removePaq3Esp(((piz-1)*2) + (mit-1))" class="text-red-500 font-black text-[10px] ml-1">&times;</button>
+                                                <div class="w-full flex justify-between items-center px-0.5">
+                                                    <span class="text-[8px] font-bold text-black truncate" x-text="paq3Halves[((piz-1)*2) + (mit-1)]"></span>
+                                                    <button @click="removePaq3Esp(((piz-1)*2) + (mit-1))" class="text-red-500 font-black text-[10px] ml-0.5">&times;</button>
                                                 </div>
                                             </template>
                                         </div>
@@ -666,11 +865,18 @@
                                 </div>
                             </template>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white max-h-40 overflow-y-auto">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="addPaq3Esp(esp.nombre)" :disabled="paq3Halves.length >= 6" class="border rounded-[8px] p-2.5 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
+
+                        <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide border border-gray-100 rounded-lg p-2 bg-white">
+                            <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                    <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-amber-500 rounded border-gray-300 focus:ring-amber-500">
+                                    <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                </label>
                             </template>
                         </div>
+                        <button @click="if(tempIngs.length > 0) { addPaq3Esp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || (paq3MitadesMode ? paq3Halves.length >= 6 : paq3Pizzas.length >= 3)" class="w-full bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                            Añadir Personalizada
+                        </button>
                     </div>
 
                 </div>
@@ -681,48 +887,10 @@
             </div>
         </div>
 
-        <div x-show="modalMitades" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[750px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMitades = false">
-                <div class="bg-[#dc3545] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Mitades</h2><button @click="modalMitades = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button></div>
-                <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    <div class="w-full md:w-[65%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide">
-                        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-                            <template x-for="tam in dbTamanosBase" :key="tam.id_tamañop">
-                                <button @click="mitTam = tam; mitSel = []" :class="mitTam?.id_tamañop === tam.id_tamañop ? 'border-red-500 bg-red-50 shadow' : 'border-gray-200 bg-white'" class="border rounded-[8px] py-4 text-center">
-                                    <span class="block font-bold text-black text-[14px]" x-text="cleanSize(tam.tamano)"></span>
-                                </button>
-                            </template>
-                        </div>
-                        <div x-show="mitTam" class="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                            <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="toggleMitad(esp.nombre)" :class="mitSel.includes(esp.nombre) ? 'border-red-500 bg-red-50 text-red-700' : 'bg-white border-gray-200 text-gray-700'" class="border rounded-[8px] p-3 text-[12px] font-bold text-left shadow-sm" x-text="esp.nombre"></button>
-                            </template>
-                        </div>
-                    </div>
-                    <div class="w-full md:w-[35%] bg-white p-6 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-[18px] font-black text-black border-b border-gray-200 pb-3 mb-5">Resumen</h3>
-                            <div class="space-y-2">
-                                <div class="border rounded-[8px] p-3 text-[13px]" :class="!mitSel[0] ? 'text-gray-400 border-dashed bg-gray-50' : 'text-black font-bold border-gray-200 bg-white'" x-text="mitSel[0] ? '1/2 ' + mitSel[0] : 'Selecciona primera mitad'"></div>
-                                <div class="border rounded-[8px] p-3 text-[13px]" :class="!mitSel[1] ? 'text-gray-400 border-dashed bg-gray-50' : 'text-black font-bold border-gray-200 bg-white'" x-text="mitSel[1] ? '2/2 ' + mitSel[1] : 'Selecciona segunda mitad'"></div>
-                            </div>
-                        </div>
-                        <div class="mt-6 text-center">
-                            <div class="flex justify-between items-end mb-4">
-                                <span class="text-gray-500 text-[14px] font-bold">Total</span>
-                                <span class="font-black text-[#28a745] text-[26px] leading-none" x-text="'$' + (mitTam ? parseFloat(mitTam.precio).toFixed(2) : '0.00')"></span>
-                            </div>
-                            <button @click="addMitad()" :disabled="mitSel.length !== 2 || !mitTam" :class="(mitSel.length !== 2 || !mitTam) ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#dc3545] text-white hover:bg-red-700'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
        <div x-show="modalIngredientes" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalIngredientes = false">
             <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white">
-                <h2 class="text-xl font-bold">Armar por Ingrediente</h2>
+                <h2 class="text-xl font-bold">Armar por Ingrediente (Pizza Completa)</h2>
                 <button @click="modalIngredientes = false" class="hover:text-orange-200 font-bold text-2xl leading-none">&times;</button>
             </div>
             
@@ -856,12 +1024,18 @@
                                 <h4 class="font-black text-[18px] text-gray-800">Registrar Nuevo Cliente</h4>
                                 <button @click="toggleFormNuevoCliente()" class="text-gray-500 hover:text-red-500 font-bold text-[15px] bg-white border border-gray-300 px-3 py-1.5 rounded">Cancelar</button>
                             </div>
-                            <div>
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Nombre *</label>
-                                <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                            <div class="flex gap-4">
+                                <div class="flex-1">
+                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Nombre *</label>
+                                    <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Apellido</label>
+                                    <input type="text" x-model="nuevoClienteData.apellido" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Teléfono</label>
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Teléfono *</label>
                                 <input type="text" x-model="nuevoClienteData.telefono" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                             </div>
                         </div>
@@ -934,7 +1108,7 @@
 
         {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
         <div x-show="modalPago" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[450px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
+            <div class="bg-white rounded-xl shadow-2xl w-[500px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
                 <div class="bg-[#ffc107] p-5 flex justify-between items-center text-black relative">
                     <h2 class="text-xl font-black" x-text="'Cobro - ' + nomServicio()"></h2>
                     <button @click="modalPago = false" class="hover:text-gray-800 font-black text-2xl leading-none">&times;</button>
@@ -943,98 +1117,121 @@
                 <div class="p-6 text-center border-b border-gray-100 bg-white">
                     {{-- BOTONES DE DESCUENTO --}}
                     <div class="grid grid-cols-3 gap-2 mb-4">
-                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Descuento</button>
-                        <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Descuento 40%</button>
-                        <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Descuento 100%</button>
+                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Desc.</button>
+                        <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 40%</button>
+                        <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-[6px] font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 100%</button>
                     </div>
 
                     {{-- TOTAL PRINCIPAL --}}
-                    <div class="font-black text-[#1a202c] text-[40px] leading-none mb-1 tracking-tighter" x-text="'$' + getGranTotal().toFixed(2)"></div>
+                    <div class="text-[12px] font-black text-slate-400 uppercase italic tracking-widest mb-1">Total del Pedido</div>
+                    <div class="font-black text-[#1a202c] text-[45px] leading-none tracking-tighter" x-text="'$' + getGranTotal().toFixed(2)"></div>
                     
                     {{-- SUBTOTAL TACHADO (Si hay cortesía) --}}
-                    <div x-show="cortesia > 0" class="text-sm font-bold text-amber-600 mb-2" x-cloak>
-                        Subtotal: <span class="line-through" x-text="'$' + getTotal().toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
+                    <div x-show="cortesia > 0" class="text-sm font-bold text-amber-600 mt-1" x-cloak>
+                        Subtotal Original: <span class="line-through" x-text="'$' + getTotal().toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
                     </div>
 
-                    <div class="text-[14px] font-bold" :class="faltaPagar() === 0 ? 'text-green-500' : (faltaPagar() < 0 ? 'text-blue-500' : 'text-red-500')" x-text="faltaPagar() === 0 ? 'Monto completo asignado' : (faltaPagar() < 0 ? 'Cambio: $' + Math.abs(faltaPagar()).toFixed(2) : 'Falta asignar: $' + faltaPagar().toFixed(2))"></div>
+                    {{-- MUESTRA CUÁNTO YA SE HABÍA PAGADO --}}
+                    <template x-if="total_pagado_previamente > 0">
+                        <div class="mt-3 bg-green-50 text-green-700 border border-green-200 rounded-lg p-3 flex justify-between items-center text-sm font-bold shadow-sm">
+                            <span class="uppercase tracking-wide text-[12px]">Abonado previamente:</span>
+                            <span class="text-xl font-black" x-text="'- $' + total_pagado_previamente.toFixed(2)"></span>
+                        </div>
+                    </template>
+
+                    <div class="mt-3 text-[14px] font-black uppercase tracking-wider p-2.5 rounded-lg" 
+                         :class="faltaPagar() === 0 ? 'bg-green-100 text-green-700' : (faltaPagar() < 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600')" 
+                         x-text="faltaPagar() === 0 ? 'Monto completo cubierto' : (faltaPagar() < 0 ? 'Cambio a devolver: $' + Math.abs(faltaPagar()).toFixed(2) : 'Falta cobrar: $' + faltaPagar().toFixed(2))"></div>
                 </div>
 
-                {{-- OCULTA LOS PAGOS SI ES 100% CORTESÍA --}}
-                <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4" x-show="cortesia !== 100">
-                    <p class="text-[13px] text-gray-500 mb-2">Selecciona métodos de pago (puedes elegir varios):</p>
+                {{-- OCULTA LOS PAGOS SI YA ESTÁ CUBIERTO 100% --}}
+                <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4" x-show="faltaPagar() > 0">
+                    <p class="text-[13px] text-gray-500 font-bold mb-2">Método de Pago:</p>
                     
-                    <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.transferencia.activo ? 'border-[#fd7e14]' : 'border-gray-200'">
-                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
-                            <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-5 h-5 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                            <span class="font-bold text-[15px] text-[#212529]">Transferencia</span>
+                    <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.efectivo.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
+                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
+                            <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
+                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <span class="font-black text-[18px] text-[#212529]">Efectivo</span>
                         </label>
-                        <div x-show="pagos.transferencia.activo" class="px-4 pb-4 pt-1 space-y-3">
+                        <div x-show="pagos.efectivo.activo" class="p-5 border-t border-gray-200 space-y-4">
+                            
                             <div>
-                                <label class="block text-[12px] text-gray-500 mb-1">Monto a cobrar con Transferencia</label>
+                                <div class="flex justify-between items-end mb-1">
+                                    <label class="block text-[13px] font-bold text-gray-500">Monto a Cobrar</label>
+                                    <button type="button" @click="pagos.efectivo.monto = faltaPagar(); pagos.efectivo.entregado = faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[12px] font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded">Autocompletar</button>
+                                </div>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-2 text-gray-500 font-bold">$</span>
-                                    <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded text-[14px] font-bold focus:outline-none focus:border-[#fd7e14]">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
+                                    <input type="number" step="0.01" min="0" x-model="pagos.efectivo.monto" class="w-full pl-9 pr-4 py-3 border-2 border-slate-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14] bg-white">
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-[12px] text-blue-600 font-bold mb-1">Número de Referencia *</label>
-                                <input type="text" x-model="pagos.transferencia.referencia" placeholder="Ref de transferencia" class="w-full px-3 py-2 border border-blue-200 bg-blue-50 rounded text-[14px] focus:outline-none focus:border-blue-400">
+
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <label class="block text-[14px] text-green-700 font-black mb-2">Paga con (Recibido):</label>
+                                <div class="relative mb-3">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-green-700 font-black text-2xl">$</span>
+                                    <input type="number" step="0.01" min="0" x-model="pagos.efectivo.entregado" placeholder="0.00" class="w-full pl-11 pr-4 py-3 border-2 border-green-400 bg-white rounded-xl text-2xl font-black text-green-800 focus:outline-none focus:ring-4 focus:ring-green-100">
+                                </div>
+                                
+                                <div x-show="parseFloat(pagos.efectivo.entregado) > 0 && (parseFloat(pagos.efectivo.entregado) - parseFloat(pagos.efectivo.monto)) >= 0" class="flex justify-between items-center bg-[#212529] text-white p-4 rounded-lg shadow-inner mt-2 transition-all">
+                                    <span class="text-[16px] font-bold uppercase tracking-widest text-gray-300">Su cambio:</span>
+                                    <span class="text-[28px] font-black text-[#ffc107] leading-none">$<span x-text="(parseFloat(pagos.efectivo.entregado) - parseFloat(pagos.efectivo.monto)).toFixed(2)"></span></span>
+                                </div>
                             </div>
+
                         </div>
                     </div>
 
-                    <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.tarjeta.activo ? 'border-[#fd7e14]' : 'border-gray-200'">
-                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
-                            <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-5 h-5 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                            <span class="font-bold text-[15px] text-[#212529]">Tarjeta</span>
+                    <div class="border-2 rounded-[12px] overflow-hidden transition-all bg-white" :class="pagos.tarjeta.activo ? 'border-[#fd7e14] shadow-md' : 'border-gray-200'">
+                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
+                            <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-6 h-6 rounded-lg border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
+                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            <span class="font-black text-[18px] text-[#212529]">Tarjeta</span>
                         </label>
-                        <div x-show="pagos.tarjeta.activo" class="px-4 pb-4 pt-1">
-                            <label class="block text-[12px] text-gray-500 mb-1">Monto a cobrar con Tarjeta</label>
+                        <div x-show="pagos.tarjeta.activo" class="p-5 border-t border-gray-200">
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="block text-[13px] font-bold text-gray-500">Monto a Cobrar</label>
+                                <button type="button" @click="pagos.tarjeta.monto = (parseFloat(pagos.tarjeta.monto) || 0) + faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[12px] font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded">Autocompletar</button>
+                            </div>
                             <div class="relative">
-                                <span class="absolute left-3 top-2 text-gray-500 font-bold">$</span>
-                                <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded text-[14px] font-bold focus:outline-none focus:border-[#fd7e14]">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
+                                <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-[8px] text-[18px] font-black focus:outline-none focus:border-[#fd7e14] bg-white">
                             </div>
-                            <p class="text-[11px] text-gray-400 italic mt-2">Se enviará terminal.</p>
                         </div>
                     </div>
 
-                    <div class="border rounded-[8px] overflow-hidden transition-all bg-white shadow-sm" :class="pagos.efectivo.activo ? 'border-[#fd7e14]' : 'border-gray-200'">
-                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none">
-                            <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-5 h-5 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            <span class="font-bold text-[15px] text-[#212529]">Efectivo</span>
+                    <div class="border-2 rounded-[12px] overflow-hidden transition-all bg-white" :class="pagos.transferencia.activo ? 'border-[#fd7e14] shadow-md' : 'border-gray-200'">
+                        <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
+                            <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-6 h-6 rounded-lg border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
+                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                            <span class="font-black text-[18px] text-[#212529]">Transferencia</span>
                         </label>
-                        <div x-show="pagos.efectivo.activo" class="px-4 pb-4 pt-1 space-y-3">
+                        <div x-show="pagos.transferencia.activo" class="p-5 border-t border-gray-200 space-y-4">
                             <div>
-                                <label class="block text-[12px] text-gray-500 mb-1">Monto a cobrar con Efectivo</label>
+                                <div class="flex justify-between items-end mb-1">
+                                    <label class="block text-[13px] font-bold text-gray-500">Monto a Cobrar</label>
+                                    <button type="button" @click="pagos.transferencia.monto = (parseFloat(pagos.transferencia.monto) || 0) + faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[12px] font-bold hover:underline bg-orange-50 px-2 py-0.5 rounded">Autocompletar</button>
+                                </div>
                                 <div class="relative">
-                                    <span class="absolute left-3 top-2 text-gray-500 font-bold">$</span>
-                                    <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.monto" class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded text-[14px] font-bold focus:outline-none focus:border-[#fd7e14]">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
+                                    <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-[8px] text-[18px] font-black focus:outline-none focus:border-[#fd7e14] bg-white">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[12px] text-green-600 font-bold mb-1">¿Con cuánto paga el cliente?</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-2 text-green-600 font-bold">$</span>
-                                    <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.entregado" placeholder="Monto entregado" class="w-full pl-7 pr-3 py-2 border border-green-200 bg-green-50 rounded text-[14px] font-bold focus:outline-none focus:border-green-400">
-                                </div>
-                                <p x-show="pagos.efectivo.entregado > 0 && (pagos.efectivo.entregado - pagos.efectivo.monto) >= 0" class="text-[12px] text-gray-600 mt-2 font-bold bg-white p-2 rounded border border-gray-100 shadow-sm text-center">
-                                    Su cambio: <span class="text-green-600 text-[16px]"> $<span x-text="(pagos.efectivo.entregado - pagos.efectivo.monto).toFixed(2)"></span></span>
-                                </p>
+                                <label class="block text-[13px] text-blue-600 font-bold mb-1">Número de Referencia *</label>
+                                <input type="text" x-model="pagos.transferencia.referencia" placeholder="Últimos 4 dígitos o folio" class="w-full px-4 py-3 border-2 border-blue-200 bg-blue-50 rounded-[8px] text-[16px] font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-blue-900">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-5 bg-white border-t border-gray-100 flex flex-col gap-2">
-                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="(!pagosValidos() || isProcessing) ? 'bg-[#1a202c]/50 text-white cursor-not-allowed' : 'bg-[#1a202c] hover:bg-black text-white shadow-md'" class="w-full font-bold py-3.5 rounded-[8px] text-[15px] transition-colors flex justify-center items-center gap-2">
-                        <span x-show="!isProcessing">Confirmar Pagos</span>
+                <div class="p-5 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="(!pagosValidos() || isProcessing) ? 'bg-[#e9ecef] text-gray-400 cursor-not-allowed' : 'bg-[#212529] hover:bg-black text-white shadow-lg active:scale-95'" class="w-full font-black py-4 rounded-[10px] text-[18px] transition-all flex justify-center items-center gap-2 uppercase tracking-wide">
+                        <span x-show="!isProcessing">Confirmar Venta</span>
                         <span x-show="isProcessing">Procesando...</span>
-                        <span x-show="!isProcessing && getTotalPagarInputs() > 0" class="bg-white/20 px-2 py-0.5 rounded text-[13px]" x-text="'$' + getTotalPagarInputs().toFixed(2)"></span>
                     </button>
-                    <p x-show="!pagosValidos()" class="text-[11px] text-red-500 text-center font-medium">Asegúrate de que la suma coincida con el total y rellenar referencias.</p>
+                    <p x-show="!pagosValidos()" class="text-[12px] text-red-500 text-center font-bold mt-2">Falta cubrir el monto total de la orden o añadir referencia.</p>
                 </div>
             </div>
         </div>
@@ -1056,6 +1253,8 @@
 
                 cortesia: 0, 
 
+                showIngs: false, tempIngs: [],
+
                 modalPaq1: false, paq1Pizzas: [], paq1MitadesMode: false, paq1Halves: [], paqObj: null,
                 modalPaq2: false, paq2Tipo: 'hamb', paq2Extra: '', paq2Pizza: '', paq2MitadesMode: false, paq2MitadesArr: [],
                 modalPaq3: false, paq3Pizzas: [], paq3MitadesMode: false, paq3Halves: [],
@@ -1072,7 +1271,7 @@
                 searchClienteText: '', showClientesList: false,
                 clienteSeleccionado: null, direccionesCliente: [], dirSeleccionada: null,
                 clienteFormVisible: false, dirFormVisible: false,
-                nuevoClienteData: { nombre: '', telefono: '' },
+                nuevoClienteData: { nombre: '', apellido: '', telefono: '' }, 
                 nuevaDirData: { calle: '', manzana: '', lote: '', colonia: '', referencia: '' },
 
                 pagos: {
@@ -1080,10 +1279,26 @@
                     tarjeta: { activo: false, monto: null },
                     transferencia: { activo: false, monto: null, referencia: '' }
                 },
+                
+                pagosPreviosRAW: {!! json_encode($pagos_edit ?? []) !!},
+                total_pagado_previamente: 0,
+                domicilioPrevio: {!! json_encode($domicilio_edit ?? null) !!},
 
                 init() {
                     if(this.cart && this.cart.length > 0) {
                         this.actualizarCarrito();
+                    }
+                    
+                    if (this.domicilioPrevio) {
+                        let clie = dbClientes.find(c => c.id_clie == this.domicilioPrevio.id_clie || c.id_cliente == this.domicilioPrevio.id_clie);
+                        if (clie) {
+                            this.seleccionarCliente(clie);
+                            this.dirSeleccionada = this.domicilioPrevio.id_dir;
+                        }
+                    }
+
+                    if(this.pagosPreviosRAW && this.pagosPreviosRAW.length > 0) {
+                        this.total_pagado_previamente = this.pagosPreviosRAW.reduce((sum, p) => sum + parseFloat(p.monto), 0);
                     }
                 },
 
@@ -1163,7 +1378,6 @@
 
                             if (baseSize !== '') {
                                 for (let i = 0; i < cItem.qty; i++) {
-                                    // EL FIX MAESTRO: Hacemos un clon agregando un "unique_key"
                                     let cloneUID = cItem.uid + '_' + i;
                                     pizzasFlat.push({ cartIndex: index, size: baseSize, price: cItem.precioBase, item: { ...cItem, unique_key: cloneUID } });
                                 }
@@ -1259,6 +1473,8 @@
                     let precioMagno = dbMagnoPrice && dbMagnoPrice > 150 ? parseFloat(dbMagnoPrice) : 230.00; 
                     this.magnoItem = { id: null, col: 'id_pizza', nombre: 'Magno', precio: precioMagno };
                     this.magnoSel = [];
+                    this.showIngs = false; 
+                    this.tempIngs = [];
                     this.modalMagno = true;
                 },
                 addMagnoEsp(esp) { if(this.magnoSel.length < 2) this.magnoSel.push(esp); },
@@ -1288,6 +1504,8 @@
                     if(!baseItem) return alert('No hay pizzas rectangulares configuradas en la base de datos.');
                     this.rectItem = { id: baseItem.id, col: baseItem.col, nombre: 'Pizza Rectangular', precio: baseItem.precio };
                     this.rectSel = [];
+                    this.showIngs = false; 
+                    this.tempIngs = [];
                     this.modalRectangular = true;
                 },
                 addRectEsp(esp) { if(this.rectSel.length < 4) this.rectSel.push(esp); },
@@ -1317,6 +1535,8 @@
                     if(!baseItem) return alert('No hay pizzas de barra configuradas en la base de datos.');
                     this.barraItem = { id: baseItem.id, col: baseItem.col, nombre: 'Pizza de Barra', precio: baseItem.precio };
                     this.barraSel = [];
+                    this.showIngs = false; 
+                    this.tempIngs = [];
                     this.modalBarra = true;
                 },
                 addBarraEsp(esp) { if(this.barraSel.length < 2) this.barraSel.push(esp); },
@@ -1355,6 +1575,8 @@
 
                 abrirPaquete(id) {
                     this.paqObj = dbPaquetes.find(p => p.id_paquete === id);
+                    this.showIngs = false; 
+                    this.tempIngs = [];
                     if(id === 1) { this.paq1Pizzas = []; this.paq1MitadesMode = false; this.paq1Halves = []; this.modalPaq1 = true; }
                     if(id === 2) { this.paq2Tipo = 'hamb'; this.paq2Extra = ''; this.paq2Pizza = ''; this.paq2MitadesMode = false; this.paq2MitadesArr = []; this.modalPaq2 = true; }
                     if(id === 3) { this.paq3Pizzas = []; this.paq3MitadesMode = false; this.paq3Halves = []; this.modalPaq3 = true; }
@@ -1428,7 +1650,14 @@
                     this.actualizarCarrito();
                 },
 
-                toggleMitad(nom) { let idx = this.mitSel.indexOf(nom); if(idx > -1) this.mitSel.splice(idx, 1); else if(this.mitSel.length < 2) this.mitSel.push(nom); },
+                toggleMitad(nom) { 
+                    let idx = this.mitSel.indexOf(nom); 
+                    if(idx > -1) this.mitSel.splice(idx, 1); 
+                    else if(this.mitSel.length < 2) this.mitSel.push(nom); 
+                },
+                addMitadEsp(esp) { 
+                    if(this.mitSel.length < 2) this.mitSel.push(esp); 
+                },
                 addMitad() {
                     let cTam = this.cleanSize(this.mitTam.tamano);
                     let nomFull = 'Mitad y Mitad ' + cTam;
@@ -1540,7 +1769,6 @@
                 eliminarItemByUid(uid) {
                     let idx = this.cart.findIndex(c => c.uid === uid);
                     if(idx > -1) {
-                        // FIX: Solo resta 1 en lugar de borrar todas
                         if (this.cart[idx].es_pizza && !this.cart[idx].is_magno && this.cart[idx].qty > 1) {
                             this.cart[idx].qty--;
                         } else {
@@ -1597,7 +1825,7 @@
                     this.dirSeleccionada = null;
                     this.clienteFormVisible = false;
                     this.dirFormVisible = false;
-                    this.nuevoClienteData = { nombre: '', telefono: '' };
+                    this.nuevoClienteData = { nombre: '', apellido: '', telefono: '' }; 
                     this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
                     this.modalCliente = true;
                 },
@@ -1651,7 +1879,7 @@
                 },
 
                 abrirModalPago() {
-                    this.cortesia = 0; // Reiniciamos cortesía
+                    this.cortesia = 0; 
                     this.pagos = {
                         efectivo: { activo: false, monto: null, entregado: null },
                         tarjeta: { activo: false, monto: null },
@@ -1676,7 +1904,10 @@
                         this.pagos.transferencia.activo = false; this.pagos.transferencia.monto = null;
                     } else {
                         ['efectivo', 'tarjeta', 'transferencia'].forEach(t => {
-                            if(this.pagos[t].activo) this.autoFillPago(t);
+                            if(this.pagos[t].activo) {
+                                this.pagos[t].monto = null; 
+                                this.autoFillPago(t);
+                            }
                         });
                     }
                 },
@@ -1686,13 +1917,18 @@
                     let pTr = this.pagos.transferencia.activo ? parseFloat(this.pagos.transferencia.monto || 0) : 0;
                     return pE + pT + pTr;
                 },
+                
                 faltaPagar() {
-                    let diff = this.getGranTotal() - this.getTotalPagarInputs();
+                    let diff = this.getGranTotal() - this.total_pagado_previamente - this.getTotalPagarInputs();
                     return parseFloat(diff.toFixed(2));
                 },
+                
                 pagosValidos() {
                     if(this.faltaPagar() !== 0) return false;
-                    if(this.getGranTotal() === 0) return true; // 100% Cortesía pasa
+                    if(this.getGranTotal() === 0) return true; // 100% Cortesía
+                    
+                    if(this.getTotalPagarInputs() === 0 && this.faltaPagar() === 0) return true;
+
                     if(!this.pagos.efectivo.activo && !this.pagos.tarjeta.activo && !this.pagos.transferencia.activo) return false;
                     if(this.pagos.transferencia.activo && (!this.pagos.transferencia.referencia || this.pagos.transferencia.referencia.trim() === '')) return false;
                     return true;
@@ -1706,7 +1942,11 @@
                         if(!this.nombreClienteMesa.trim()) return alert("El nombre del cliente es obligatorio para llevar.");
                         this.abrirModalPago(); 
                     } else if(this.servicio === 3) {
-                        this.abrirModalCliente(); 
+                        if (this.id_venta_edit && this.domicilioPrevio) {
+                            this.abrirModalPago(); 
+                        } else {
+                            this.abrirModalCliente();
+                        }
                     }
                 },
 
@@ -1725,6 +1965,15 @@
 
                     let pagosToSend = [];
                     if(!esAbierta) {
+                        this.pagosPreviosRAW.forEach(p => {
+                            pagosToSend.push({ 
+                                id_metpago: p.id_metpago, 
+                                monto: p.monto, 
+                                referencia: p.referencia || '', 
+                                entregado: p.referencia || p.monto 
+                            });
+                        });
+
                         if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
                             pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
                         }
@@ -1736,11 +1985,9 @@
                         }
                     }
 
-                    // Limpiamos la palabra cortesía/descuento vieja por si se está editando
                     let baseComments = this.comentariosGenerales.replace(/ \| CORTESÍA \d+%/ig, '').replace(/CORTESÍA \d+%/ig, '').replace(/ \| CORTESIA \d+%/ig, '').replace(/CORTESIA \d+%/ig, '').replace(/ \| DESCUENTO \d+%/ig, '').replace(/DESCUENTO \d+%/ig, '').trim();
                     if (baseComments.endsWith('|')) baseComments = baseComments.slice(0, -1).trim();
                     
-                    // Añadimos el descuento nuevo si existe
                     let finalComments = baseComments + (this.cortesia > 0 ? (baseComments ? " | " : "") + "DESCUENTO " + this.cortesia + "%" : "");
 
                     let reqBody = {

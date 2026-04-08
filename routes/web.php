@@ -74,10 +74,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/venta/flujo-caja/cerrar/{id}', [FlujoCajaController::class, 'cerrarCaja'])->name('flujo.caja.cerrar');
     Route::get('/venta/flujo-caja/pdf/{id}', [FlujoCajaController::class, 'descargarPdf'])->name('flujo.caja.pdf');
 
-    // --- CLIENTES (Consulta y Registro) ---
+    // --- CLIENTES (Consulta, Registro, Edición y Direcciones) ---
+    // 👇 Estas rutas se movieron aquí para que los cajeros puedan gestionar información básica y direcciones
     Route::get('/clientes', [ClientesController::class, 'index'])->name('clientes.index');
     Route::get('/clientes/crear', [ClientesController::class, 'create'])->name('clientes.create');
     Route::post('/clientes', [ClientesController::class, 'store'])->name('clientes.store');
+    Route::get('/clientes/{id}/editar', [ClientesController::class, 'edit'])->name('clientes.edit');
+    Route::put('/clientes/{id}', [ClientesController::class, 'update'])->name('clientes.update');
+    Route::post('/clientes/{id}/direcciones', [ClientesController::class, 'storeDireccion'])->name('clientes.storeDireccion');
+    Route::delete('/direcciones/{id}', [ClientesController::class, 'destroyDireccion'])->name('clientes.destroyDireccion');
 
     // --- GASTOS (Visible para Cajeros y Admin) ---
     Route::get('/venta/gastos', [GastosController::class, 'index'])->name('gastos.index');
@@ -99,13 +104,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');
     Route::post('/venta/editar-pago', [PuntoVentaController::class, 'editarPago'])->name('ventas.editar_pago');
 
-    // --- GESTIÓN AVANZADA DE CLIENTES ---
-    Route::get('/clientes/{id}/editar', [ClientesController::class, 'edit'])->name('clientes.edit');
-    Route::put('/clientes/{id}', [ClientesController::class, 'update'])->name('clientes.update');
+    // --- GESTIÓN AVANZADA DE CLIENTES (Solo Admin) ---
+    // 👇 Únicamente el borrado lógico y reactivación se quedan para uso exclusivo del Administrador
     Route::put('/clientes/{id}/desactivar', [ClientesController::class, 'destroy'])->name('clientes.destroy'); 
     Route::put('/clientes/{id}/activar', [ClientesController::class, 'activar'])->name('clientes.activar'); 
-    Route::post('/clientes/{id}/direcciones', [ClientesController::class, 'storeDireccion'])->name('clientes.storeDireccion');
-    Route::delete('/direcciones/{id}', [ClientesController::class, 'destroyDireccion'])->name('clientes.destroyDireccion');
 
     // --- GESTIÓN DE EMPLEADOS ---
     Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados.index');

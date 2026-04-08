@@ -186,17 +186,20 @@
                             <td class="px-6 py-6">
                                 <div class="flex items-center justify-center gap-2">
                                     @if($venta->status != 3)
+                                        
+                                        {{-- ESTE ES EL BOTÓN QUE MOVIMOS: AHORA SIEMPRE ESTÁ VISIBLE (Para estado 0 y 1) --}}
+                                        <a href="/venta/pos?edit={{ $venta->id_venta }}" title="Editar / Añadir Productos" class="hover:scale-110 text-blue-500 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </a>
+
                                         @if($venta->status == 0)
-                                            <a href="/venta/pos?edit={{ $venta->id_venta }}" title="Editar" class="hover:scale-110 text-blue-500 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                            </a>
                                             <button @click="abrirPago({{ $venta->id_venta }}, {{ $venta->total }}, false, '{{ $venta->folio_virtual }}')" title="Cobrar" class="hover:scale-110 text-green-600 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                             </button>
                                         @endif
 
                                         @if($venta->status == 1)
-                                            <button @click="abrirPago({{ $venta->id_venta }}, {{ $venta->total }}, true, '{{ $venta->folio_virtual }}')" title="Pago" class="hover:scale-110 text-amber-600 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
+                                            <button @click="abrirPago({{ $venta->id_venta }}, {{ $venta->total }}, true, '{{ $venta->folio_virtual }}')" title="Ajustar Pago" class="hover:scale-110 text-amber-600 bg-white shadow-sm border border-gray-100 p-2 rounded-xl transition-all">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                                             </button>
                                         @endif

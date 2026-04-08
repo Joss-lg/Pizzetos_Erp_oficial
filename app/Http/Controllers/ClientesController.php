@@ -8,20 +8,39 @@ use Illuminate\Support\Facades\DB;
 class ClientesController extends Controller
 {
     /**
-     * Lista todos los clientes activos y sus direcciones.
+     * Lista todos los clientes activos y sus direcciones (con filtro de búsqueda).
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Traemos todos los clientes
-        $clientes = DB::table('Clientes')->where('status', 1)->get();
+        $buscar = $request->input('buscar');
+
+        // Iniciamos la consulta de clientes activos
+        $query = DB::table('Clientes')->where('status', 1);
+
+        // Si el usuario escribió algo en el buscador, aplicamos el filtro
+        if (!empty($buscar)) {
+            $query->where(function($q) use ($buscar) {
+                $q->where('nombre', 'LIKE', '%' . $buscar . '%')
+                  ->orWhere('telefono', 'LIKE', '%' . $buscar . '%');
+            });
+        }
+
+        // Ejecutamos la consulta
+        $clientes = $query->get();
         
-        // Consultar todas las direcciones activas
-        $direcciones = DB::table('Direcciones')->where('status', 1)->get();
+        // Optimización: Extraemos solo los IDs de los clientes encontrados
+        $clientesIds = $clientes->pluck('id_clie')->toArray();
+
+        // Consultamos solo las direcciones de esos clientes filtrados
+        $direcciones = DB::table('Direcciones')
+            ->where('status', 1)
+            ->whereIn('id_clie', $clientesIds)
+            ->get();
         
         // Agrupar las direcciones por id_clie para que la vista las pueda leer en el modal
         $todasDirecciones = $direcciones->groupBy('id_clie')->toArray();
 
-        return view('Clientes.index', compact('clientes', 'todasDirecciones'));
+        return view('Clientes.index', compact('clientes', 'todasDirecciones', 'buscar'));
     }
 
     /**
