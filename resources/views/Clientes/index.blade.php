@@ -91,9 +91,9 @@
                             @else
                                 <span class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs">Inactivo</span>
                             @endif
-                        </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex justify-end gap-3 items-center">
+                                {{-- BOTÓN GESTIONAR DIRECCIONES CON NUEVO SVG --}}
                                 <button type="button" @click="
                                     clienteId = {{ $clie->id_clie }};
                                     clienteActivo = '{{ addslashes($clie->nombre . ' ' . $clie->apellido) }}';
@@ -101,7 +101,14 @@
                                     formAccionDireccion = '{{ route('clientes.storeDireccion', $clie->id_clie) }}';
                                     mostrarModalDirecciones = true;
                                 " class="text-green-500 hover:text-green-700 transition-colors" title="Gestionar Direcciones">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 512 512"><path d="M96 0C60.7 0 32 28.7 32 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H96zM208 288h64c44.2 0 80 35.8 80 80c0 8.8-7.2 16-16 16H144c-8.8 0-16-7.2-16-16c0-44.2 35.8-80 80-80zm-32-96a64 64 0 1 1 128 0 64 64 0 1 1 -128 0z"/></svg>
+                                    <svg class="w-6 h-6" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                        <g stroke-width="0"></g>
+                                        <g stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g>
+                                            <path stroke="currentColor" stroke-width="12" d="M96 22a51.88 51.88 0 0 0-36.77 15.303A52.368 52.368 0 0 0 44 74.246c0 16.596 4.296 28.669 20.811 48.898a163.733 163.733 0 0 1 20.053 28.38C90.852 163.721 90.146 172 96 172c5.854 0 5.148-8.279 11.136-20.476a163.723 163.723 0 0 1 20.053-28.38C143.704 102.915 148 90.841 148 74.246a52.37 52.37 0 0 0-15.23-36.943A51.88 51.88 0 0 0 96 22Z"></path>
+                                            <circle cx="96" cy="74" r="20" stroke="currentColor" stroke-width="12"></circle>
+                                        </g>
+                                    </svg>
                                 </button>
 
                                 <a href="{{ route('clientes.edit', $clie->id_clie) }}" class="text-blue-500 hover:text-blue-700 transition-colors" title="Editar Cliente">
