@@ -94,6 +94,14 @@
                     <span x-show="sidebarExpanded || isMobile" class="text-sm font-bold uppercase italic tracking-tighter whitespace-nowrap">Repartidor</span>
                 </a>
 
+                {{-- NUEVO BOTÓN: PEDIDOS ESPECIALES --}}
+                <a href="{{ route('especiales.index') }}" @click="if(isMobile) sidebarOpen = false" class="flex items-center px-4 py-3 rounded-xl transition-all {{ request()->routeIs('especiales.*') ? 'bg-black text-amber-400 shadow-xl' : 'hover:bg-black/5 font-bold' }}" :class="(sidebarExpanded || isMobile) ? 'gap-3 justify-start' : 'justify-center'">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span x-show="sidebarExpanded || isMobile" class="text-sm font-bold uppercase italic tracking-tighter whitespace-nowrap">Especiales</span>
+                </a>
+
                 <a href="{{ route('flujo.caja.index') }}" @click="if(isMobile) sidebarOpen = false" class="flex items-center px-4 py-3 rounded-xl transition-all {{ request()->routeIs('flujo.caja.*') ? 'bg-black text-amber-400 shadow-xl' : 'hover:bg-black/5 font-bold' }}" :class="(sidebarExpanded || isMobile) ? 'gap-3 justify-start' : 'justify-center'">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <span x-show="sidebarExpanded || isMobile" class="text-sm font-bold uppercase italic tracking-tighter whitespace-nowrap">Flujo Caja</span>

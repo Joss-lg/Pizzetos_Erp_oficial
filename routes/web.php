@@ -27,13 +27,14 @@ use App\Http\Controllers\GastosController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\PuntoVentaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PedidosEspecialesController; // <--- NUEVO CONTROLADOR IMPORTADO
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 /*
-|--------------------------------
+|--------------------------------------------------------------------------
 | Web Routes - Sistema Pizzetos 
-|--------------------------------
+|--------------------------------------------------------------------------
 */
 
 // Redirección inicial
@@ -62,20 +63,24 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/venta/resume', [VentasController::class, 'resume'])->name('ventas.resume');
     Route::post('/venta/pagar', [PuntoVentaController::class, 'pagarOrden'])->name('ventas.pagar');
 
+    // --- MÓDULO PEDIDOS ESPECIALES ---
+    Route::get('/pedidos-especiales', [PedidosEspecialesController::class, 'index'])->name('especiales.index');
+    Route::post('/venta/pos/especial', [PedidosEspecialesController::class, 'store'])->name('especiales.store');
+    Route::put('/pedidos-especiales/{id}/entregar', [PedidosEspecialesController::class, 'marcarEntregado'])->name('especiales.entregar');
+    Route::post('/pedidos-especiales/{id}/abono', [PedidosEspecialesController::class, 'agregarAbono'])->name('especiales.abono'); // <--- NUEVA RUTA PARA ABONOS
+
     // --- MONITOR DE PEDIDOS / REPARTIDOR ---
     Route::get('/venta/pedidos', [PedidosController::class, 'index'])->name('ventas.pedidos');
     Route::put('/venta/pedidos/{id}/status', [PedidosController::class, 'cambiarStatus'])->name('ventas.pedidos.status');
 
     // --- FLUJO DE CAJA ---
     Route::get('/venta/flujo-caja', [FlujoCajaController::class, 'index'])->name('flujo.caja.index');
-    // 👇 RUTA MOVIDA: Ahora los cajeros tienen acceso al historial de cajas
     Route::get('/venta/flujo-caja/historial', [FlujoCajaController::class, 'historial'])->name('flujo.caja.historial');
     Route::post('/venta/flujo-caja/abrir', [FlujoCajaController::class, 'abrirCaja'])->name('flujo.caja.abrir');
     Route::post('/venta/flujo-caja/cerrar/{id}', [FlujoCajaController::class, 'cerrarCaja'])->name('flujo.caja.cerrar');
     Route::get('/venta/flujo-caja/pdf/{id}', [FlujoCajaController::class, 'descargarPdf'])->name('flujo.caja.pdf');
 
     // --- CLIENTES (Consulta, Registro, Edición y Direcciones) ---
-    // 👇 Estas rutas se movieron aquí para que los cajeros puedan gestionar información básica y direcciones
     Route::get('/clientes', [ClientesController::class, 'index'])->name('clientes.index');
     Route::get('/clientes/crear', [ClientesController::class, 'create'])->name('clientes.create');
     Route::post('/clientes', [ClientesController::class, 'store'])->name('clientes.store');
@@ -84,7 +89,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/clientes/{id}/direcciones', [ClientesController::class, 'storeDireccion'])->name('clientes.storeDireccion');
     Route::delete('/direcciones/{id}', [ClientesController::class, 'destroyDireccion'])->name('clientes.destroyDireccion');
 
-    // --- GASTOS (Visible para Cajeros y Admin) ---
+    // --- GASTOS ---
     Route::get('/venta/gastos', [GastosController::class, 'index'])->name('gastos.index');
     Route::post('/venta/gastos', [GastosController::class, 'store'])->name('gastos.store');
     Route::delete('/venta/gastos/{id}', [GastosController::class, 'destroy'])->name('gastos.destroy');
@@ -97,15 +102,13 @@ Route::middleware(['auth'])->group(function () {
 // =====================================================================
 Route::middleware(['auth', 'admin'])->group(function () {
 
-    // DASHBOARD CONECTADO AL CONTROLADOR (Movido a la sección de Admin)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- SEGURIDAD FINANCIERA ---
     Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');
     Route::post('/venta/editar-pago', [PuntoVentaController::class, 'editarPago'])->name('ventas.editar_pago');
 
-    // --- GESTIÓN AVANZADA DE CLIENTES (Solo Admin) ---
-    // 👇 Únicamente el borrado lógico y reactivación se quedan para uso exclusivo del Administrador
+    // --- GESTIÓN AVANZADA DE CLIENTES ---
     Route::put('/clientes/{id}/desactivar', [ClientesController::class, 'destroy'])->name('clientes.destroy'); 
     Route::put('/clientes/{id}/activar', [ClientesController::class, 'activar'])->name('clientes.activar'); 
 
@@ -121,7 +124,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // --- REPORTES Y CORTES CRÍTICOS ---
     Route::get('/corte-mensual', [CorteController::class, 'index'])->name('corte.index');
     Route::get('/corte-mensual/dia/{fecha}', [CorteController::class, 'getDetalleDia'])->name('corte.dia');
-    // 👆 Se eliminó el historial de cajas de aquí para que no choque
 
     // --- CATÁLOGO DE PRODUCTOS ---
     Route::prefix('productos')->group(function () {

@@ -59,13 +59,28 @@ class PuntoVentaController extends Controller
         $cart_preloaded = [];
         $pagos_edit = [];
         $domicilio_edit = null;
+        $pespecial_edit = null;
 
-        if ($request->has('edit')) {
-            $venta_edit = DB::table('Venta')->where('id_venta', $request->edit)->first();
+        if ($request->has('edit') || $request->has('id_venta')) {
+            $id_busqueda = $request->edit ?? $request->id_venta;
+            $venta_edit = DB::table('Venta')->where('id_venta', $id_busqueda)->first();
+            
             if($venta_edit) {
                 $pagos_edit = DB::table('Pago')->where('id_venta', $venta_edit->id_venta)->get();
+                
                 if ($venta_edit->tipo_servicio == 3) {
                     $domicilio_edit = DB::table('PDomicilio')->where('id_venta', $venta_edit->id_venta)->first();
+                }
+
+                if ($venta_edit->tipo_servicio == 4) {
+                    $pespecial_edit = DB::table('PEspeciales')->where('id_venta', $venta_edit->id_venta)->first();
+                    if ($pespecial_edit && $pespecial_edit->id_clie) {
+                        $domicilio_edit = (object)[
+                            'id_venta' => $venta_edit->id_venta,
+                            'id_clie' => $pespecial_edit->id_clie,
+                            'id_dir' => $pespecial_edit->id_dir
+                        ];
+                    }
                 }
 
                 $detalles_edit = DB::table('DetalleVenta')->where('id_venta', $venta_edit->id_venta)->get();
@@ -129,7 +144,8 @@ class PuntoVentaController extends Controller
             'categorias_extras' => $categorias_extras, 'clientes' => $clientes, 'direcciones' => $direcciones,
             'magno_precio' => $magno_precio, 'precios_orilla' => $this->getPreciosOrilla(),
             'venta_edit' => $venta_edit, 'cart_preloaded' => $cart_preloaded,
-            'pagos_edit' => $pagos_edit, 'domicilio_edit' => $domicilio_edit
+            'pagos_edit' => $pagos_edit, 'domicilio_edit' => $domicilio_edit,
+            'pespecial_edit' => $pespecial_edit
         ]);
     }
 

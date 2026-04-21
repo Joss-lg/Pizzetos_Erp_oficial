@@ -271,6 +271,8 @@
                                 <svg x-show="servicio === 3" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                                 <svg x-show="servicio === 1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <svg x-show="servicio === 2" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                {{-- ÍCONO PARA PEDIDO ESPECIAL --}}
+                                <svg x-show="servicio === 4" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 <span x-text="nomServicio()"></span>
                             </div>
                             <svg class="w-3.5 h-3.5 transition-transform" :class="openServicio ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
@@ -285,17 +287,20 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Comer Aqui
                             </button>
-                            <button @click="servicio = 2; openServicio = false" class="w-full text-left px-5 py-3 text-[14px] flex items-center gap-3 transition-colors" :class="servicio === 2 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
+                            <button @click="servicio = 2; openServicio = false" class="w-full text-left px-5 py-3 text-[14px] flex items-center gap-3 transition-colors border-b border-gray-100" :class="servicio === 2 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                 Para Llevar
                             </button>
+                            <button @click="servicio = 4; openServicio = false" class="w-full text-left px-5 py-3 text-[14px] flex items-center gap-3 transition-colors" :class="servicio === 4 ? 'text-[#17a2b8] font-black bg-cyan-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                Pedido Especial
+                            </button>
                         </div>
 
-                        <button @click="procesarOrden()" :disabled="cart.length === 0" :class="cart.length === 0 ? 'bg-[#fd7e14]/60 text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white'" class="flex-1 font-black text-[15px] rounded-r-[6px] transition-colors shadow-sm">
-                            <span x-text="id_venta_edit ? 'Guardar Cambios' : 'Enviar Orden'"></span>
+                        <button @click="procesarOrden()" :disabled="cart.length === 0" :class="cart.length === 0 ? 'bg-[#fd7e14]/60 text-white cursor-not-allowed' : (servicio === 4 ? 'bg-[#17a2b8] hover:bg-[#138496] text-white' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white')" class="flex-1 font-black text-[15px] rounded-r-[6px] transition-colors shadow-sm">
+                            <span x-text="id_venta_edit ? 'Guardar Cambios' : (servicio === 4 ? 'Programar Especial' : 'Enviar Orden')"></span>
                         </button>
                     </div>
-                </div>
             </div>
         </div>
 
@@ -611,7 +616,7 @@
             </div>
         </div>
 
-        {{-- MODAL PAQUETE 1 (SE DEJA INTACTO) --}}
+        {{-- MODAL PAQUETE 1 --}}
         <div x-show="modalPaq1" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq1 = false">
                 <div class="p-6 pb-4 relative border-b border-gray-100 bg-[#ffc107]">
@@ -680,7 +685,7 @@
             </div>
         </div>
 
-        {{-- MODAL PAQUETE 2 CON INGREDIENTES --}}
+        {{-- MODAL PAQUETE 2 --}}
         <div x-show="modalPaq2" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq2 = false">
                 <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]"><h2 class="text-2xl font-black text-black mb-1">Paquete 2</h2><button @click="modalPaq2 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button></div>
@@ -771,7 +776,7 @@
             </div>
         </div>
 
-        {{-- MODAL PAQUETE 3 CON INGREDIENTES --}}
+        {{-- MODAL PAQUETE 3 --}}
         <div x-show="modalPaq3" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq3 = false">
                 <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]">
@@ -968,265 +973,291 @@
         </div>
     </div>
 
-        <div x-show="modalCliente" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[900px] max-w-[95vw] flex flex-col max-h-[95vh] overflow-hidden">
-                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
-                    <h2 class="text-3xl font-black text-gray-800 flex items-center gap-3">
-                        <svg class="w-8 h-8 text-[#fd7e14]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
-                        Dirección de Entrega
-                    </h2>
-                    <button @click="modalCliente = false" class="text-gray-400 hover:text-black font-bold text-4xl leading-none">&times;</button>
-                </div>
-                
-                <div class="flex-1 overflow-y-auto p-8 lg:p-10 bg-white space-y-8">
-                    <div class="relative">
-                        <div class="flex justify-between items-end mb-3">
-                            <label class="block text-[18px] font-bold text-gray-700">Seleccionar Cliente *</label>
-                            <button x-show="!clienteFormVisible && !clienteSeleccionado" @click="toggleFormNuevoCliente()" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-black px-6 py-2.5 rounded-[8px] text-[16px] flex items-center gap-2 shadow-sm whitespace-nowrap transition-colors">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
-                                Nuevo Cliente
-                            </button>
+    <div x-show="modalCliente" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-[900px] max-w-[95vw] flex flex-col max-h-[95vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+                <h2 class="text-3xl font-black text-gray-800 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-[#fd7e14]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                    <span x-text="soloClienteMode ? 'Buscar Cliente' : 'Dirección de Entrega'"></span>
+                </h2>
+                <button @click="modalCliente = false; if(servicio === 4) modalEspecial = true;" class="text-gray-400 hover:text-black font-bold text-4xl leading-none">&times;</button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-8 lg:p-10 bg-white space-y-8">
+                <div class="relative">
+                    <div class="flex justify-between items-end mb-3">
+                        <label class="block text-[18px] font-bold text-gray-700">Seleccionar Cliente *</label>
+                        <button x-show="!clienteFormVisible && !clienteSeleccionado" @click="toggleFormNuevoCliente()" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-black px-6 py-2.5 rounded-[8px] text-[16px] flex items-center gap-2 shadow-sm whitespace-nowrap transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
+                            Nuevo Cliente
+                        </button>
+                    </div>
+
+                    <div x-show="!clienteSeleccionado && !clienteFormVisible" class="space-y-3">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </span>
+                            <input type="text" 
+                                   x-model="searchClienteText" 
+                                   placeholder="Escribe el nombre o teléfono del cliente..." 
+                                   autocomplete="off"
+                                   class="w-full border-2 border-gray-300 rounded-[8px] py-4 pl-12 pr-5 text-[20px] font-medium focus:border-[#fd7e14] focus:ring-4 focus:ring-orange-100 focus:outline-none transition-all">
                         </div>
-
-                        <div x-show="!clienteSeleccionado && !clienteFormVisible" class="space-y-3">
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </span>
-                                <input type="text" 
-                                       x-model="searchClienteText" 
-                                       placeholder="Escribe el nombre o teléfono del cliente..." 
-                                       autocomplete="off"
-                                       class="w-full border-2 border-gray-300 rounded-[8px] py-4 pl-12 pr-5 text-[20px] font-medium focus:border-[#fd7e14] focus:ring-4 focus:ring-orange-100 focus:outline-none transition-all">
-                            </div>
-                            
-                            <div class="bg-white border border-gray-200 rounded-[8px] shadow-inner max-h-[300px] overflow-y-auto">
-                                <template x-if="getClientesFiltrados().length === 0">
-                                    <div class="px-5 py-8 text-[16px] text-gray-500 italic text-center bg-gray-50">
-                                        No se encontraron clientes en la base de datos.<br><span class="font-bold">Haz clic en "Nuevo Cliente" para registrarlo.</span>
-                                    </div>
-                                </template>
-
-                                <template x-for="cl in getClientesFiltrados()" :key="cl.id_cliente || cl.id_clie || Math.random()">
-                                    <div @click="seleccionarCliente(cl)" class="px-6 py-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 flex justify-between items-center transition-colors">
-                                        <span class="font-bold text-[18px] text-gray-800" x-text="getClienteNombre(cl)"></span>
-                                        <span class="text-[15px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md shadow-sm" x-text="getClienteTelefono(cl)"></span>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-
-                        <div x-show="clienteSeleccionado && !clienteFormVisible" class="bg-green-50 border border-green-200 p-6 rounded-[8px] flex justify-between items-center transition-all">
-                            <div>
-                                <span class="text-[13px] font-bold text-green-600 uppercase tracking-wider mb-1 block">Cliente Seleccionado</span>
-                                <span class="font-black text-[24px] text-green-800 block leading-none" x-text="getClienteNombre(clienteSeleccionado)"></span>
-                                <span class="text-[18px] text-green-700 font-bold block mt-2" x-text="'Tel: ' + getClienteTelefono(clienteSeleccionado)"></span>
-                            </div>
-                            <button @click="clienteSeleccionado = null; direccionesCliente = []; dirSeleccionada = null; searchClienteText='';" class="text-red-600 bg-red-100 px-6 py-3 rounded-lg font-bold hover:bg-red-200 transition-colors text-[16px]">Cambiar Cliente</button>
-                        </div>
-
-                        <div x-show="clienteFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4">
-                            <div class="flex justify-between items-center border-b border-gray-200 pb-3">
-                                <h4 class="font-black text-[18px] text-gray-800">Registrar Nuevo Cliente</h4>
-                                <button @click="toggleFormNuevoCliente()" class="text-gray-500 hover:text-red-500 font-bold text-[15px] bg-white border border-gray-300 px-3 py-1.5 rounded">Cancelar</button>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Nombre *</label>
-                                    <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                        
+                        <div class="bg-white border border-gray-200 rounded-[8px] shadow-inner max-h-[300px] overflow-y-auto">
+                            <template x-if="getClientesFiltrados().length === 0">
+                                <div class="px-5 py-8 text-[16px] text-gray-500 italic text-center bg-gray-50">
+                                    No se encontraron clientes en la base de datos.<br><span class="font-bold">Haz clic en "Nuevo Cliente" para registrarlo.</span>
                                 </div>
-                                <div class="flex-1">
-                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Apellido</label>
-                                    <input type="text" x-model="nuevoClienteData.apellido" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                            </template>
+
+                            <template x-for="cl in getClientesFiltrados()" :key="cl.id_cliente || cl.id_clie || Math.random()">
+                                <div @click="seleccionarCliente(cl)" class="px-6 py-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 flex justify-between items-center transition-colors">
+                                    <span class="font-bold text-[18px] text-gray-800" x-text="getClienteNombre(cl)"></span>
+                                    <span class="text-[15px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md shadow-sm" x-text="getClienteTelefono(cl)"></span>
                                 </div>
-                            </div>
-                            <div>
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Teléfono *</label>
-                                <input type="text" x-model="nuevoClienteData.telefono" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
-                            </div>
+                            </template>
                         </div>
                     </div>
 
-                    <div x-show="clienteSeleccionado || clienteFormVisible" class="pt-6 border-t border-gray-200 transition-all">
-                        <div class="flex justify-between items-center mb-4">
-                            <label class="block text-[16px] font-bold text-gray-700">Dirección de Entrega *</label>
-                            <button @click="dirFormVisible = !dirFormVisible; dirSeleccionada = null" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-bold px-5 py-2.5 rounded-[6px] text-[15px] flex items-center gap-1 shadow-sm transition-colors">
-                                + Nueva Dirección
-                            </button>
+                    <div x-show="clienteSeleccionado && !clienteFormVisible" class="bg-green-50 border border-green-200 p-6 rounded-[8px] flex justify-between items-center transition-all">
+                        <div>
+                            <span class="text-[13px] font-bold text-green-600 uppercase tracking-wider mb-1 block">Cliente Seleccionado</span>
+                            <span class="font-black text-[24px] text-green-800 block leading-none" x-text="getClienteNombre(clienteSeleccionado)"></span>
+                            <span class="text-[18px] text-green-700 font-bold block mt-2" x-text="'Tel: ' + getClienteTelefono(clienteSeleccionado)"></span>
                         </div>
+                        <button @click="clienteSeleccionado = null; direccionesCliente = []; dirSeleccionada = null; searchClienteText='';" class="text-red-600 bg-red-100 px-6 py-3 rounded-lg font-bold hover:bg-red-200 transition-colors text-[16px]">Cambiar Cliente</button>
+                    </div>
 
-                        <div x-show="!dirFormVisible && direccionesCliente.length > 0" class="space-y-3 max-h-60 overflow-y-auto pr-1">
-                            <template x-for="dir in direccionesCliente" :key="dir.id_direccion || dir.id_dir || Math.random()">
-                                <label class="block cursor-pointer">
-                                    <div class="border rounded-[8px] p-5 transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'border-2 border-[#fd7e14] bg-orange-50 shadow-md' : 'border-gray-200 hover:bg-gray-50'">
-                                        <div class="flex items-start gap-4">
-                                            <input type="radio" :value="dir.id_direccion || dir.id_dir" x-model="dirSeleccionada" class="mt-1 text-[#fd7e14] focus:ring-[#fd7e14] w-6 h-6">
-                                            <div class="text-[15px] text-gray-700 leading-snug">
-                                                <span class="font-black block text-[18px] text-black mb-1.5" x-text="dir.calle || dir.Calle || 'Sin calle'"></span>
-                                                <span class="block text-gray-600 mb-1" x-text="'Manzana: ' + (dir.manzana||dir.Manzana||'-') + ' | Lote: ' + (dir.lote||dir.Lote||'-')"></span>
-                                                <span class="block text-gray-600 font-medium" x-text="'Colonia: ' + (dir.colonia||dir.Colonia||'-')"></span>
-                                                <span class="block text-gray-500 italic mt-2 bg-white px-3 py-1.5 border border-gray-200 rounded" x-show="dir.referencia || dir.Referencia" x-text="'Referencia: ' + (dir.referencia || dir.Referencia)"></span>
-                                            </div>
+                    <div x-show="clienteFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4">
+                        <div class="flex justify-between items-center border-b border-gray-200 pb-3">
+                            <h4 class="font-black text-[18px] text-gray-800">Registrar Nuevo Cliente</h4>
+                            <button @click="toggleFormNuevoCliente()" class="text-gray-500 hover:text-red-500 font-bold text-[15px] bg-white border border-gray-300 px-3 py-1.5 rounded">Cancelar</button>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Nombre *</label>
+                                <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Apellido</label>
+                                <input type="text" x-model="nuevoClienteData.apellido" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[15px] font-bold text-gray-600 mb-2">Teléfono *</label>
+                            <input type="text" x-model="nuevoClienteData.telefono" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="(clienteSeleccionado || clienteFormVisible) && !soloClienteMode" class="pt-6 border-t border-gray-200 transition-all">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="block text-[16px] font-bold text-gray-700">Dirección de Entrega (Opcional si es a recoger) *</label>
+                        <button @click="dirFormVisible = !dirFormVisible; dirSeleccionada = null" class="bg-[#ffc107] hover:bg-[#e0a800] text-black font-bold px-5 py-2.5 rounded-[6px] text-[15px] flex items-center gap-1 shadow-sm transition-colors">
+                            + Nueva Dirección
+                        </button>
+                    </div>
+
+                    <div x-show="!dirFormVisible && direccionesCliente.length > 0" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                        <template x-for="dir in direccionesCliente" :key="dir.id_direccion || dir.id_dir || Math.random()">
+                            <label class="block cursor-pointer">
+                                <div class="border rounded-[8px] p-5 transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'border-2 border-[#fd7e14] bg-orange-50 shadow-md' : 'border-gray-200 hover:bg-gray-50'">
+                                    <div class="flex items-start gap-4">
+                                        <input type="radio" :value="dir.id_direccion || dir.id_dir" x-model="dirSeleccionada" class="mt-1 text-[#fd7e14] focus:ring-[#fd7e14] w-6 h-6">
+                                        <div class="text-[15px] text-gray-700 leading-snug">
+                                            <span class="font-black block text-[18px] text-black mb-1.5" x-text="dir.calle || dir.Calle || 'Sin calle'"></span>
+                                            <span class="block text-gray-600 mb-1" x-text="'Manzana: ' + (dir.manzana||dir.Manzana||'-') + ' | Lote: ' + (dir.lote||dir.Lote||'-')"></span>
+                                            <span class="block text-gray-600 font-medium" x-text="'Colonia: ' + (dir.colonia||dir.Colonia||'-')"></span>
+                                            <span class="block text-gray-500 italic mt-2 bg-white px-3 py-1.5 border border-gray-200 rounded" x-show="dir.referencia || dir.Referencia" x-text="'Referencia: ' + (dir.referencia || dir.Referencia)"></span>
                                         </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </template>
+                    </div>
+                    <div x-show="!dirFormVisible && direccionesCliente.length === 0 && !clienteFormVisible" class="text-center p-8 border-2 border-dashed border-gray-300 rounded-[8px] text-[16px] text-gray-500 font-medium bg-gray-50">
+                        Este cliente no tiene direcciones guardadas.<br>Haz clic en "+ Nueva Dirección".
+                    </div>
+
+                    <div x-show="dirFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4 mt-3">
+                        <h4 class="font-black text-[18px] text-gray-800 border-b border-gray-200 pb-3">Registrar Nueva Dirección</h4>
+                        <div>
+                            <label class="block text-[15px] font-bold text-gray-600 mb-2">Calle *</label>
+                            <input type="text" x-model="nuevaDirData.calle" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Manzana</label>
+                                <input type="text" x-model="nuevaDirData.manzana" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Lote</label>
+                                <input type="text" x-model="nuevaDirData.lote" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[15px] font-bold text-gray-600 mb-2">Colonia</label>
+                            <input type="text" x-model="nuevaDirData.colonia" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[15px] font-bold text-gray-600 mb-2">Referencia</label>
+                            <textarea x-model="nuevaDirData.referencia" rows="2" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="p-6 flex gap-4 bg-gray-50 border-t border-gray-200 shrink-0">
+                <button @click="modalCliente = false; if(servicio === 4) modalEspecial = true;" class="flex-1 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold py-4 rounded-[8px] text-[18px] transition-colors">Cancelar / Volver</button>
+                <button x-show="!soloClienteMode" @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Dirección</button>
+                <button x-show="soloClienteMode" @click="confirmarSoloCliente()" :disabled="!esClienteValido()" :class="!esClienteValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#17a2b8] hover:bg-[#138496] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Cliente</button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="modalEspecial" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-[35px] shadow-2xl w-[500px] max-w-full flex flex-col overflow-hidden" @click.away="modalEspecial = false">
+            
+            <div class="bg-[#17a2b8] p-6 flex justify-between items-center text-white relative">
+                <h2 class="text-xl font-black italic uppercase tracking-tighter">Programar Pedido Especial</h2>
+                <button @click="modalEspecial = false" class="hover:rotate-90 transition-transform font-black text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div class="p-8 space-y-5 overflow-y-auto max-h-[70vh] custom-scroll bg-white">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 italic">Fecha de Entrega *</label>
+                        <input type="date" x-model="espData.fecha" class="w-full border-2 border-slate-100 rounded-xl py-3 px-4 font-bold focus:border-[#17a2b8] outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 italic">Hora de Entrega *</label>
+                        <input type="time" x-model="espData.hora" class="w-full border-2 border-slate-100 rounded-xl py-3 px-4 font-bold focus:border-[#17a2b8] outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 italic">Información del Cliente *</label>
+                    
+                    <div x-show="clienteSeleccionado || clienteFormVisible" class="bg-green-50 border border-green-200 p-3 rounded-xl flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] font-black text-green-600 uppercase block mb-0.5">Cliente en Base de Datos</span>
+                            <span class="font-black text-green-800 block text-sm" x-text="clienteSeleccionado ? getClienteNombre(clienteSeleccionado) : nuevoClienteData.nombre"></span>
+                        </div>
+                        <button @click="modalEspecial = false; abrirModalCliente(true);" class="text-[10px] font-bold text-green-700 underline uppercase px-2 py-1">Cambiar</button>
+                    </div>
+                    
+                    <div x-show="!clienteSeleccionado && !clienteFormVisible" class="flex items-center gap-2">
+                        <input type="text" x-model="espData.nombre" placeholder="Nombre (Paso rápido)" class="flex-1 border-2 border-slate-200 rounded-xl py-3 px-4 font-bold text-sm focus:border-[#17a2b8] outline-none transition-all">
+                        <span class="text-sm font-bold text-slate-400 italic">Ó</span>
+                        <button @click="modalEspecial = false; abrirModalCliente(true);" class="bg-[#17a2b8] hover:bg-[#138496] text-white px-4 py-3 rounded-xl font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-sm whitespace-nowrap transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            Buscar / Reg.
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 italic">Método de Entrega *</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button @click="espData.modo = 'recoger'" :class="espData.modo === 'recoger' ? 'bg-[#17a2b8] text-white shadow-inner' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'" class="py-3 rounded-xl font-black uppercase text-[11px] italic transition-all">Recoger en Tienda</button>
+                        <button @click="espData.modo = 'domicilio';" :class="espData.modo === 'domicilio' ? 'bg-[#17a2b8] text-white shadow-inner' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'" class="py-3 rounded-xl font-black uppercase text-[11px] italic transition-all">A Domicilio</button>
+                    </div>
+                </div>
+
+                <div x-show="espData.modo === 'domicilio'" x-transition class="mt-3 bg-cyan-50 border-2 border-dashed border-cyan-200 p-4 rounded-xl">
+                    <label class="block text-[10px] font-black text-cyan-600 uppercase mb-2 italic">Domicilio de Entrega *</label>
+
+                    <div x-show="!clienteSeleccionado && !clienteFormVisible" class="text-[11px] text-red-500 font-bold bg-white p-2 rounded border border-red-200">
+                        ⚠️ Para enviar a domicilio, debes usar el botón "Buscar / Reg." arriba para asignar un cliente.
+                    </div>
+
+                    <div x-show="clienteSeleccionado || clienteFormVisible" class="space-y-3">
+                        <div x-show="direccionesCliente.length > 0 && !dirFormVisible" class="space-y-2 max-h-32 overflow-y-auto custom-scroll pr-1">
+                            <template x-for="dir in direccionesCliente" :key="dir.id_direccion || dir.id_dir">
+                                <label class="flex items-start gap-2 p-2 bg-white rounded-lg border cursor-pointer transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'border-[#17a2b8] shadow-sm' : 'border-cyan-100 hover:border-[#17a2b8]'">
+                                    <input type="radio" :value="dir.id_direccion || dir.id_dir" x-model="dirSeleccionada" class="mt-1 text-[#17a2b8] focus:ring-[#17a2b8]">
+                                    <div class="text-[11px] leading-tight text-gray-700">
+                                        <span class="font-bold block text-black" x-text="dir.calle || dir.Calle"></span>
+                                        <span x-text="'Col: ' + (dir.colonia || dir.Colonia || '-')"></span>
                                     </div>
                                 </label>
                             </template>
                         </div>
-                        <div x-show="!dirFormVisible && direccionesCliente.length === 0 && !clienteFormVisible" class="text-center p-8 border-2 border-dashed border-gray-300 rounded-[8px] text-[16px] text-gray-500 font-medium bg-gray-50">
-                            Este cliente no tiene direcciones guardadas.<br>Haz clic en "+ Nueva Dirección".
+                        
+                        <div x-show="direccionesCliente.length === 0 && !dirFormVisible" class="text-[11px] text-slate-500 font-bold text-center bg-white p-2 rounded">
+                            El cliente no tiene direcciones guardadas.
                         </div>
 
-                        <div x-show="dirFormVisible" class="bg-gray-50 p-6 rounded-[8px] border border-gray-200 space-y-4 mt-3">
-                            <h4 class="font-black text-[18px] text-gray-800 border-b border-gray-200 pb-3">Registrar Nueva Dirección</h4>
-                            <div>
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Calle *</label>
-                                <input type="text" x-model="nuevaDirData.calle" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Manzana</label>
-                                    <input type="text" x-model="nuevaDirData.manzana" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
-                                </div>
-                                <div class="flex-1">
-                                    <label class="block text-[15px] font-bold text-gray-600 mb-2">Lote</label>
-                                    <input type="text" x-model="nuevaDirData.lote" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Colonia</label>
-                                <input type="text" x-model="nuevaDirData.colonia" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Referencia</label>
-                                <textarea x-model="nuevaDirData.referencia" rows="2" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none resize-none"></textarea>
-                            </div>
-                        </div>
+                        <button x-show="!dirFormVisible" @click="dirFormVisible = true; dirSeleccionada = null" type="button" class="w-full bg-white border border-[#17a2b8] text-[#17a2b8] font-bold py-2 rounded-lg text-[11px] uppercase transition-colors hover:bg-cyan-50">
+                            + Agregar Nuevo Domicilio
+                        </button>
 
-                    </div>
-                </div>
-
-                <div class="p-6 flex gap-4 bg-gray-50 border-t border-gray-200 shrink-0">
-                    <button @click="modalCliente = false" class="flex-1 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold py-4 rounded-[8px] text-[18px] transition-colors">Cancelar</button>
-                    <button @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Dirección</button>
-                </div>
-            </div>
-        </div>
-
-       {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
-<div x-show="modalPago" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-[35px] shadow-2xl w-[500px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
-        
-        <div class="bg-[#ffc107] p-5 flex justify-between items-center text-black relative">
-            <h2 class="text-xl font-black italic uppercase" x-text="'Cobro - ' + nomServicio()"></h2>
-            <button @click="modalPago = false" class="hover:rotate-90 transition-transform font-black text-2xl leading-none">&times;</button>
-        </div>
-        
-        <div class="p-8 text-center border-b border-gray-100 bg-white">
-            {{-- BOTONES DE DESCUENTO --}}
-            <div class="grid grid-cols-3 gap-2 mb-4">
-                <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Sin Desc.</button>
-                <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 40%</button>
-                <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-700'" class="py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-colors shadow-sm">Desc. 100%</button>
-            </div>
-
-            <div class="text-[12px] font-black text-slate-400 uppercase italic tracking-widest mb-1">Total del Pedido</div>
-            <div class="font-black text-[#1a202c] text-[45px] leading-none tracking-tighter" x-text="'$' + getGranTotal().toFixed(2)"></div>
-            
-            <div x-show="cortesia > 0" class="text-sm font-bold text-amber-600 mt-1" x-cloak>
-                Subtotal Original: <span class="line-through" x-text="'$' + getTotal().toFixed(2)"></span> (-<span x-text="cortesia"></span>%)
-            </div>
-
-            {{-- Badge Dinámico de Estado --}}
-            <div class="mt-4 text-[14px] font-black uppercase tracking-wider p-2.5 rounded-full inline-block px-6" 
-                 :class="faltaPagar() === 0 ? 'bg-green-100 text-green-700' : (faltaPagar() < 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600')" 
-                 x-text="faltaPagar() === 0 ? 'Monto completo cubierto' : (faltaPagar() < 0 ? 'Cambio: $' + Math.abs(faltaPagar()).toFixed(2) : 'Faltan: $' + faltaPagar().toFixed(2))">
-            </div>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-5 bg-[#f8f9fa] space-y-4" x-show="cortesia !== 100">
-            
-            <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.efectivo.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
-                <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
-                    <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                    <span class="font-black text-[18px] text-[#212529] italic uppercase">Efectivo</span>
-                </label>
-                
-                <div x-show="pagos.efectivo.activo" class="px-5 pb-5 pt-1 space-y-4" x-transition>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 italic">Monto a abonar</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                                <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.monto" 
-                                    class="w-full pl-7 pr-4 py-3 border-2 border-slate-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14]">
+                        <div x-show="dirFormVisible" class="bg-white p-3 rounded-lg border border-cyan-200 space-y-2">
+                            <input type="text" x-model="nuevaDirData.calle" placeholder="Calle *" class="w-full border border-gray-300 rounded py-1.5 px-2 text-[11px] focus:border-[#17a2b8] outline-none">
+                            <div class="flex gap-2">
+                                <input type="text" x-model="nuevaDirData.manzana" placeholder="Manzana" class="w-1/2 border border-gray-300 rounded py-1.5 px-2 text-[11px] focus:border-[#17a2b8] outline-none">
+                                <input type="text" x-model="nuevaDirData.lote" placeholder="Lote" class="w-1/2 border border-gray-300 rounded py-1.5 px-2 text-[11px] focus:border-[#17a2b8] outline-none">
                             </div>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-green-600 uppercase mb-1 italic text-right">Recibido (Paga con)</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 font-bold">$</span>
-                                <input type="number" step="0.01" min="0" x-model.number="pagos.efectivo.entregado" placeholder="0.00"
-                                    class="w-full pl-7 pr-4 py-3 border-2 border-green-100 bg-green-50 rounded-xl text-lg font-black text-green-700 focus:outline-none focus:border-green-400">
-                            </div>
+                            <input type="text" x-model="nuevaDirData.colonia" placeholder="Colonia" class="w-full border border-gray-300 rounded py-1.5 px-2 text-[11px] focus:border-[#17a2b8] outline-none">
+                            <input type="text" x-model="nuevaDirData.referencia" placeholder="Referencia" class="w-full border border-gray-300 rounded py-1.5 px-2 text-[11px] focus:border-[#17a2b8] outline-none">
+                            
+                            <button @click="dirFormVisible = false" type="button" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-1.5 rounded text-[10px] uppercase transition-colors">Cancelar Nueva Dirección</button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.tarjeta.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
-                <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
-                    <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                    <span class="font-black text-[18px] text-[#212529] italic uppercase">Tarjeta</span>
-                </label>
-                <div x-show="pagos.tarjeta.activo" class="p-5 border-t border-gray-100" x-transition>
-                    <div class="flex justify-between items-end mb-1">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase italic">Monto Tarjeta</label>
-                        <button type="button" @click="pagos.tarjeta.monto = (parseFloat(pagos.tarjeta.monto) || 0) + faltaPagar()" x-show="faltaPagar() > 0" class="text-[#fd7e14] text-[10px] font-black hover:underline uppercase bg-orange-50 px-2 py-0.5 rounded">Cobrar resto</button>
+                <div class="pt-4 border-t border-slate-100">
+                    <div class="flex justify-between items-end mb-4">
+                        <span class="text-[10px] font-black text-slate-400 uppercase italic">Dejar <span x-text="id_venta_edit ? 'Nuevo Abono' : 'Anticipo'"></span> (Opcional)</span>
+                        <div class="text-right bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                            <span class="text-[10px] font-black text-slate-400 uppercase italic block leading-none mb-1">Total Pedido</span>
+                            <span class="text-2xl font-black text-black leading-none" x-text="'$' + getGranTotal().toFixed(2)"></span>
+                        </div>
                     </div>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 font-black text-xl">$</span>
-                        <input type="number" step="0.01" min="0" x-model.number="pagos.tarjeta.monto" 
-                            class="w-full pl-8 pr-4 py-3 border-2 border-gray-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14]">
+
+                    <div x-show="total_pagado_previamente > 0" class="mb-4 bg-green-50 border border-green-200 p-3 rounded-xl flex justify-between items-center">
+                        <span class="text-[11px] font-black text-green-700 uppercase">Abonado Previamente:</span>
+                        <span class="text-lg font-black text-green-800" x-text="'$' + total_pagado_previamente.toFixed(2)"></span>
                     </div>
+
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-3">
+                            <label class="w-20 text-[11px] font-black text-slate-500 uppercase">Efectivo $</label>
+                            <input type="number" step="0.1" min="0" x-model.number="espData.anticipo_efectivo" placeholder="0.00" class="flex-1 bg-white border-2 border-slate-200 rounded-xl py-2 px-3 text-lg font-black text-[#28a745] focus:outline-none focus:border-[#28a745] transition-colors">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="w-20 text-[11px] font-black text-slate-500 uppercase">Tarjeta $</label>
+                            <input type="number" step="0.1" min="0" x-model.number="espData.anticipo_tarjeta" placeholder="0.00" class="flex-1 bg-white border-2 border-slate-200 rounded-xl py-2 px-3 text-lg font-black text-[#28a745] focus:outline-none focus:border-[#28a745] transition-colors">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="w-20 text-[11px] font-black text-slate-500 uppercase">Transf. $</label>
+                            <div class="flex-1 flex gap-2">
+                                <input type="number" step="0.1" min="0" x-model.number="espData.anticipo_transferencia" placeholder="0.00" class="w-1/2 bg-white border-2 border-slate-200 rounded-xl py-2 px-3 text-lg font-black text-[#28a745] focus:outline-none focus:border-[#28a745] transition-colors">
+                                <input type="text" x-model="espData.referencia_transferencia" placeholder="Ref." class="w-1/2 bg-white border-2 border-slate-200 rounded-xl py-2 px-3 text-sm font-bold text-slate-600 focus:outline-none focus:border-[#17a2b8] transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 rounded-xl border flex justify-between items-center transition-colors" :class="(getAnticipoTotal() + total_pagado_previamente) > getGranTotal() ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'">
+                        <span class="text-[11px] font-black uppercase" :class="(getAnticipoTotal() + total_pagado_previamente) > getGranTotal() ? 'text-red-700' : 'text-green-700'" x-text="id_venta_edit ? 'Nuevo Abono:' : 'Total Anticipo:'"></span>
+                        <span class="text-xl font-black" :class="(getAnticipoTotal() + total_pagado_previamente) > getGranTotal() ? 'text-red-700' : 'text-green-700'" x-text="'$' + getAnticipoTotal().toFixed(2)"></span>
+                    </div>
+                    <p class="text-[10px] text-red-500 font-bold mt-2 text-center" x-show="(getAnticipoTotal() + total_pagado_previamente) > getGranTotal()">Los abonos superan el total de las pizzas</p>
                 </div>
             </div>
 
-            <div class="border-2 rounded-[25px] overflow-hidden transition-all bg-white" :class="pagos.transferencia.activo ? 'border-[#fd7e14] shadow-md' : 'border-slate-100'">
-                <label class="flex items-center gap-3 p-4 cursor-pointer select-none bg-gray-50 hover:bg-gray-100">
-                    <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-6 h-6 rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14]">
-                    <span class="font-black text-[18px] text-[#212529] italic uppercase">Transferencia</span>
-                </label>
-                <div x-show="pagos.transferencia.activo" class="p-5 border-t border-gray-100 space-y-4" x-transition>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 italic">Monto</label>
-                            <input type="number" step="0.01" min="0" x-model.number="pagos.transferencia.monto" 
-                                class="w-full px-4 py-3 border-2 border-slate-100 rounded-xl text-lg font-black focus:outline-none focus:border-[#fd7e14]">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-blue-600 uppercase mb-1 italic">Referencia</label>
-                            <input type="text" x-model="pagos.transferencia.referencia" placeholder="Últimos 4 dígitos" 
-                                class="w-full px-4 py-3 border-2 border-blue-100 bg-blue-50 rounded-xl text-lg font-black focus:outline-none focus:border-blue-400 text-blue-900">
-                        </div>
-                    </div>
-                </div>
+            <div class="p-6 bg-white border-t border-slate-50 flex gap-3 shadow-inner">
+                <button @click="modalEspecial = false" class="flex-1 font-black py-4 rounded-2xl text-[14px] uppercase italic text-slate-400 bg-slate-50 hover:bg-slate-100 transition-all">Cancelar</button>
+                <button @click="confirmarEspecial()" :disabled="!isEspValido() || isProcessing" :class="!isEspValido() || isProcessing ? 'bg-slate-200 text-white' : 'bg-black text-white shadow-xl'" class="flex-1 font-black py-4 rounded-2xl text-[14px] uppercase italic transition-all">
+                    <span x-show="!isProcessing" x-text="id_venta_edit ? 'Actualizar Especial' : 'Programar Especial'"></span>
+                    <span x-show="isProcessing">Guardando...</span>
+                </button>
             </div>
-        </div>
-
-        <div class="p-6 bg-white border-t border-gray-100 shadow-inner">
-            <button @click="procesarOrdenFinal(false)" 
-                :disabled="!pagosValidos() || isProcessing" 
-                :class="(!pagosValidos() || isProcessing) ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-black hover:bg-slate-800 text-white shadow-xl'" 
-                class="w-full font-black py-4 rounded-[20px] text-[18px] transition-all flex justify-center items-center gap-2 uppercase italic tracking-tighter">
-                <span x-show="!isProcessing" x-text="id_venta_edit ? 'Actualizar Pedido' : 'Confirmar Venta'"></span>
-                <span x-show="isProcessing">Procesando...</span>
-            </button>
-            <p x-show="!pagosValidos() && cortesia !== 100" class="text-[11px] text-red-500 text-center font-bold mt-3 italic uppercase tracking-wider">
-                Revisar montos o falta referencia en transferencia
-            </p>
         </div>
     </div>
-</div>
 
     </div>
 
@@ -1258,6 +1289,7 @@
                 modalMagno: false, magnoItem: null, magnoSel: [],
 
                 modalCliente: false, 
+                soloClienteMode: false, // <-- NUEVA VARIABLE
                 modalPago: false,
                 isProcessing: false,
                 searchClienteText: '', showClientesList: false,
@@ -1275,6 +1307,7 @@
                 pagosPreviosRAW: {!! json_encode($pagos_edit ?? []) !!},
                 total_pagado_previamente: 0,
                 domicilioPrevio: {!! json_encode($domicilio_edit ?? null) !!},
+                pespecialPrevio: {!! json_encode($pespecial_edit ?? null) !!},
 
                 init() {
                     if(this.cart && this.cart.length > 0) {
@@ -1291,6 +1324,13 @@
 
                     if(this.pagosPreviosRAW && this.pagosPreviosRAW.length > 0) {
                         this.total_pagado_previamente = this.pagosPreviosRAW.reduce((sum, p) => sum + parseFloat(p.monto), 0);
+                    }
+
+                    if (this.pespecialPrevio) {
+                        let fParts = this.pespecialPrevio.fecha_entrega.split(' ');
+                        this.espData.fecha = fParts[0];
+                        this.espData.hora = fParts[1] ? fParts[1].substring(0, 5) : '';
+                        this.espData.modo = this.pespecialPrevio.id_dir ? 'domicilio' : 'recoger';
                     }
                 },
 
@@ -1807,10 +1847,13 @@
                     if(this.servicio === 1) return 'Comer Aqui';
                     if(this.servicio === 2) return 'Para Llevar';
                     if(this.servicio === 3) return 'A Domicilio';
+                    if(this.servicio === 4) return 'Pedido Especial'; 
                     return 'Seleccionar'; 
                 },
 
-                abrirModalCliente() {
+                // --- MODIFICADO: AHORA RECIBE EL PARÁMETRO soloCliente ---
+                abrirModalCliente(soloCliente = false) {
+                    this.soloClienteMode = soloCliente;
                     this.clienteSeleccionado = null;
                     this.searchClienteText = '';
                     this.direccionesCliente = [];
@@ -1847,6 +1890,19 @@
                         this.dirSeleccionada = null;
                     }
                 },
+                
+                // --- NUEVO: VALIDA SOLO CLIENTE ---
+                esClienteValido() {
+                    if (this.clienteFormVisible) return this.nuevoClienteData.nombre.trim() !== '';
+                    return this.clienteSeleccionado !== null;
+                },
+                confirmarSoloCliente() {
+                    if (this.esClienteValido()) {
+                        this.modalCliente = false;
+                        if (this.servicio === 4) this.modalEspecial = true;
+                    }
+                },
+
                 esDomicilioValido() {
                     if (this.clienteFormVisible) {
                         if(!this.nuevoClienteData.nombre) return false;
@@ -1866,7 +1922,11 @@
                 confirmarDomicilio() {
                     if(this.esDomicilioValido()) {
                         this.modalCliente = false;
-                        this.abrirModalPago();
+                        if (this.servicio === 4) {
+                            this.modalEspecial = true;
+                        } else {
+                            this.abrirModalPago();
+                        }
                     }
                 },
 
@@ -1939,6 +1999,8 @@
                         } else {
                             this.abrirModalCliente();
                         }
+                    } else if(this.servicio === 4) {
+                        this.abrirModalEspecial();
                     }
                 },
 
@@ -1996,7 +2058,7 @@
 
                     if(this.servicio === 3) {
                         if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
-                        else reqBody.id_clie = this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie;
+                        else reqBody.id_clie = this.clienteSeleccionado ? (this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie) : null;
 
                         if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
                         else reqBody.id_dir = this.dirSeleccionada;
@@ -2065,7 +2127,133 @@
                         alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
                         this.isProcessing = false;
                     });
+                },
+
+                espData: {
+                    fecha: '',
+                    hora: '',
+                    nombre: '',
+                    modo: 'recoger', 
+                    anticipo_efectivo: null,
+                    anticipo_tarjeta: null,
+                    anticipo_transferencia: null,
+                    referencia_transferencia: ''
+                },
+
+                getAnticipoTotal() {
+                    let e = parseFloat(this.espData.anticipo_efectivo) || 0;
+                    let t = parseFloat(this.espData.anticipo_tarjeta) || 0;
+                    let tr = parseFloat(this.espData.anticipo_transferencia) || 0;
+                    return e + t + tr;
+                },
+
+                modalEspecial: false,
+
+                isEspValido() {
+                    if (!this.espData.fecha || !this.espData.hora) return false;
+                    
+                    let hasClient = this.clienteSeleccionado || this.clienteFormVisible || this.espData.nombre.trim();
+                    if (!hasClient) return false;
+
+                    let requiresDbClient = this.espData.modo === 'domicilio';
+                    if (requiresDbClient && !this.clienteSeleccionado && !this.clienteFormVisible) return false;
+                    if (requiresDbClient && !this.dirSeleccionada && !this.dirFormVisible) return false;
+                    
+                    let totalAcumulado = this.getAnticipoTotal() + this.total_pagado_previamente;
+                    if (totalAcumulado < 0 || totalAcumulado > this.getGranTotal()) return false;
+                    
+                    if ((parseFloat(this.espData.anticipo_transferencia) || 0) > 0 && !this.espData.referencia_transferencia.trim()) return false;
+
+                    return true;
+                },
+
+                abrirModalEspecial() {
+                    if(this.cart.length === 0) return alert('Agrega productos primero.');
+                    this.espData.nombre = this.nombreClienteMesa;
+                    this.modalEspecial = true;
+                },
+
+                getDireccionResumen() {
+                    if (!this.dirSeleccionada) return '';
+                    let dir = dbDirecciones.find(d => (d.id_direccion || d.id_dir) == this.dirSeleccionada);
+                    return dir ? `${dir.calle || dir.Calle}, Col. ${dir.colonia || dir.Colonia}` : '';
+                },
+
+                async confirmarEspecial() {
+                    if(!this.isEspValido()) return;
+                    this.isProcessing = true;
+                    
+                    this.procesarPedidoEspecialFinal();
+                },
+
+                async procesarPedidoEspecialFinal() {
+                    let cartPayload = [];
+                    this.cartGroups.forEach(g => {
+                        if(g.type === 'pizza_pair') {
+                            g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
+                        } else {
+                            cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
+                        }
+                    });
+
+                    let pagosAnticipo = [];
+                    if ((parseFloat(this.espData.anticipo_efectivo) || 0) > 0) pagosAnticipo.push({ id_metpago: 2, monto: parseFloat(this.espData.anticipo_efectivo) });
+                    if ((parseFloat(this.espData.anticipo_tarjeta) || 0) > 0) pagosAnticipo.push({ id_metpago: 1, monto: parseFloat(this.espData.anticipo_tarjeta) });
+                    if ((parseFloat(this.espData.anticipo_transferencia) || 0) > 0) pagosAnticipo.push({ id_metpago: 3, monto: parseFloat(this.espData.anticipo_transferencia), referencia: this.espData.referencia_transferencia });
+
+                    let finalName = this.espData.nombre;
+                    if (this.clienteSeleccionado) finalName = this.getClienteNombre(this.clienteSeleccionado);
+                    else if (this.clienteFormVisible) finalName = this.nuevoClienteData.nombre;
+
+                    let reqBody = {
+                        _token: '{{ csrf_token() }}',
+                        id_venta_edit: this.id_venta_edit,
+                        nombre_cliente: finalName,
+                        comentarios: this.comentariosGenerales,
+                        total: this.getGranTotal(),
+                        anticipo: this.getAnticipoTotal(),
+                        pagos_anticipo: pagosAnticipo,
+                        fecha_entrega: this.espData.fecha + ' ' + this.espData.hora,
+                        carrito: cartPayload
+                    };
+
+                    if (this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
+                    else reqBody.id_clie = this.clienteSeleccionado ? (this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie) : null;
+
+                    if (this.espData.modo === 'domicilio') {
+                        if (this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
+                        else reqBody.id_dir = this.dirSeleccionada;
+                    }
+
+                    try {
+                        let response = await fetch("{{ route('especiales.store') }}", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                            body: JSON.stringify(reqBody)
+                        });
+                        
+                        let res = await response.json();
+                        if(res.success) {
+                            let urlTicket = '/venta/pos/ticket/' + res.id_venta + '?solo_nuevos=1';
+                            const w = 420; const h = 700; const l = (window.screen.width/2)-(w/2); const t = (window.screen.height/2)-(h/2);
+                            window.open(urlTicket, 'TicketEspecial', `width=${w},height=${h},left=${l},top=${t},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`);
+
+                            alert("¡Pedido Especial # " + res.id_venta + (this.id_venta_edit ? " Actualizado!" : " Guardado!"));
+                            if(this.id_venta_edit) {
+                                window.location.href = "{{ route('especiales.index') }}";
+                            } else {
+                                window.location.reload(); 
+                            }
+                        } else {
+                            alert("Error: " + res.message);
+                        }
+                    } catch (e) {
+                        alert("Error de conexión");
+                    } finally {
+                        this.isProcessing = false;
+                    }
                 }
+
             }));
         });
     </script>

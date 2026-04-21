@@ -47,6 +47,24 @@
 </head>
 <body>
 
+    @php
+        // Consultar datos extra si es Pedido Especial (Tipo 4)
+        $es_especial = ($venta->tipo_servicio == 4);
+        $pespecial = null;
+        $dir_especial = null;
+
+        if($es_especial) {
+            $pespecial = \Illuminate\Support\Facades\DB::table('PEspeciales')
+                ->leftJoin('Clientes', 'PEspeciales.id_clie', '=', 'Clientes.id_clie')
+                ->select('PEspeciales.*', 'Clientes.nombre as cnombre', 'Clientes.apellido as capellido', 'Clientes.telefono')
+                ->where('id_venta', $venta->id_venta)->first();
+                
+            if($pespecial && $pespecial->id_dir) {
+                $dir_especial = \Illuminate\Support\Facades\DB::table('Direcciones')->where('id_dir', $pespecial->id_dir)->first();
+            }
+        }
+    @endphp
+
     <div class="text-center mb-1">
         <img src="{{ asset('pizzetos.png') }}" alt="Pizzetos Logo" class="ticket-logo">
         
@@ -65,11 +83,36 @@
                 PARA LLEVAR
             @elseif($venta->tipo_servicio == 3)
                 DOMICILIO
+            @elseif($venta->tipo_servicio == 4)
+                PEDIDO ESPECIAL
             @endif
         </div>
     </div>
 
-    @if($venta->tipo_servicio == 3 && $domicilio)
+    @if($es_especial && $pespecial)
+        <div class="text-center" style="padding-bottom: 5px; margin-bottom: 5px; border-bottom: 1px dashed #000;">
+            <span class="font-bold" style="font-size: 14px;">ENTREGAR EL:</span><br>
+            <span style="font-size: 16px; font-weight: 900;">{{ \Carbon\Carbon::parse($pespecial->fecha_entrega)->format('d/m/Y - h:i A') }}</span>
+        </div>
+        
+        <div class="mb-1" style="font-size: 11px; line-height: 1.4; margin-bottom: 5px;">
+            <span class="font-bold" style="font-size: 13px;">CLIENTE:</span> {{ mb_strtoupper(trim(($pespecial->cnombre ?? '') . ' ' . ($pespecial->capellido ?? ''))) ?: mb_strtoupper($venta->nombreClie) }} <br>
+            <span class="font-bold">TEL:</span> {{ $pespecial->telefono ?? 'S/N' }} 
+            
+            @if($dir_especial)
+                <br><span class="font-bold">DIR:</span> {{ $dir_especial->calle ?? 'S/N' }}, 
+                <span class="font-bold">COL:</span> {{ $dir_especial->colonia ?? 'S/N' }}, 
+                <span class="font-bold">MZ:</span> {{ $dir_especial->manzana ?? '-' }}, <span class="font-bold">LT:</span> {{ $dir_especial->lote ?? '-' }}
+                @if(isset($dir_especial->referencia) && $dir_especial->referencia)
+                    <br><span class="font-bold">REF:</span> {{ $dir_especial->referencia }}
+                @endif
+            @else
+                <br><span class="font-bold" style="font-size: 13px;">* PASA A RECOGER *</span>
+            @endif
+        </div>
+        <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
+
+    @elseif($venta->tipo_servicio == 3 && $domicilio)
         <div class="mb-1" style="font-size: 11px; line-height: 1.4; margin-bottom: 5px;">
             <span class="font-bold" style="font-size: 13px;">CLIENTE:</span> {{ trim(($domicilio->cnombre ?? '') . ' ' . ($domicilio->capellido ?? '')) }} | 
             <span class="font-bold">TEL:</span> {{ $domicilio->telefono ?? 'S/N' }} | 
@@ -81,6 +124,7 @@
             @endif
         </div>
         <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
+
     @elseif(($venta->tipo_servicio == 2 || $venta->tipo_servicio == 1) && $venta->nombreClie)
         <div class="mb-1" style="font-size: 12px; line-height: 1.3;">
             <span class="font-bold">CLIENTE:</span> {{ mb_strtoupper($venta->nombreClie) }}
@@ -152,15 +196,35 @@
         
         <div style="padding: 5px 0;">
             <div class="flex-between">
-                <div class="font-bold text-lg" style="margin: 0;">TOTAL A PAGAR:</div>
+                <div class="font-bold text-lg" style="margin: 0;">TOTAL DEL PEDIDO:</div>
                 <div class="font-bold text-lg" style="margin: 0;">${{ number_format($venta->total, 2) }}</div>
             </div>
         </div>
 
-        <div style="border-top: 1px dashed #000; margin-bottom: 10px;"></div>
+        @php
+            $sumaPagos = collect($pagos)->sum('monto');
+            $restante = $venta->total - $sumaPagos;
+        @endphp
+
+        @if($venta->status == 5)
+            <div style="border-top: 1px dashed #000; padding: 5px 0;">
+                <div class="flex-between" style="font-size: 14px; margin-bottom: 2px;">
+                    <span>ANTICIPO PAGADO:</span>
+                    <span class="font-bold">${{ number_format($sumaPagos, 2) }}</span>
+                </div>
+                <div class="flex-between" style="font-size: 16px; margin-top: 5px; border-top: 1px dashed #000; padding-top: 5px;">
+                    <span class="font-bold">RESTA POR PAGAR:</span>
+                    <span class="font-bold text-xl">${{ number_format($restante, 2) }}</span>
+                </div>
+            </div>
+        @endif
+
+        <div style="border-top: 1px dashed #000; margin-bottom: 8px;"></div>
 
         <div>
-            <div class="font-bold" style="font-size: 13px; margin-bottom: 5px;">MÉTODO DE PAGO:</div>
+            <div class="font-bold" style="font-size: 13px; margin-bottom: 5px;">
+                @if($venta->status == 5) ABONOS REGISTRADOS: @else MÉTODO DE PAGO: @endif
+            </div>
             
             @foreach($pagos as $pago)
                 <div style="margin-bottom: 5px;">
@@ -189,8 +253,8 @@
                             <span>TRANSFERENCIA</span>
                             <span>${{ number_format($pago->monto, 2) }}</span>
                         </div>
-                        @if($pago->referencia)
-                            <div style="font-size: 11px; color: #333;">REF: {{ $pago->referencia }}</div>
+                        @if($pago->referencia && !is_numeric($pago->referencia))
+                            <div style="font-size: 11px; color: #333;">REF: {{ mb_strtoupper($pago->referencia) }}</div>
                         @endif
                     @endif
                 </div>

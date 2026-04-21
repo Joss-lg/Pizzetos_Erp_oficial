@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('PEspeciales', function (Blueprint $table) {
-            $table->integer('id_pespeciales', true); // True activa el auto_increment
+            $table->integer('id_pespeciales', true);
             $table->integer('id_venta');
             $table->integer('id_dir')->nullable();
             $table->integer('id_clie')->nullable();
+            $table->decimal('anticipo', 10, 2)->default(0); 
             $table->datetime('fecha_creacion')->useCurrent();
             $table->datetime('fecha_entrega')->nullable();
             $table->integer('status')->default(1);
@@ -26,9 +27,7 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('PEspeciales');
