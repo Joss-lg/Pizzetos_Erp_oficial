@@ -1555,7 +1555,7 @@
                 },
 
                 abrirMagnoGeneral() {
-                    let precioMagno = dbMagnoPrice && dbMagnoPrice > 150 ? parseFloat(dbMagnoPrice) : 230.00; 
+                    let precioMagno = dbMagnoPrice && dbMagnoPrice > 150 ? parseFloat(dbMagnoPrice) : 260.00; 
                     this.magnoItem = { id: null, col: 'id_pizza', nombre: 'Magno', precio: precioMagno };
                     this.magnoSel = [];
                     this.showIngs = false; 
