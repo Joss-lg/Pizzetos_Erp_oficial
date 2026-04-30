@@ -11,10 +11,10 @@ class PuntoVentaController extends Controller
 {
     private function getPreciosOrilla() {
         return [
-            'chica' => 35.00,
-            'mediana' => 40.00,
-            'grande' => 45.00,
-            'familiar' => 50.00
+            'chica' => 40.00,
+            'mediana' => 50.00,
+            'grande' => 60.00,
+            'familiar' => 70.00
         ];
     }
 
