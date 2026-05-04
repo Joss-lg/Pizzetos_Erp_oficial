@@ -30,7 +30,7 @@ class FlujoCajaController extends Controller
         }
 
         // GENERAR FOLIO VIRTUAL DE CAJA SIN FECHA (Ej: 00012)
-        $cajaAbierta->folio_virtual = str_pad($cajaAbierta->id_caja, 5, '0', STR_PAD_LEFT);
+        $cajaAbierta->folio_virtual = str_pad($cajaAbierta->id_caja, STR_PAD_LEFT);
 
         // 1. GASTOS DETALLADOS
         try {
@@ -81,7 +81,7 @@ class FlujoCajaController extends Controller
             ->get();
 
         foreach($ventas_detalle as $v) {
-            $v->folio_virtual = str_pad($v->id_venta, 5, '0', STR_PAD_LEFT);
+            $v->folio_virtual = str_pad($v->id_venta, 5, STR_PAD_LEFT);
         }
 
         // 3. TOTALES POR MÉTODO
@@ -122,7 +122,7 @@ class FlujoCajaController extends Controller
 
         if (!$caja) abort(404);
 
-        $caja->folio_virtual = str_pad($caja->id_caja, 5, '0', STR_PAD_LEFT);
+        $caja->folio_virtual = str_pad($caja->id_caja, 5, STR_PAD_LEFT);
 
         try {
             $gastos = DB::table('Gastos')
@@ -167,7 +167,7 @@ class FlujoCajaController extends Controller
             ->get();
 
         foreach($ventas as $v) {
-            $v->folio_virtual = str_pad($v->id_venta, 5, '0', STR_PAD_LEFT);
+            $v->folio_virtual = str_pad($v->id_venta, STR_PAD_LEFT);
         }
 
         $pagos_pdf = DB::table('Pago')
@@ -207,7 +207,7 @@ class FlujoCajaController extends Controller
             ->paginate(15);
 
         foreach($cajas as $c) {
-            $c->folio_virtual = str_pad($c->id_caja, 5, '0', STR_PAD_LEFT);
+            $c->folio_virtual = str_pad($c->id_caja, STR_PAD_LEFT);
         }
 
         return view('Ventas.historial_cajas', compact('cajas'));
