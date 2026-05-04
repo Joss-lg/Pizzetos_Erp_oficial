@@ -407,7 +407,7 @@ class PuntoVentaController extends Controller
         $venta = DB::table('Venta')->where('id_venta', $id)->first();
         if(!$venta) abort(404);
 
-        $venta->folio_virtual = Carbon::parse($venta->fecha_hora)->format('d-m-y') . ' ' . str_pad($venta->id_venta, 3, '0', STR_PAD_LEFT);
+        $venta->folio_virtual = Carbon::parse($venta->fecha_hora)->format('d-m-y') . ' ' . str_pad($venta->id_venta, STR_PAD_LEFT);
 
         $comentarios_limpios = [];
         if ($venta->comentarios) {

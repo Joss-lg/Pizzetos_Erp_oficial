@@ -78,7 +78,7 @@ class VentasController extends Controller
 
     // 6. Formateo de datos (N+1 evitado en la medida de lo posible)
     foreach ($ventas as $v) {
-        $v->folio_virtual = str_pad($v->id_venta, 5, STR_PAD_LEFT);
+        $v->folio_virtual = str_pad($v->id_venta, STR_PAD_LEFT);
 
         $v->total_productos = DB::table('DetalleVenta')
             ->where('id_venta', $v->id_venta)
@@ -106,7 +106,7 @@ class VentasController extends Controller
         if (!$venta) abort(404);
 
         // AQUÍ ESTÁ EL TRUCO: Creamos el folio virtual SIN FECHA antes de enviarlo al ticket
-        $venta->folio_virtual = str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT);
+        $venta->folio_virtual = str_pad($venta->id_venta, STR_PAD_LEFT);
 
         $final_items = DB::table('DetalleVenta')
             ->where('id_venta', $id)

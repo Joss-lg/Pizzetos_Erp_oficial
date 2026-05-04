@@ -71,7 +71,7 @@
         <div style="font-size: 12px;">TICKET DE VENTA</div>
         
         <div class="font-bold mt-1" style="font-size: 16px;">
-            FOLIO: {{ str_pad($venta->id_venta, 5, STR_PAD_LEFT) }}
+            FOLIO: {{ str_pad($venta->id_venta, STR_PAD_LEFT) }}
         </div>
         
         <div style="font-size: 12px;">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</div>
