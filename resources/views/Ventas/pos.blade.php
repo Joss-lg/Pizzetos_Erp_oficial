@@ -215,10 +215,10 @@
                                         <span class="text-[12px] text-[#495057] block font-bold whitespace-pre-wrap" x-text="group.item.variante"></span>
                                     </div>
 
-                                    <template x-if="group.item.is_magno">
+                                    <template x-if="group.item.is_magno || group.item.col === 'id_rec' || group.item.col === 'id_barr'">
                                         <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
-                                            <input type="checkbox" x-model="group.item.orilla_queso" @change="recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">
-                                            Orilla Queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + group.item.precio_orilla"></span>
+                                            <input type="checkbox" x-model="group.item.orilla_queso" @change="group.item.orillas_qty = group.item.orilla_queso ? group.item.qty : 0; if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">
+                                            Orilla Queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
                                         </label>
                                     </template>
 
@@ -1449,6 +1449,18 @@
                     return dbPreciosOrilla.chica; 
                 },
 
+                fixPrecioOrilla(item) {
+                    if (item.precio_orilla && item.precio_orilla > 0) return;
+                    if (item.tipo === 'paq') {
+                        item.precio_orilla = dbPreciosOrilla.grande;
+                    } else if (item.is_magno || item.col === 'id_rec' || item.col === 'id_barr') {
+                        item.precio_orilla = dbPreciosOrilla.familiar; 
+                    } else {
+                        let cTam = this.cleanSize(item.nombre_base);
+                        item.precio_orilla = this.getPrecioOrilla(cTam);
+                    }
+                },
+
                 actualizarCarrito() {
                     let pizzasFlat = [];
                     let normals = [];
@@ -1545,13 +1557,10 @@
 
                 addBebida(opc) {
                     let nomFull = this.bebidaItem.nombre + ' ' + opc.tamano;
-                    let idx = this.cart.findIndex(i => i.db_id === opc.id && i.col === 'id_refresco');
+                    let idx = this.cart.findIndex(i => i.db_id === opc.id && i.col === 'id_refresco' && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
-                    else { 
-                        this.cart.push({ db_id: opc.id, col: 'id_refresco', tipo: 'directo', nombre_base: nomFull, variante: '', precioBase: parseFloat(opc.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
-                    }
-                    this.actualizarCarrito();
-                    this.modalBebida = false;
+                    else { this.cart.push({ db_id: opc.id, col: 'id_refresco', tipo: 'directo', nombre_base: nomFull, variante: '', precioBase: parseFloat(opc.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); }
+                    this.actualizarCarrito(); this.modalBebida = false;
                 },
 
                 abrirMagnoGeneral() {
@@ -1575,13 +1584,10 @@
                 addMagno() {
                     let pb = parseFloat(this.magnoItem.precio);
                     let varianteFinal = this.formatearMagnoPreview();
-                    let idx = this.cart.findIndex(i => i.is_magno && i.variante === varianteFinal && !i.orilla_queso);
+                    let idx = this.cart.findIndex(i => i.is_magno && i.variante === varianteFinal && !i.orilla_queso && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
-                    else { 
-                        this.cart.push({ db_id: null, col: 'id_magno', tipo: 'directo', nombre_base: 'Magno', variante: varianteFinal, medios: this.magnoSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: true, orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar, uid: this.generateUID() }); 
-                    }
-                    this.actualizarCarrito();
-                    this.modalMagno = false;
+                    else { this.cart.push({ db_id: null, col: 'id_magno', tipo: 'directo', nombre_base: 'Magno', variante: varianteFinal, medios: this.magnoSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: true, orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar, uid: this.generateUID() }); }
+                    this.actualizarCarrito(); this.modalMagno = false;
                 },
 
                 abrirRectangularGeneral() {
@@ -1606,13 +1612,19 @@
                 addRectangular() {
                     let pb = parseFloat(this.rectItem.precio);
                     let varianteFinal = this.formatearCuartosPreview();
-                    let idx = this.cart.findIndex(i => i.db_id === this.rectItem.id && i.variante === varianteFinal);
+                    let idx = this.cart.findIndex(i => i.db_id === this.rectItem.id && i.variante === varianteFinal && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
-                    else { 
-                        this.cart.push({ db_id: this.rectItem.id, col: this.rectItem.col, tipo: 'directo', nombre_base: this.rectItem.nombre, variante: varianteFinal, cuartos: this.rectSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
-                    }
-                    this.actualizarCarrito();
-                    this.modalRectangular = false;
+                    else { this.cart.push({ db_id: this.rectItem.id, col: this.rectItem.col, tipo: 'directo', nombre_base: this.rectItem.nombre, variante: varianteFinal, cuartos: this.rectSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar }); }
+                    this.actualizarCarrito(); this.modalRectangular = false;
+                },
+
+                addBarra() {
+                    let pb = parseFloat(this.barraItem.precio);
+                    let varianteFinal = this.formatearMediosPreview();
+                    let idx = this.cart.findIndex(i => i.db_id === this.barraItem.id && i.variante === varianteFinal && !i.is_old);
+                    if(idx > -1) { this.cart[idx].qty++; } 
+                    else { this.cart.push({ db_id: this.barraItem.id, col: this.barraItem.col, tipo: 'directo', nombre_base: this.barraItem.nombre, variante: varianteFinal, medios: this.barraSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar }); }
+                    this.actualizarCarrito(); this.modalBarra = false;
                 },
 
                 abrirBarraGeneral() {
@@ -1634,27 +1646,14 @@
                     for(let k in counts) { parts.push(counts[k] + '/2 ' + k); }
                     return parts.join(', ');
                 },
-                addBarra() {
-                    let pb = parseFloat(this.barraItem.precio);
-                    let varianteFinal = this.formatearMediosPreview();
-                    let idx = this.cart.findIndex(i => i.db_id === this.barraItem.id && i.variante === varianteFinal);
-                    if(idx > -1) { this.cart[idx].qty++; } 
-                    else { 
-                        this.cart.push({ db_id: this.barraItem.id, col: this.barraItem.col, tipo: 'directo', nombre_base: this.barraItem.nombre, variante: varianteFinal, medios: this.barraSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
-                    }
-                    this.actualizarCarrito();
-                    this.modalBarra = false;
-                },
 
                 addDirecto(p) {
                     if(p.cat === 11) return this.abrirRectangularGeneral();
                     if(p.cat === 10) return this.abrirBarraGeneral();
 
-                    let idx = this.cart.findIndex(i => i.db_id === p.id && i.col === p.col && !i.es_pizza);
+                    let idx = this.cart.findIndex(i => i.db_id === p.id && i.col === p.col && !i.es_pizza && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
-                    else { 
-                        this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); 
-                    }
+                    else { this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); }
                     this.actualizarCarrito();
                 },
 
@@ -1747,6 +1746,10 @@
 
                 recalcPaqOrillas(item) {
                     item.orillas_qty = item.pizzas_paq.filter(p => p.orilla).length;
+                    if(item.orillas_qty > 0) this.fixPrecioOrilla(item);
+                    if(item.is_old) {
+                        item.is_old = false;
+                    }
                     this.actualizarCarrito();
                 },
 
@@ -1862,7 +1865,16 @@
                 recalc() { this.actualizarCarrito(); },
                 toggleOrilla(uid, checked) {
                     let idx = this.cart.findIndex(c => c.uid === uid);
-                    if(idx > -1) this.cart[idx].orilla_queso = checked;
+                    if(idx > -1) {
+                        this.cart[idx].orilla_queso = checked;
+                        this.cart[idx].orillas_qty = checked ? this.cart[idx].qty : 0; 
+                        
+                        if(checked) this.fixPrecioOrilla(this.cart[idx]); 
+
+                        if(this.cart[idx].is_old) {
+                            this.cart[idx].is_old = false;
+                        }
+                    }
                     this.actualizarCarrito();
                 },
                 
@@ -1893,6 +1905,25 @@
                 },
 
                 updateNormalQty(item, mod) {
+                    // Si el usuario quiere sumar (+) un artículo que ya fue enviado a cocina (old)
+                    if(item.is_old && mod > 0) {
+                        let clone = JSON.parse(JSON.stringify(item));
+                        clone.qty = 1;
+                        clone.is_old = false; // Lo marcamos como NUEVO
+                        clone.uid = this.generateUID();
+                        
+                        // Si ya habíamos agregado uno nuevo igual, le sumamos a ese
+                        let idxNuevo = this.cart.findIndex(c => c.db_id === clone.db_id && c.col === clone.col && c.variante === clone.variante && !c.is_old);
+                        if (idxNuevo > -1 && clone.tipo === 'directo') {
+                            this.cart[idxNuevo].qty += 1;
+                        } else {
+                            this.cart.push(clone);
+                        }
+                        this.actualizarCarrito();
+                        return;
+                    }
+
+                    // Comportamiento normal (restar, o sumar si es nuevo)
                     let idx = this.cart.findIndex(c => c.uid === item.uid);
                     if(idx > -1) {
                         this.cart[idx].qty += mod;
