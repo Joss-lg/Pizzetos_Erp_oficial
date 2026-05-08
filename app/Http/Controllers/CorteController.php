@@ -19,14 +19,14 @@ class CorteController extends Controller
         $sucursalId = Auth::user()->id_suc;
 
         // TOTALES DEL MES
-        $totalGastos = DB::table('gastos')->where('id_suc', $sucursalId)->whereYear('fecha', $year)->whereMonth('fecha', $month)->sum('precio');
+        $totalGastos = DB::table('Gastos')->where('id_suc', $sucursalId)->whereYear('fecha', $year)->whereMonth('fecha', $month)->sum('precio');
 
-        $pagos = DB::table('pago')
-            ->join('venta', 'pago.id_venta', '=', 'venta.id_venta')
-            ->where('venta.id_suc', $sucursalId)->where('venta.status', '!=', 0)
-            ->whereYear('venta.fecha_hora', $year)->whereMonth('venta.fecha_hora', $month)
-            ->select('pago.id_metpago', DB::raw('SUM(pago.monto) as total_monto'))
-            ->groupBy('pago.id_metpago')->get();
+        $pagos = DB::table('Pago')
+            ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
+            ->where('Venta.id_suc', $sucursalId)->where('Venta.status', '!=', 0)
+            ->whereYear('Venta.fecha_hora', $year)->whereMonth('Venta.fecha_hora', $month)
+            ->select('Pago.id_metpago', DB::raw('SUM(Pago.monto) as total_monto'))
+            ->groupBy('Pago.id_metpago')->get();
 
         $ingresosEfectivo = 0; $ingresosTarjeta = 0; $ingresosTransferencia = 0;
         foreach ($pagos as $pago) {
@@ -55,12 +55,12 @@ class CorteController extends Controller
             ];
         }
 
-        $pagosDiarios = DB::table('pago')
-            ->join('venta', 'pago.id_venta', '=', 'venta.id_venta')
-            ->where('venta.id_suc', $sucursalId)->where('venta.status', '!=', 0)
-            ->whereYear('venta.fecha_hora', $year)->whereMonth('venta.fecha_hora', $month)
-            ->select(DB::raw('DAY(venta.fecha_hora) as dia'), 'pago.id_metpago', DB::raw('SUM(pago.monto) as total_monto'))
-            ->groupBy('dia', 'pago.id_metpago')->get();
+        $pagosDiarios = DB::table('Pago')
+            ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
+            ->where('Venta.id_suc', $sucursalId)->where('Venta.status', '!=', 0)
+            ->whereYear('Venta.fecha_hora', $year)->whereMonth('Venta.fecha_hora', $month)
+            ->select(DB::raw('DAY(Venta.fecha_hora) as dia'), 'Pago.id_metpago', DB::raw('SUM(Pago.monto) as total_monto'))
+            ->groupBy('dia', 'Pago.id_metpago')->get();
 
         foreach ($pagosDiarios as $pd) {
             if ($pd->id_metpago == 1) $desgloseDiario[$pd->dia]['efectivo'] = $pd->total_monto;
@@ -68,7 +68,7 @@ class CorteController extends Controller
             if ($pd->id_metpago == 3) $desgloseDiario[$pd->dia]['transferencia'] = $pd->total_monto;
         }
 
-        $gastosDiarios = DB::table('gastos')
+        $gastosDiarios = DB::table('Gastos')
             ->where('id_suc', $sucursalId)->whereYear('fecha', $year)->whereMonth('fecha', $month)
             ->select(DB::raw('DAY(fecha) as dia'), DB::raw('SUM(precio) as total_gastos'))
             ->groupBy('dia')->get();
@@ -87,15 +87,15 @@ class CorteController extends Controller
         $date = Carbon::parse($fecha)->format('Y-m-d');
 
         // Gastos del día
-        $gastos = DB::table('gastos')->where('id_suc', $sucursalId)->whereDate('fecha', $date)->get();
+        $gastos = DB::table('Gastos')->where('id_suc', $sucursalId)->whereDate('fecha', $date)->get();
         $totalGastos = $gastos->sum('precio');
 
         // Ingresos del día
-        $pagos = DB::table('pago')
-            ->join('venta', 'pago.id_venta', '=', 'venta.id_venta')
-            ->where('venta.id_suc', $sucursalId)->where('venta.status', '!=', 0)
-            ->whereDate('venta.fecha_hora', $date)
-            ->select('pago.id_metpago', 'pago.monto')
+        $pagos = DB::table('Pago')
+            ->join('Venta', 'Pago.id_venta', '=', 'Venta.id_venta')
+            ->where('Venta.id_suc', $sucursalId)->where('Venta.status', '!=', 0)
+            ->whereDate('Venta.fecha_hora', $date)
+            ->select('Pago.id_metpago', 'Pago.monto')
             ->get();
 
         $efectivo = $pagos->where('id_metpago', 1)->sum('monto');
@@ -108,8 +108,8 @@ class CorteController extends Controller
         $pctTransferencia = $totalIngresos > 0 ? round(($transferencia / $totalIngresos) * 100) : 0;
 
         // Listas para las pestañas inferiores
-        $ventas = DB::table('venta')->where('id_suc', $sucursalId)->where('status', '!=', 0)->whereDate('fecha_hora', $date)->select('id_venta', 'total', 'fecha_hora')->get();
-        $sucursal = DB::table('sucursal')->where('id_suc', $sucursalId)->first();
+        $ventas = DB::table('Venta')->where('id_suc', $sucursalId)->where('status', '!=', 0)->whereDate('fecha_hora', $date)->select('id_venta', 'total', 'fecha_hora')->get();
+        $sucursal = DB::table('Sucursal')->where('id_suc', $sucursalId)->first();
 
         return response()->json([
             'ingresos' => $totalIngresos,
