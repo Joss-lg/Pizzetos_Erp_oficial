@@ -47,18 +47,20 @@
         
         <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto flex-1 justify-end">
             
-            <div class="relative w-full sm:max-w-md">
-                <input type="text" x-model="searchQuery" placeholder="Buscar por nombre o teléfono..." 
+            {{-- FORMULARIO PARA BÚSQUEDA EN TODA LA BASE DE DATOS --}}
+            <form action="{{ route('clientes.index') }}" method="GET" class="relative w-full sm:max-w-md">
+                <input type="text" name="buscar" x-model="searchQuery" placeholder="Buscar y presiona Enter..." 
                        class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                 
                 <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 
-                <button x-show="searchQuery.length > 0" x-cloak @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors" title="Limpiar búsqueda">
+                {{-- BOTÓN PARA LIMPIAR LA BÚSQUEDA QUE RECARGA LA PÁGINA --}}
+                <a href="{{ route('clientes.index') }}" x-show="searchQuery.length > 0" x-cloak class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors" title="Limpiar búsqueda">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
+                </a>
+            </form>
 
             <a href="{{ route('clientes.create') }}" class="bg-amber-500 hover:bg-amber-600 text-white w-full sm:w-auto px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-sm whitespace-nowrap">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg> Añadir Cliente
@@ -138,13 +140,18 @@
                                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </div>
                                 <h3 class="text-sm font-bold text-gray-900">La base de datos está vacía</h3>
-                                <p class="text-sm text-gray-500 mt-1">Aún no hay clientes registrados en el sistema.</p>
+                                <p class="text-sm text-gray-500 mt-1">Aún no hay clientes registrados en el sistema o la búsqueda no arrojó resultados.</p>
                             </div>
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- ENLACES DE PAGINACIÓN DE LARAVEL --}}
+    <div class="mt-4 pt-4 border-t border-gray-100">
+        {{ $clientes->appends(request()->query())->links() }}
     </div>
 
     <div x-show="mostrarModalEstado" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">

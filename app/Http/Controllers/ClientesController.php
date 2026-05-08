@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class ClientesController extends Controller
 {
     /**
-     * Lista todos los clientes activos y sus direcciones (con filtro de búsqueda).
+     * Lista todos los clientes activos y sus direcciones (con filtro de búsqueda y paginación).
      */
     public function index(Request $request)
     {
@@ -21,14 +21,15 @@ class ClientesController extends Controller
         if (!empty($buscar)) {
             $query->where(function($q) use ($buscar) {
                 $q->where('nombre', 'LIKE', '%' . $buscar . '%')
+                  ->orWhere('apellido', 'LIKE', '%' . $buscar . '%')
                   ->orWhere('telefono', 'LIKE', '%' . $buscar . '%');
             });
         }
 
-        // Ejecutamos la consulta
-        $clientes = $query->get();
+        // Ejecutamos la consulta CON PAGINACIÓN (10 por página) y ordenamos por los más recientes
+        $clientes = $query->orderBy('id_clie', 'desc')->paginate(10);
         
-        // Optimización: Extraemos solo los IDs de los clientes encontrados
+        // Optimización: Extraemos solo los IDs de los clientes encontrados en esta página
         $clientesIds = $clientes->pluck('id_clie')->toArray();
 
         // Consultamos solo las direcciones de esos clientes filtrados
