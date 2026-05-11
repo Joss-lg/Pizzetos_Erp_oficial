@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket #{{ str_pad($venta->id_venta, 5, STR_PAD_LEFT) }}</title>
+    <title>Ticket #{{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}</title>
     <style>
         @page { margin: 0; }
         body { 
@@ -25,10 +25,12 @@
         
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
         th, td { text-align: left; vertical-align: top; padding: 3px 0; }
-        th { border-bottom: 1px dashed #000; font-weight: bold; padding-bottom: 3px; font-size: 12px;}
+        th { border-bottom: 1px dashed #000; font-weight: bold; padding-bottom: 3px; font-size: 13px;}
         
-        .sub-item { font-size: 12px; color: #333; }
-        .sub-text { padding-left: 8px; }
+        /* Ajustes de letra grande y súper negrita para cocina */
+        .item-principal { font-size: 18px; font-weight: 900; line-height: 1.2; }
+        .sub-item { font-size: 16px; font-weight: 900; color: #000; line-height: 1.2; }
+        .precio-text { font-size: 15px; font-weight: bold; }
         
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         
@@ -71,7 +73,7 @@
         <div style="font-size: 12px;">TICKET DE VENTA</div>
         
         <div class="font-bold mt-1" style="font-size: 16px;">
-            FOLIO: {{ str_pad($venta->id_venta, STR_PAD_LEFT) }}
+            FOLIO: {{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}
         </div>
         
         <div style="font-size: 12px;">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</div>
@@ -95,7 +97,7 @@
             <span style="font-size: 16px; font-weight: 900;">{{ \Carbon\Carbon::parse($pespecial->fecha_entrega)->format('d/m/Y - h:i A') }}</span>
         </div>
         
-        <div class="mb-1" style="font-size: 11px; line-height: 1.4; margin-bottom: 5px;">
+        <div class="mb-1" style="font-size: 12px; line-height: 1.4; margin-bottom: 5px;">
             <span class="font-bold" style="font-size: 13px;">CLIENTE:</span> {{ mb_strtoupper(trim(($pespecial->cnombre ?? '') . ' ' . ($pespecial->capellido ?? ''))) ?: mb_strtoupper($venta->nombreClie) }} <br>
             <span class="font-bold">TEL:</span> {{ $pespecial->telefono ?? 'S/N' }} 
             
@@ -113,7 +115,7 @@
         <div style="border-top: 1px dashed #000; margin-top: 5px; margin-bottom: 5px;"></div>
 
     @elseif($venta->tipo_servicio == 3 && $domicilio)
-        <div class="mb-1" style="font-size: 11px; line-height: 1.4; margin-bottom: 5px;">
+        <div class="mb-1" style="font-size: 12px; line-height: 1.4; margin-bottom: 5px;">
             <span class="font-bold" style="font-size: 13px;">CLIENTE:</span> {{ trim(($domicilio->cnombre ?? '') . ' ' . ($domicilio->capellido ?? '')) }} | 
             <span class="font-bold">TEL:</span> {{ $domicilio->telefono ?? 'S/N' }} | 
             <span class="font-bold">DIR:</span> {{ $domicilio->calle ?? 'S/N' }}, 
@@ -135,17 +137,15 @@
     <table class="mb-1">
         <thead>
             <tr>
-                <th style="width: 15%;">CANT</th>
-                <th style="width: 60%;">DESCRIPCIÓN</th>
+                <th style="width: 75%; padding-left: 8px;">DESCRIPCIÓN</th>
                 <th style="width: 25%; text-align: right;">IMPORTE</th>
             </tr>
         </thead>
         <tbody>
             @foreach($final_items as $item)
-                <tr style="font-size: 16px; font-weight: 900; line-height: 1.1;">
-                    <td style="white-space: nowrap; vertical-align: top; padding-top: 4px;">{{ $item->cantidad }}</td>
-                    <td style="vertical-align: top; padding-top: 4px;">{{ $item->nombre }}</td>
-                    <td class="text-right" style="vertical-align: top; padding-top: 4px; {{ str_contains($item->nombre, 'PAPAS') ? 'font-size: 15px;' : '' }}">
+                <tr class="item-principal">
+                    <td style="vertical-align: top; padding-top: 8px; padding-left: 8px;">{{ $item->nombre }}</td>
+                    <td class="text-right precio-text" style="vertical-align: top; padding-top: 8px;">
                         @if($item->total !== null)
                             ${{ number_format($item->total, 2) }}
                         @endif
@@ -154,12 +154,11 @@
                 
                 @foreach($item->subs as $sub)
                     <tr class="sub-item">
-                        <td></td>
                         @if(is_array($sub))
-                            <td style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">
-                                {!! str_replace(' / ', ' <span style="font-weight: 900; font-size: 16px; margin: 0 3px;">/</span> ', e($sub['texto'])) !!}
+                            <td style="padding-bottom: 4px; padding-right: 5px; padding-left: 8px;">
+                                {!! str_replace(' / ', ' <span style="font-weight: 900; font-size: 18px; margin: 0 4px;">/</span> ', e($sub['texto'])) !!}
                             </td>
-                            <td class="text-right" style="font-size: 14px; font-weight: bold; padding-bottom: 2px;">
+                            <td class="text-right precio-text" style="padding-bottom: 4px; vertical-align: top;">
                                 @if(isset($sub['precio']))
                                     ${{ number_format($sub['precio'], 2) }}
                                 @elseif(isset($sub['precio_ext']) && $sub['precio_ext'] != '')
@@ -167,14 +166,15 @@
                                 @endif
                             </td>
                         @else
-                            <td colspan="2" style="font-size: 14px; font-weight: bold; padding-left: 5px; padding-bottom: 2px;">
-                                {!! str_replace(' / ', ' <span style="font-weight: 900; font-size: 16px; margin: 0 3px;">/</span> ', e($sub)) !!}
+                            <td colspan="2" style="padding-bottom: 4px; padding-left: 8px;">
+                                {!! str_replace(' / ', ' <span style="font-weight: 900; font-size: 18px; margin: 0 4px;">/</span> ', e($sub)) !!}
                             </td>
                         @endif
                     </tr>
                 @endforeach
                 
-                <tr><td colspan="3" style="height: 12px;"></td></tr>
+                {{-- Espacio limpio entre productos (se quitó la línea punteada) --}}
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
             @endforeach
         </tbody>
     </table>
@@ -182,7 +182,7 @@
     @if($venta->comentarios)
         <div style="border-top: 1px dashed #000; margin-top: 5px;"></div>
         
-        <div class="text-center" style="padding: 5px 0; font-size: 12px; font-weight: bold;">
+        <div class="text-center" style="padding: 8px 0; font-size: 15px; font-weight: 900;">
             {{ $venta->comentarios }}
         </div>
     @endif
@@ -239,11 +239,11 @@
                             <span>${{ number_format($pago->monto, 2) }}</span>
                         </div>
                         @if($pago->referencia && is_numeric($pago->referencia) && $pago->referencia > $pago->monto)
-                            <div class="flex-between" style="font-size: 11px; color: #333;">
+                            <div class="flex-between" style="font-size: 12px; color: #333;">
                                 <span>RECIBIDO:</span>
                                 <span>${{ number_format($pago->referencia, 2) }}</span>
                             </div>
-                            <div class="flex-between" style="font-size: 11px; color: #333;">
+                            <div class="flex-between" style="font-size: 12px; color: #333;">
                                 <span>CAMBIO:</span>
                                 <span>${{ number_format($pago->referencia - $pago->monto, 2) }}</span>
                             </div>
@@ -254,7 +254,7 @@
                             <span>${{ number_format($pago->monto, 2) }}</span>
                         </div>
                         @if($pago->referencia && !is_numeric($pago->referencia))
-                            <div style="font-size: 11px; color: #333;">REF: {{ mb_strtoupper($pago->referencia) }}</div>
+                            <div style="font-size: 12px; color: #333;">REF: {{ mb_strtoupper($pago->referencia) }}</div>
                         @endif
                     @endif
                 </div>

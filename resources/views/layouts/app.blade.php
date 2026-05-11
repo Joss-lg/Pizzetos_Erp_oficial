@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" 
-      x-data="{ 
-          sidebarOpen: false, 
-          sidebarExpanded: false,
-          isMobile: window.innerWidth < 1024 
-      }" 
-      @resize.window="isMobile = window.innerWidth < 1024">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +9,8 @@
     <link rel="icon" type="image/png" href="{{ asset('pizzetos2.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <style>
@@ -23,11 +19,25 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Hacemos la scrollbar general más profesional para PC */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
         .logo-container:hover img { transform: rotate(-5deg) scale(1.1); }
         .logo-container img { transition: all 0.3s ease; }
     </style>
 </head>
-<body class="bg-[#f8fafc] font-sans antialiased text-slate-900 overflow-x-hidden">
+
+{{-- APPSHELL: Congelamos el body (h-screen overflow-hidden) para que solo el main tenga scroll --}}
+<body class="bg-[#f8fafc] font-sans antialiased text-slate-900 h-screen overflow-hidden"
+      x-data="{ 
+          sidebarOpen: false, 
+          sidebarExpanded: $persist(false), /* Magia: Guardamos el estado en LocalStorage */
+          isMobile: window.innerWidth < 1024 
+      }" 
+      @resize.window="isMobile = window.innerWidth < 1024">
 
     {{-- Overlay con Blur dinámico (Solo visible en móviles) --}}
     <div x-show="sidebarOpen" 
@@ -37,8 +47,8 @@
          class="fixed inset-0 bg-slate-900/60 z-40 backdrop-blur-sm lg:hidden">
     </div>
 
-    {{-- Contenedor Principal --}}
-    <div class="min-h-screen flex flex-col transition-all duration-300" :class="sidebarExpanded ? 'lg:pl-60' : 'lg:pl-20'">
+    {{-- CONTENEDOR MAESTRO: Ajusta el padding izquierdo dependiendo de la barra --}}
+    <div class="h-screen flex flex-col transition-all duration-300 w-full" :class="sidebarExpanded ? 'lg:pl-60' : 'lg:pl-20'">
         
         {{-- SIDEBAR LATERAL (Amarillo) --}}
         <aside 
@@ -47,14 +57,14 @@
                 sidebarExpanded ? 'w-60' : 'w-60 lg:w-20'
             ]"
             @keydown.window.escape="sidebarOpen = false"
-            class="fixed inset-y-0 left-0 z-50 bg-amber-400 text-slate-900 transition-all duration-300 ease-in-out transform lg:translate-x-0 flex flex-col shadow-2xl border-r border-amber-500/20 overflow-hidden">
+            class="fixed inset-y-0 left-0 z-50 h-screen bg-amber-400 text-slate-900 transition-all duration-300 ease-in-out transform lg:translate-x-0 flex flex-col shadow-2xl border-r border-amber-500/20 overflow-hidden">
             
             {{-- Logo Area con Botón Integrado --}}
-            <div class="h-24 flex px-4 border-b border-black/5 shrink-0 transition-all" :class="(sidebarExpanded || isMobile) ? 'items-center justify-between' : 'flex-col items-center justify-center gap-2 py-3'">
+            <div class="h-20 lg:h-24 flex px-4 border-b border-black/5 shrink-0 transition-all" :class="(sidebarExpanded || isMobile) ? 'items-center justify-between' : 'flex-col items-center justify-center gap-2 py-3'">
                 
                 <div class="flex items-center gap-2 logo-container" :class="(sidebarExpanded || isMobile) ? '' : 'justify-center'">
                     <div class="bg-white p-1.5 rounded-xl shadow-sm shrink-0">
-                        <img src="{{ asset('pizzetos.png') }}" alt="Logo" class="h-7 w-7 object-contain">
+                        <img src="{{ asset('pizzetos.png') }}" alt="Logo" class="h-7 w-7 lg:h-8 lg:w-8 object-contain">
                     </div>
                     <span x-show="sidebarExpanded || isMobile" class="text-lg font-black italic tracking-tighter uppercase whitespace-nowrap transition-opacity">Pizzetos</span>
                 </div>
@@ -66,8 +76,8 @@
                 </button>
 
                 {{-- Botón de cerrar (Oculto en PC, para móviles) --}}
-                <button @click="sidebarOpen = false" class="lg:hidden p-2 hover:bg-black/5 rounded-xl transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                <button @click="sidebarOpen = false" class="lg:hidden p-2 hover:bg-black/5 rounded-xl transition-colors text-black">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
@@ -94,7 +104,6 @@
                     <span x-show="sidebarExpanded || isMobile" class="text-sm font-bold uppercase italic tracking-tighter whitespace-nowrap">Repartidor</span>
                 </a>
 
-                {{-- NUEVO BOTÓN: PEDIDOS ESPECIALES --}}
                 <a href="{{ route('especiales.index') }}" @click="if(isMobile) sidebarOpen = false" class="flex items-center px-4 py-3 rounded-xl transition-all {{ request()->routeIs('especiales.*') ? 'bg-black text-amber-400 shadow-xl' : 'hover:bg-black/5 font-bold' }}" :class="(sidebarExpanded || isMobile) ? 'gap-3 justify-start' : 'justify-center'">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -204,38 +213,42 @@
             </div>
         </aside>
 
-        {{-- HEADER (Blanco) --}}
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 shrink-0 sticky top-0 z-30 shadow-sm transition-all duration-300">
-            <div class="flex items-center gap-4">
-                
-                {{-- Botón Hamburger Solo para Móviles (Abre el sidebar flotante) --}}
-                <button @click="sidebarOpen = true" class="lg:hidden p-2.5 bg-amber-400 rounded-2xl text-slate-900 shadow-sm hover:scale-105 transition-all active:scale-95">
-                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M4 6h16M4 12h16m-7 6h7"/></svg>
-                </button>
+        {{-- Contenedor Principal Derecho (con el Header y el @yield) --}}
+        <div class="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 relative w-full">
+            
+            {{-- HEADER (Blanco) --}}
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-10 shrink-0 sticky top-0 z-30 shadow-sm transition-all duration-300 w-full">
+                <div class="flex items-center gap-4">
+                    
+                    {{-- Botón Hamburger Solo para Móviles (Abre el sidebar flotante) --}}
+                    <button @click="sidebarOpen = true" class="lg:hidden p-2.5 bg-amber-400 rounded-2xl text-slate-900 shadow-sm hover:scale-105 transition-all active:scale-95">
+                        <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M4 6h16M4 12h16m-7 6h7"/></svg>
+                    </button>
 
-                <div class="hidden md:block">
-                    <h2 class="text-[10px] font-black text-slate-400 tracking-[0.3em] italic leading-none uppercase">Pizzetos Management</h2>
-                    <p class="text-xs font-bold text-slate-600 mt-1 italic tracking-tighter">By Ollintem Sistema POS</p>
+                    <div class="hidden md:block">
+                        <h2 class="text-[10px] font-black text-slate-400 tracking-[0.3em] italic leading-none uppercase">Pizzetos Management</h2>
+                        <p class="text-xs font-bold text-slate-600 mt-1 italic tracking-tighter">By Ollintem Sistema POS</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="flex items-center gap-4">
-                <div class="hidden sm:block text-right">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Usuario Activo</p>
-                    <p class="text-sm font-black text-gray-900 uppercase italic leading-none tracking-tighter">{{ Auth::user()->nombre }}</p>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:block text-right">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Usuario Activo</p>
+                        <p class="text-sm font-black text-gray-900 uppercase italic leading-none tracking-tighter">{{ Auth::user()->nombre ?? 'Admin' }}</p>
+                    </div>
+                    <div class="h-11 w-11 bg-amber-400 rounded-2xl flex items-center justify-center font-black text-lg text-slate-900 border-2 border-white shadow-md">
+                        {{ substr(Auth::user()->nombre ?? 'A', 0, 1) }}
+                    </div>
                 </div>
-                <div class="h-11 w-11 bg-amber-400 rounded-2xl flex items-center justify-center font-black text-lg text-slate-900 border-2 border-white shadow-md">
-                    {{ substr(Auth::user()->nombre, 0, 1) }}
-                </div>
-            </div>
-        </header>
+            </header>
 
-        {{-- MAIN CONTENT --}}
-        <main class="flex-1 p-4 lg:p-8 overflow-y-auto scrollbar-hide">
-            <div class="max-w-[1600px] mx-auto">
-                @yield('content')
-            </div>
-        </main>
+            {{-- MAIN CONTENT: Aquí ocurre el scroll interno --}}
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#f8fafc] relative w-full">
+                <div class="p-4 lg:p-8 max-w-[1600px] mx-auto w-full">
+                    @yield('content')
+                </div>
+            </main>
+        </div>
     </div>
 </body>
 </html>

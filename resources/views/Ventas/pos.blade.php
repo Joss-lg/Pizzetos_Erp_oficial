@@ -1014,7 +1014,7 @@
                                 <input type="text" x-model="nuevoClienteData.nombre" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                             </div>
                             <div class="flex-1">
-                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Apellido</label>
+                                <label class="block text-[15px] font-bold text-gray-600 mb-2">Apellidos *</label>
                                 <input type="text" x-model="nuevoClienteData.apellido" class="w-full border border-gray-300 rounded-[8px] py-3 px-4 text-[16px] focus:border-[#fd7e14] focus:outline-none">
                             </div>
                         </div>
@@ -1992,7 +1992,11 @@
                 
                 // --- NUEVO: VALIDA SOLO CLIENTE ---
                 esClienteValido() {
-                    if (this.clienteFormVisible) return this.nuevoClienteData.nombre.trim() !== '';
+                    if (this.clienteFormVisible) {
+                        return this.nuevoClienteData.nombre.trim() !== '' && 
+                               this.nuevoClienteData.apellido.trim() !== '' && 
+                               this.nuevoClienteData.telefono.trim() !== '';
+                    }
                     return this.clienteSeleccionado !== null;
                 },
                 confirmarSoloCliente() {
@@ -2004,7 +2008,9 @@
 
                 esDomicilioValido() {
                     if (this.clienteFormVisible) {
-                        if(!this.nuevoClienteData.nombre) return false;
+                        // AQUÍ TAMBIÉN BLOQUEAMOS SI FALTA EL APELLIDO O TELÉFONO
+                        if(!this.nuevoClienteData.nombre || !this.nuevoClienteData.apellido || !this.nuevoClienteData.telefono) return false;
+                        
                         if(!this.dirFormVisible && this.direccionesCliente.length === 0) {
                             this.dirFormVisible = true;
                         }
