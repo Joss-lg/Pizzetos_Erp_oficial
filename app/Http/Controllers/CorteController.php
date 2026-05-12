@@ -77,7 +77,7 @@ class CorteController extends Controller
             $desgloseDiario[$gd->dia]['gastos'] = $gd->total_gastos;
         }
 
-        return view('corte.index', compact('mesSeleccionado','totalIngresos','totalGastos','balanceNeto','ingresosEfectivo','ingresosTarjeta','ingresosTransferencia','pctEfectivo','pctTarjeta','pctTransferencia','desgloseDiario'));
+        return view('Corte.index', compact('mesSeleccionado','totalIngresos','totalGastos','balanceNeto','ingresosEfectivo','ingresosTarjeta','ingresosTransferencia','pctEfectivo','pctTarjeta','pctTransferencia','desgloseDiario'));
     }
 
     // --- Detalle
