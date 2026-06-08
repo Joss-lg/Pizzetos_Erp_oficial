@@ -45,3 +45,7 @@ class UsuarioAdminSeeder extends Seeder
         $this->command->info('¡Perfecto! Se creó el cargo y el administrador sin errores de timestamps.');
     }
 }
+
+
+
+

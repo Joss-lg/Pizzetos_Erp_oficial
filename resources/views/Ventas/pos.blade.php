@@ -217,8 +217,7 @@
 
                                     <template x-if="group.item.is_magno || group.item.col === 'id_rec' || group.item.col === 'id_barr'">
                                         <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
-                                            <input type="checkbox" x-model="group.item.orilla_queso" @change="group.item.orillas_qty = group.item.orilla_queso ? group.item.qty : 0; if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">
-                                            Orilla Queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
+                                            <input type="checkbox" x-model="group.item.orilla_queso" @change="if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">Orilla de queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
                                         </label>
                                     </template>
 
