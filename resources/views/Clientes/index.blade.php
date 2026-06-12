@@ -149,9 +149,39 @@
         </table>
     </div>
 
-    {{-- ENLACES DE PAGINACIÓN DE LARAVEL --}}
-    <div class="mt-4 pt-4 border-t border-gray-100">
-        {{ $clientes->appends(request()->query())->links() }}
+
+    <div class="mt-4 pt-4 border-t border-gray-100 w-full">
+        <div class="flex flex-row justify-between items-center px-4 py-2.5 bg-gray-50 rounded-lg border border-gray-100 shadow-sm">
+            
+            {{-- Botón Anterior --}}
+            @if ($clientes->onFirstPage())
+                <span class="text-xs md:text-sm font-bold text-gray-400 bg-white px-4 py-2 rounded-md border border-gray-200 cursor-not-allowed select-none">
+                    Anterior
+                </span>
+            @else
+                <a href="{{ $clientes->appends(request()->query())->previousPageUrl() }}" class="text-xs md:text-sm font-bold text-gray-700 bg-white hover:bg-gray-100 px-4 py-2 rounded-md border border-gray-200 transition-colors shadow-sm">
+                    Anterior
+                </a>
+            @endif
+
+            {{-- Texto Informativo Central --}}
+            <span class="text-xs md:text-sm text-gray-600 font-bold tracking-wide">
+                Pág. {{ $clientes->currentPage() }} de {{ $clientes->lastPage() }}
+            </span>
+
+            {{-- Botón Siguiente --}}
+            @if ($clientes->hasMorePages())
+                <a href="{{ $clientes->appends(request()->query())->nextPageUrl() }}" class="text-xs md:text-sm font-bold text-gray-700 bg-white hover:bg-gray-100 px-4 py-2 rounded-md border border-gray-200 transition-colors shadow-sm">
+                    Siguiente
+                </a>
+            @else
+                <span class="text-xs md:text-sm font-bold text-gray-400 bg-white px-4 py-2 rounded-md border border-gray-200 cursor-not-allowed select-none">
+                    Siguiente
+                </span>
+            @endif
+            
+        </div>
+
     </div>
 
     <div x-show="mostrarModalEstado" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">

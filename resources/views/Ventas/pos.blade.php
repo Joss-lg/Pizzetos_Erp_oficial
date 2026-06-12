@@ -11,6 +11,207 @@
     border-radius: 10px;
 }
     [x-cloak] { display: none !important; }
+
+
+@media (max-width: 767px) {
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq1"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"],
+        [x-show="modalIngredientes"]
+    ) {
+        align-items: flex-end !important;
+        padding: 0.5rem 0.5rem 0 !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq1"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"],
+        [x-show="modalIngredientes"]
+    ) > div {
+        width: 100% !important;
+        height: calc(100dvh - 4.75rem) !important;
+        max-height: calc(100dvh - 4.75rem) !important;
+        border-radius: 18px 18px 0 0 !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq1"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"],
+        [x-show="modalIngredientes"]
+    ) > div::before {
+        content: "";
+        display: block;
+        width: 3rem;
+        height: 0.35rem;
+        margin: 0.5rem auto 0.35rem;
+        border-radius: 999px;
+        background: #d1d5db;
+        flex: 0 0 auto;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq3"]
+    ) > div > div:nth-child(2) {
+        display: block !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq3"]
+    ) > div > div:nth-child(2) > div {
+        width: 100% !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        border-right: 0 !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq3"]
+    ) > div > div:nth-child(2) > div:first-child {
+        padding: 1rem !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq3"]
+    ) > div > div:nth-child(2) > div:last-child {
+        padding: 1rem !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq1"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"],
+        [x-show="modalIngredientes"]
+    ) h2 {
+        font-size: 1.15rem !important;
+        line-height: 1.25 !important;
+        padding-right: 2rem;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq1"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"]
+    ) .truncate {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"]
+    ) > div > div:nth-child(2) .overflow-hidden {
+        overflow: visible !important;
+    }
+
+    :is(
+        [x-show="modalMagno"],
+        [x-show="modalRectangular"],
+        [x-show="modalBarra"],
+        [x-show="modalMitades"],
+        [x-show="modalPaq2"],
+        [x-show="modalPaq3"]
+    ) > div > div:nth-child(2) .h-full {
+        height: auto !important;
+    }
+
+    [x-show="modalPaq2"] > div > div:nth-child(2),
+    [x-show="modalIngredientes"] > div > div:nth-child(2) {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    [x-show="modalPaq2"] .paq2-body {
+        display: block !important;
+        padding: 1rem !important;
+        overflow-y: auto !important;
+    }
+
+    [x-show="modalPaq2"] .paq2-body > * + * {
+        margin-top: 1rem !important;
+    }
+
+    [x-show="modalPaq2"] .paq2-extra-grid,
+    [x-show="modalPaq2"] .paq2-specialty-grid,
+    [x-show="modalPaq2"] .paq2-ingredient-grid {
+        max-height: none !important;
+        overflow: visible !important;
+        padding-right: 0 !important;
+    }
+
+    [x-show="modalPaq2"] .paq2-pizza-section {
+        display: block !important;
+        min-height: auto !important;
+        padding-top: 1rem !important;
+    }
+
+    [x-show="modalPaq2"] .paq2-choice-card {
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.2;
+    }
+
+    [x-show="modalPaq2"] .paq2-footer {
+        flex-shrink: 0;
+        padding: 1rem !important;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .mobile-sheet-header {
+        touch-action: pan-y;
+        cursor: grab;
+        user-select: none;
+    }
+
+}
+
 </style>
 
 @if(!$cajaAbierta)
@@ -58,11 +259,13 @@
         const dbDirecciones = Array.isArray(rawDirs) ? rawDirs : Object.values(rawDirs || {});
     </script>
 
-    <div class="w-full h-[calc(100vh-95px)] bg-[#f8f9fa] font-sans text-[#212529] flex flex-col overflow-hidden" x-data="posApp()">
+
+    <div class="w-full min-h-[calc(100dvh-95px)] lg:h-[calc(100vh-95px)] bg-[#f8f9fa] font-sans text-[#212529] flex flex-col max-lg:overflow-y-auto lg:overflow-hidden" x-data="posApp()">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full min-h-0">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:h-full lg:min-h-0 p-2 lg:p-0">
             
-            <div class="lg:col-span-8 flex flex-col gap-2 h-full min-h-0">
+            <div class="lg:col-span-8 flex flex-col gap-2 lg:h-full lg:min-h-0">
+
                 <div class="flex flex-row gap-2 overflow-x-auto w-full mb-4 pb-2" style="scrollbar-width: thin;">
                     <button @click="abrirPaquete(1)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
                     <button @click="abrirPaquete(2)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
@@ -104,7 +307,9 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto scrollbar-hide pb-2 pt-1">
+
+                <div class="max-lg:h-auto lg:flex-1 overflow-y-auto scrollbar-hide pb-6 pt-1">
+
                     <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2">
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
                             <button @click="abrirOpciones(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
@@ -140,7 +345,9 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-full min-h-0">
+
+            <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col lg:h-full lg:min-h-0 max-lg:mt-4 pb-20 lg:pb-0">
+
                 <div class="p-5 pb-4 border-b border-gray-100 flex justify-between items-end shrink-0">
                     <div>
                         <h2 class="text-[20px] font-black text-[#212529] leading-none" x-text="id_venta_edit ? 'Editando #' + id_venta_edit : 'Pedido Actual'"></h2>
@@ -148,7 +355,9 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-hide bg-[#f8f9fa]">
+
+                <div class="max-lg:max-h-[50vh] lg:flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-hide bg-[#f8f9fa]">
+
                     <template x-for="(group, gIdx) in cartGroups" :key="group.id_grupo">
                         <div>
                             <template x-if="group.type === 'pizza_pair'">
@@ -248,8 +457,19 @@
                     </template>
                 </div>
 
-                <div class="p-4 border-t border-gray-200 bg-white rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0">
-                    <div class="flex justify-between items-center font-black text-[#212529] mb-3">
+
+                <div
+                    class="p-4 border-t border-gray-200 bg-white lg:rounded-b-xl shadow-[0_-4px_14px_-1px_rgba(0,0,0,0.16)] shrink-0 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:w-full max-lg:z-40 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] max-lg:rounded-t-[18px] max-lg:transition-transform max-lg:duration-300 max-lg:ease-out"
+                    :class="mobilePayOpen ? 'max-lg:translate-y-0' : 'max-lg:translate-y-[calc(100%-76px)]'"
+                    @touchstart.passive="mobilePayTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="let mobilePayDiff = mobilePayTouchStartY - $event.changedTouches[0].clientY; if (mobilePayDiff > 35) mobilePayOpen = true; if (mobilePayDiff < -35) { mobilePayOpen = false; openServicio = false; }"
+                >
+                    <button type="button" @click="mobilePayOpen = !mobilePayOpen; if(!mobilePayOpen) openServicio = false" class="lg:hidden w-full flex justify-center pb-3 -mt-1" aria-label="Mostrar u ocultar panel de pago">
+                        <span class="w-12 h-1.5 rounded-full bg-gray-300"></span>
+                    </button>
+
+                    <div class="flex justify-between items-center font-black text-[#212529] mb-3 max-lg:min-h-[36px]" @click="mobilePayOpen = true">
+
                         <span class="text-[16px]">Total:</span>
                         <span x-text="'$' + getGranTotal().toFixed(2)" class="text-[26px]"></span>
                     </div>
@@ -356,9 +576,15 @@
         </div>
 
         {{-- MODAL MAGNO CON INGREDIENTES --}}
-        <div x-show="modalMagno" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalMagno" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMagno = false">
-                <div class="bg-[#212529] p-5 flex justify-between items-center text-white">
+                <div
+                    class="mobile-sheet-header bg-[#212529] p-5 flex justify-between items-center text-white"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalMagno = false"
+                >
+
                     <h2 class="text-xl font-bold flex items-center gap-2">Magno</h2>
                     <button @click="modalMagno = false" class="hover:text-gray-300 font-bold text-2xl leading-none">&times;</button>
                 </div>
@@ -427,9 +653,15 @@
         </div>
 
         {{-- MODAL RECTANGULAR CON INGREDIENTES --}}
-        <div x-show="modalRectangular" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalRectangular" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalRectangular = false">
-                <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white">
+                <div
+                    class="mobile-sheet-header bg-[#fd7e14] p-5 flex justify-between items-center text-white"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalRectangular = false"
+                >
+
                     <h2 class="text-xl font-bold">Pizza Rectangular (4 Cuartos)</h2>
                     <button @click="modalRectangular = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button>
                 </div>
@@ -491,9 +723,15 @@
         </div>
 
         {{-- MODAL BARRA CON INGREDIENTES --}}
-        <div x-show="modalBarra" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalBarra" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[700px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalBarra = false">
-                <div class="bg-[#17a2b8] p-5 flex justify-between items-center text-white">
+                <div
+                    class="mobile-sheet-header bg-[#17a2b8] p-5 flex justify-between items-center text-white"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalBarra = false"
+                >
+
                     <h2 class="text-xl font-bold">Pizza de Barra (2 Mitades)</h2>
                     <button @click="modalBarra = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button>
                 </div>
@@ -555,9 +793,15 @@
         </div>
 
         {{-- MODAL MITADES (STANDALONE) CON INGREDIENTES --}}
-        <div x-show="modalMitades" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalMitades" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[750px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalMitades = false">
-                <div class="bg-[#dc3545] p-5 flex justify-between items-center text-white"><h2 class="text-xl font-bold">Mitades</h2><button @click="modalMitades = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button></div>
+                <div
+                    class="mobile-sheet-header bg-[#dc3545] p-5 flex justify-between items-center text-white"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalMitades = false"
+                ><h2 class="text-xl font-bold">Mitades</h2><button @click="modalMitades = false" class="hover:text-gray-200 font-bold text-2xl leading-none">&times;</button></div>
+
                 <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
                     <div class="w-full md:w-[65%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
                         <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 shrink-0">
@@ -616,9 +860,15 @@
         </div>
 
         {{-- MODAL PAQUETE 1 --}}
-        <div x-show="modalPaq1" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalPaq1" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq1 = false">
-                <div class="p-6 pb-4 relative border-b border-gray-100 bg-[#ffc107]">
+                <div
+                    class="mobile-sheet-header p-6 pb-4 relative border-b border-gray-100 bg-[#ffc107]"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalPaq1 = false"
+                >
+
                     <button @click="modalPaq1 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
                     <h2 class="text-2xl font-black text-black mb-1">Paquete 1</h2>
                 </div>
@@ -685,10 +935,16 @@
         </div>
 
         {{-- MODAL PAQUETE 2 --}}
-        <div x-show="modalPaq2" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalPaq2" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq2 = false">
-                <div class="p-6 relative border-b border-gray-100 bg-[#ffc107]"><h2 class="text-2xl font-black text-black mb-1">Paquete 2</h2><button @click="modalPaq2 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button></div>
-                <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                <div
+                    class="mobile-sheet-header p-6 relative border-b border-gray-100 bg-[#ffc107]"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalPaq2 = false"
+                ><h2 class="text-2xl font-black text-black mb-1">Paquete 2</h2><button @click="modalPaq2 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button></div>
+                <div class="paq2-body p-6 overflow-y-auto flex-1 space-y-5 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+
                     <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-2 mt-0 shrink-0"><li>1 Hamburguesa o Alitas</li><li>1 Pizza Grande</li><li>1 Refresco de 2L Jarrito</li></ul>
                     
                     <div class="shrink-0">
@@ -696,14 +952,18 @@
                             <button @click="paq2Tipo = 'hamb'; paq2Extra = ''" :class="paq2Tipo === 'hamb' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Hamburguesa</button>
                             <button @click="paq2Tipo = 'alitas'; paq2Extra = ''" :class="paq2Tipo === 'alitas' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Alitas</button>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+
+                        <div class="paq2-extra-grid grid grid-cols-2 gap-2">
                             <template x-for="p in dbDirectos.filter(d => { return paq2Tipo === 'hamb' ? (d.cat === 6 && d.nombre.toLowerCase().includes('sencilla')) : (d.cat === 5); })" :key="p.id">
-                                <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]"><span x-text="p.nombre"></span></button>
+                                <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="paq2-choice-card border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]"><span x-text="p.nombre"></span></button>
+
                             </template>
                         </div>
                     </div>
 
-                    <div class="flex-1 flex flex-col min-h-0 pt-4 border-t border-gray-200">
+
+                    <div class="paq2-pizza-section flex-1 flex flex-col min-h-0 pt-4 border-t border-gray-200">
+
                         <label class="flex items-center gap-2 mb-3 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm shrink-0">
                             <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                             <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
@@ -715,9 +975,11 @@
                         </div>
 
                         <div x-show="!showIngs" class="flex flex-col min-h-0 flex-1">
-                            <div x-show="!paq2MitadesMode" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+
+                            <div x-show="!paq2MitadesMode" class="paq2-specialty-grid grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
+                                    <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
+
                                 </template>
                             </div>
                             <div x-show="paq2MitadesMode" x-cloak class="flex flex-col h-full min-h-0">
@@ -733,9 +995,11 @@
                                         </div>
                                     </template>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
+
+                                <div class="paq2-specialty-grid grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
                                     <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                        <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                        <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+
                                     </template>
                                 </div>
                             </div>
@@ -754,7 +1018,9 @@
                                     </div>
                                 </template>
                             </div>
-                            <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide bg-white border border-gray-100 rounded-lg p-2">
+
+                            <div class="paq2-ingredient-grid grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide bg-white border border-gray-100 rounded-lg p-2">
+
                                 <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
                                     <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
                                         <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-amber-500 rounded border-gray-300 focus:ring-amber-500">
@@ -768,7 +1034,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-5 flex gap-3 border-t border-gray-100 bg-white justify-between items-center">
+
+                <div class="paq2-footer p-5 flex gap-3 border-t border-gray-100 bg-white justify-between items-center">
+
                     <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
                     <button @click="addPaq2()" :disabled="!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)" :class="(!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
@@ -776,9 +1044,15 @@
         </div>
 
         {{-- MODAL PAQUETE 3 ACTUALIZADO PARA PIZZAS TOTALMENTE MIXTAS --}}
-        <div x-show="modalPaq3" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <div x-show="modalPaq3" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalPaq3 = false">
-                <div class="p-6 relative border-b border-gray-100 bg-[#ffc107] shrink-0">
+                <div
+                    class="mobile-sheet-header p-6 relative border-b border-gray-100 bg-[#ffc107] shrink-0"
+                    @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                    @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalPaq3 = false"
+                >
+
                     <h2 class="text-2xl font-black text-black mb-1">Paquete 3</h2>
                     <button @click="modalPaq3 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
                 </div>
@@ -870,9 +1144,15 @@
             </div>
         </div>
 
-       <div x-show="modalIngredientes" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+
+       <div x-show="modalIngredientes" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalIngredientes = false">
-            <div class="bg-[#fd7e14] p-5 flex justify-between items-center text-white">
+            <div
+                class="mobile-sheet-header bg-[#fd7e14] p-5 flex justify-between items-center text-white"
+                @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
+                @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalIngredientes = false"
+            >
+
                 <h2 class="text-xl font-bold">Armar por Ingrediente (Pizza Completa)</h2>
                 <button @click="modalIngredientes = false" class="hover:text-orange-200 font-bold text-2xl leading-none">&times;</button>
             </div>
@@ -1318,6 +1598,10 @@
             Alpine.data('posApp', () => ({
                 openServicio: false,
                 openExtras: false,
+
+                mobilePayOpen: false,
+                mobilePayTouchStartY: 0,
+                productModalTouchStartY: 0,
                 cat: 12, view: 'pizzas', search: '', cart: {!! json_encode($cart_preloaded ?? []) !!}, cartGroups: [], 
                 servicio: {{ $venta_edit->tipo_servicio ?? 3 }}, 
                 mesa: '{{ $venta_edit->mesa ?? '' }}', 
@@ -2362,4 +2646,6 @@
         });
     </script>
 @endif
+
 @endsection
+

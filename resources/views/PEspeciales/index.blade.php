@@ -6,14 +6,16 @@
     [x-cloak] { display: none !important; }
 </style>
 
-<div class="p-6 h-[calc(100vh-95px)] overflow-y-auto bg-[#f8f9fa]" x-data="especialesApp()">
+
+<div class="p-4 sm:p-6 h-[calc(100vh-95px)] overflow-y-auto bg-[#f8f9fa]" x-data="especialesApp()">
     <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-                <h1 class="text-3xl font-black text-gray-800 italic uppercase tracking-tighter leading-none">Pedidos Especiales</h1>
+                <h1 class="text-2xl sm:text-3xl font-black text-gray-800 italic uppercase tracking-tighter leading-none">Pedidos Especiales</h1>
                 <p class="text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">Por entregar</p>
             </div>
-            <a href="{{ route('ventas.pos') }}" class="bg-gray-800 hover:bg-black text-white px-5 py-2.5 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2">
+            <a href="{{ route('ventas.pos') }}" class="w-full sm:w-auto justify-center bg-gray-800 hover:bg-black text-white px-5 py-2.5 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2">
+
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Volver al POS
             </a>
@@ -29,56 +31,60 @@
             </div>
         @else
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-[11px] uppercase tracking-widest">
-                            <th class="p-4 font-black">Entrega / Hora</th>
-                            <th class="p-4 font-black">Folio / Cliente</th>
-                            <th class="p-4 font-black text-right">Total</th>
-                            <th class="p-4 font-black text-right">Abonado</th>
-                            <th class="p-4 font-black text-right">Resta</th>
-                            <th class="p-4 font-black text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm font-medium text-gray-700">
-                        @foreach($especiales as $esp)
-                            <tr class="border-b border-gray-100 hover:bg-cyan-50/30 transition-colors">
-                                <td class="p-4">
-                                    <span class="block font-black text-black text-[15px]">{{ \Carbon\Carbon::parse($esp->fecha_entrega)->format('d/m/Y') }}</span>
-                                    <span class="text-[#17a2b8] font-bold">{{ \Carbon\Carbon::parse($esp->fecha_entrega)->format('h:i A') }}</span>
-                                </td>
-                                <td class="p-4">
-                                    <span class="block font-black text-gray-800">#{{ str_pad($esp->id_venta, 5, '0', STR_PAD_LEFT) }}</span>
-                                    <span class="text-gray-600 block">{{ $esp->cliente_display }}</span>
-                                    <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">{{ $esp->telefono_display }}</span>
-                                </td>
-                                <td class="p-4 text-right font-black text-gray-800">${{ number_format($esp->total, 2) }}</td>
-                                <td class="p-4 text-right font-bold text-green-600">${{ number_format($esp->pagado, 2) }}</td>
-                                <td class="p-4 text-right font-black text-red-500 text-lg">${{ number_format($esp->restante, 2) }}</td>
-                                <td class="p-4">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <button @click="imprimirTicket({{ $esp->id_venta }})" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors" title="Imprimir Ticket">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                        </button>
 
-                                        <a href="/venta/pos?id_venta={{ $esp->id_venta }}" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" title="Editar Pedido">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                        </a>
-
-                                        <button @click="abrirAbono({{ json_encode($esp) }})" class="p-2.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors" title="Agregar Abono">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        </button>
-
-                                        <button @click="abrirCobro({{ json_encode($esp) }})" class="bg-[#17a2b8] hover:bg-[#138496] text-white px-3 py-2.5 rounded-lg font-bold shadow-sm transition-all text-[11px] uppercase tracking-wider flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                            Entregar
-                                        </button>
-                                    </div>
-                                </td>
+                <div class="w-full overflow-x-auto min-w-full inline-block align-middle">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 text-[11px] uppercase tracking-widest">
+                                <th class="p-4 font-black">Entrega / Hora</th>
+                                <th class="p-4 font-black">Folio / Cliente</th>
+                                <th class="p-4 font-black text-right">Total</th>
+                                <th class="p-4 font-black text-right">Abonado</th>
+                                <th class="p-4 font-black text-right">Resta</th>
+                                <th class="p-4 font-black text-center">Acciones</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="text-sm font-medium text-gray-700">
+                            @foreach($especiales as $esp)
+                                <tr class="border-b border-gray-100 hover:bg-cyan-50/30 transition-colors">
+                                    <td class="p-4">
+                                        <span class="block font-black text-black text-[15px]">{{ \Carbon\Carbon::parse($esp->fecha_entrega)->format('d/m/Y') }}</span>
+                                        <span class="text-[#17a2b8] font-bold">{{ \Carbon\Carbon::parse($esp->fecha_entrega)->format('h:i A') }}</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="block font-black text-gray-800">#{{ str_pad($esp->id_venta, 5, '0', STR_PAD_LEFT) }}</span>
+                                        <span class="text-gray-600 block">{{ $esp->cliente_display }}</span>
+                                        <span class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">{{ $esp->telefono_display }}</span>
+                                    </td>
+                                    <td class="p-4 text-right font-black text-gray-800">${{ number_format($esp->total, 2) }}</td>
+                                    <td class="p-4 text-right font-bold text-green-600">${{ number_format($esp->pagado, 2) }}</td>
+                                    <td class="p-4 text-right font-black text-red-500 text-lg">${{ number_format($esp->restante, 2) }}</td>
+                                    <td class="p-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <button @click="imprimirTicket({{ $esp->id_venta }})" class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors" title="Imprimir Ticket">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                            </button>
+
+                                            <a href="/venta/pos?id_venta={{ $esp->id_venta }}" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" title="Editar Pedido">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </a>
+
+                                            <button @click="abrirAbono({{ json_encode($esp) }})" class="p-2.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors" title="Agregar Abono">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            </button>
+
+                                            <button @click="abrirCobro({{ json_encode($esp) }})" class="bg-[#17a2b8] hover:bg-[#138496] text-white px-3 py-2.5 rounded-lg font-bold shadow-sm transition-all text-[11px] uppercase tracking-wider flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                Entregar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         @endif
     </div>

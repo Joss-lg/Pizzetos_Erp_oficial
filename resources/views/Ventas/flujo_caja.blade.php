@@ -319,16 +319,20 @@
                             Cerrar Caja y Turno
                         </button>
                         
-                        <div x-show="modal" x-cloak style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem;">
-                            <div class="pizzetos-card" style="max-width: 450px; text-align: center;">
-                                <h3 class="text-3xl pizzetos-title text-slate-900 mb-4 italic uppercase">¿Confirmar Cierre?</h3>
-                                <p class="text-slate-400 font-bold italic text-[11px] mb-10 uppercase tracking-widest leading-relaxed">Se generará el reporte final y se lanzará el PDF automáticamente.</p>
-                                <div class="flex gap-4">
-                                    <button @click="modal = false" type="button" class="flex-1 py-5 font-black uppercase italic rounded-2xl bg-slate-100 text-slate-500 text-xs tracking-tighter">Cancelar</button>
-                                    <button type="button" @click="document.getElementById('formCerrar').submit()" class="flex-1 py-5 font-black uppercase italic rounded-2xl bg-red-600 text-white text-xs tracking-tighter shadow-lg shadow-red-200">Finalizar Todo</button>
+
+                        <template x-teleport="body">
+                            <div x-show="modal" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/85 backdrop-blur-[26px] backdrop-brightness-[0.18] backdrop-saturate-50 p-4 sm:p-6" style="-webkit-backdrop-filter: blur(26px) brightness(0.18) saturate(50%); backdrop-filter: blur(26px) brightness(0.18) saturate(50%);">
+                                <div class="relative pizzetos-card w-[min(92vw,420px)] max-h-[88vh] overflow-y-auto text-center border border-white/70 shadow-[0_45px_140px_-40px_rgba(15,23,42,0.95)]" style="margin: 0 auto; background: rgba(255,255,255,0.99) !important; isolation: isolate;">
+                                    <h3 class="text-3xl pizzetos-title text-slate-900 mb-4 italic uppercase">¿Confirmar Cierre?</h3>
+                                    <p class="text-slate-400 font-bold italic text-[11px] mb-8 uppercase tracking-widest leading-relaxed">Se generará el reporte final y se lanzará el PDF automáticamente.</p>
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <button @click="modal = false" type="button" class="flex-1 py-5 font-black uppercase italic rounded-2xl bg-slate-100 text-slate-500 text-xs tracking-tighter">Cancelar</button>
+                                        <button type="button" @click="document.getElementById('formCerrar').submit()" class="flex-1 py-5 font-black uppercase italic rounded-2xl bg-red-600 text-white text-xs tracking-tighter shadow-lg shadow-red-200">Finalizar Todo</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </template>
+
                     </form>
                 </div>
             </div>
