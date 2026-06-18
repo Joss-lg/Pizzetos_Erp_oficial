@@ -9,6 +9,14 @@
     <link rel="icon" type="image/png" href="{{ asset('pizzetos2.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script>
+        (() => {
+            const savedTheme = localStorage.getItem('appDarkMode');
+            const darkMode = savedTheme === null ? true : savedTheme === 'true';
+            document.documentElement.classList.toggle('app-dark', darkMode);
+        })();
+    </script>
     
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -38,17 +46,383 @@
             -webkit-overflow-scrolling: touch;
         }
 
+<<<<<<< HEAD
+=======
+        .theme-toggle {
+            position: relative;
+            width: 3.25rem;
+            height: 2rem;
+            border-radius: 999px;
+            background: #fbbf24;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45), 0 8px 18px rgba(15,23,42,0.12);
+            transition: background-color 220ms ease, box-shadow 220ms ease, transform 160ms ease;
+        }
+        .theme-toggle:hover { transform: translateY(-1px); }
+        .theme-toggle:active { transform: translateY(1px) scale(0.98); }
+        .theme-toggle__orb {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 999px;
+            background: #fff7cc;
+            color: #f59e0b;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 4px 10px rgba(15,23,42,0.18);
+            transition: transform 240ms ease, background-color 220ms ease, color 220ms ease;
+        }
+        .app-dark .theme-toggle {
+            background: #111827;
+            box-shadow: inset 0 0 0 2px rgba(148,163,184,0.28), 0 8px 18px rgba(0,0,0,0.32);
+        }
+        .app-dark .theme-toggle__orb {
+            transform: translateX(1.25rem) rotate(-28deg);
+            background: #1f2937;
+            color: #94a3b8;
+        }
+
+        html.app-dark,
+        .app-dark {
+            --app-dark-bg: #0b1220;
+            --app-dark-surface: #131c2e;
+            --app-dark-surface-soft: #182235;
+            --app-dark-surface-strong: #1d2940;
+            --app-dark-border: #2f3c53;
+            --app-dark-text: #e5e7eb;
+            --app-dark-muted: #94a3b8;
+            background: #0f172a !important;
+            color: #e5e7eb !important;
+            color-scheme: dark;
+        }
+        html.app-dark body,
+        .app-dark body {
+            background: var(--app-dark-bg) !important;
+            color: var(--app-dark-text) !important;
+        }
+        html.app-dark header,
+        .app-dark header {
+            background-color: #151e2f !important;
+            border-color: #263246 !important;
+        }
+        html.app-dark main,
+        html.app-dark .bg-\[\#f8fafc\],
+        html.app-dark .bg-\[\#f8f9fa\],
+        html.app-dark .bg-gray-50,
+        html.app-dark .bg-slate-50,
+        .app-dark main,
+        .app-dark .bg-\[\#f8fafc\],
+        .app-dark .bg-\[\#f8f9fa\],
+        .app-dark .bg-gray-50,
+        .app-dark .bg-slate-50 {
+            background-color: var(--app-dark-bg) !important;
+        }
+        .app-dark .bg-slate-100,
+        .app-dark .bg-gray-100,
+        .app-dark .bg-slate-100\/50,
+        .app-dark .bg-slate-50\/50,
+        .app-dark .bg-gray-50\/50,
+        .app-dark .bg-slate-50\/80,
+        .app-dark .bg-slate-100\/70,
+        .app-dark .bg-slate-100\/60,
+        .app-dark .bg-gray-50\/80 {
+            background-color: var(--app-dark-surface) !important;
+        }
+        .app-dark .bg-white {
+            background-color: var(--app-dark-surface-soft) !important;
+        }
+        .app-dark .bg-white\/90,
+        .app-dark .bg-white\/95,
+        .app-dark .bg-white\/80,
+        .app-dark .bg-white\/70 {
+            background-color: rgba(24, 34, 53, 0.94) !important;
+        }
+        .app-dark .bg-white\/60,
+        .app-dark .bg-white\/50 {
+            background-color: rgba(19, 28, 46, 0.9) !important;
+        }
+        .app-dark .border,
+        .app-dark .border-2 {
+            border-color: var(--app-dark-border) !important;
+        }
+        .app-dark .rounded-\[45px\],
+        .app-dark .rounded-\[35px\],
+        .app-dark .rounded-\[30px\],
+        .app-dark .rounded-2xl,
+        .app-dark .rounded-xl {
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18) !important;
+        }
+        .app-dark .text-gray-900,
+        .app-dark .text-slate-900,
+        .app-dark .text-\[\#212529\] {
+            color: #f9fafb !important;
+        }
+        .app-dark .bg-white .text-black,
+        .app-dark .bg-\[\#f8f9fa\] .text-black,
+        .app-dark .bg-\[\#f8fafc\] .text-black {
+            color: #f9fafb !important;
+        }
+        .app-dark .text-slate-600,
+        .app-dark .text-gray-700,
+        .app-dark .text-\[\#495057\] {
+            color: #cbd5e1 !important;
+        }
+        .app-dark .text-slate-400,
+        .app-dark .text-gray-500,
+        .app-dark .text-\[\#6c757d\] {
+            color: #94a3b8 !important;
+        }
+        .app-dark .text-gray-300,
+        .app-dark .text-slate-300,
+        .app-dark .text-gray-400 {
+            color: #cbd5e1 !important;
+        }
+        .app-dark .border-slate-200,
+        .app-dark .border-gray-200,
+        .app-dark .border-gray-100,
+        .app-dark .border-slate-100 {
+            border-color: var(--app-dark-border) !important;
+        }
+        .app-dark .border-slate-300,
+        .app-dark .border-gray-300,
+        .app-dark .border-slate-400,
+        .app-dark .border-gray-400 {
+            border-color: #44526b !important;
+        }
+        .app-dark input,
+        .app-dark select,
+        .app-dark textarea {
+            background-color: #101828 !important;
+            color: #f9fafb !important;
+            border-color: #334155 !important;
+        }
+        .app-dark input:focus,
+        .app-dark select:focus,
+        .app-dark textarea:focus {
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.28) !important;
+        }
+        .app-dark input::placeholder,
+        .app-dark textarea::placeholder {
+            color: #64748b !important;
+        }
+        .app-dark table,
+        .app-dark th,
+        .app-dark td {
+            border-color: #334155 !important;
+        }
+        .app-dark th {
+            background-color: #111827 !important;
+            color: var(--app-dark-muted) !important;
+        }
+        .app-dark td {
+            background-color: var(--app-dark-surface-soft) !important;
+        }
+        .app-dark tr:hover td,
+        .app-dark tr:hover .bg-white {
+            background-color: var(--app-dark-surface-strong) !important;
+        }
+        .app-dark .shadow-inner {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(47,60,83,0.52) !important;
+        }
+        .app-dark .shadow-sm,
+        .app-dark .shadow-md,
+        .app-dark .shadow-lg,
+        .app-dark .shadow-xl,
+        .app-dark .shadow-2xl {
+            --tw-shadow-color: rgba(0, 0, 0, 0.35) !important;
+        }
+        .app-dark .bg-black\/40,
+        .app-dark .bg-black\/50,
+        .app-dark .bg-black\/60,
+        .app-dark .bg-slate-900\/80 {
+            background-color: rgba(2, 6, 23, 0.78) !important;
+        }
+        .app-dark .backdrop-blur-sm,
+        .app-dark .backdrop-blur-md {
+            backdrop-filter: blur(10px);
+        }
+        .app-dark .bg-amber-50,
+        .app-dark .bg-amber-100,
+        .app-dark .bg-yellow-50,
+        .app-dark .bg-yellow-100 {
+            background-color: rgba(245, 158, 11, 0.12) !important;
+        }
+        .app-dark .bg-green-50,
+        .app-dark .bg-green-100 {
+            background-color: rgba(34, 197, 94, 0.1) !important;
+        }
+        .app-dark .bg-red-50,
+        .app-dark .bg-red-100,
+        .app-dark .bg-red-50\/50 {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+        }
+        .app-dark .bg-blue-50,
+        .app-dark .bg-blue-100,
+        .app-dark .bg-cyan-50,
+        .app-dark .bg-cyan-100 {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+        .app-dark .ring-1,
+        .app-dark .ring-2,
+        .app-dark .ring,
+        .app-dark .outline,
+        .app-dark .outline-1 {
+            --tw-ring-color: rgba(71, 85, 105, 0.45) !important;
+        }
+        .app-dark .text-amber-600,
+        .app-dark .text-amber-700,
+        .app-dark .text-yellow-600,
+        .app-dark .text-yellow-700 {
+            color: #fbbf24 !important;
+        }
+        .app-dark .text-green-600,
+        .app-dark .text-green-700 {
+            color: #4ade80 !important;
+        }
+        .app-dark .text-red-500,
+        .app-dark .text-red-600,
+        .app-dark .text-red-700 {
+            color: #f87171 !important;
+        }
+        .app-dark .text-blue-500,
+        .app-dark .text-blue-600,
+        .app-dark .text-cyan-600 {
+            color: #60a5fa !important;
+        }
+        .app-dark .bg-amber-400,
+        .app-dark .bg-amber-500,
+        .app-dark .bg-\[\#ffc107\] {
+            background-color: #d97706 !important;
+            color: #fff7ed !important;
+        }
+        .app-dark .bg-green-500,
+        .app-dark .bg-green-600,
+        .app-dark .bg-\[\#28a745\] {
+            background-color: #15803d !important;
+            color: #f0fdf4 !important;
+        }
+        .app-dark .bg-red-500,
+        .app-dark .bg-\[\#dc3545\] {
+            background-color: #b91c1c !important;
+            color: #fef2f2 !important;
+        }
+        .app-dark .bg-blue-600,
+        .app-dark .bg-\[\#17a2b8\],
+        .app-dark .bg-cyan-500 {
+            background-color: #0f766e !important;
+            color: #ecfeff !important;
+        }
+        .app-dark .bg-\[\#fd7e14\] {
+            background-color: #c2410c !important;
+            color: #fff7ed !important;
+        }
+        .app-dark .bg-\[\#343a40\],
+        .app-dark .bg-black {
+            background-color: #0b1120 !important;
+            color: #f8fafc !important;
+        }
+        .app-dark .hover\:bg-white:hover,
+        .app-dark .hover\:bg-slate-50:hover,
+        .app-dark .hover\:bg-gray-50:hover,
+        .app-dark .hover\:bg-white\/90:hover {
+            background-color: var(--app-dark-surface-strong) !important;
+        }
+        .app-dark .hover\:bg-gray-50:hover,
+        .app-dark .hover\:bg-gray-100:hover,
+        .app-dark .hover\:bg-slate-100:hover,
+        .app-dark .hover\:bg-slate-200:hover {
+            background-color: var(--app-dark-surface-strong) !important;
+        }
+        .app-dark [class*='rounded-'][class*='shadow'][class*='bg-white'],
+        .app-dark [class*='rounded-'][class*='border'][class*='bg-white'] {
+            background-color: var(--app-dark-surface-soft) !important;
+        }
+        html.app-dark .pizzetos-card,
+        html.app-dark .resume-surface,
+        html.app-dark .resume-chip,
+        html.app-dark .gastos-card,
+        html.app-dark .modal-gasto__panel > div,
+        html.app-dark [class*='card'],
+        html.app-dark [class*='Card'],
+        html.app-dark [class*='surface'],
+        html.app-dark [class*='Surface'],
+        html.app-dark [class*='panel'],
+        html.app-dark [class*='Panel'],
+        html.app-dark [class*='modal'],
+        html.app-dark [class*='Modal'] {
+            background-color: var(--app-dark-surface-soft) !important;
+            border-color: var(--app-dark-border) !important;
+            color: var(--app-dark-text) !important;
+        }
+        html.app-dark [style*='background: #fff'],
+        html.app-dark [style*='background:#fff'],
+        html.app-dark [style*='background: #ffffff'],
+        html.app-dark [style*='background:#ffffff'],
+        html.app-dark [style*='background: #fafafa'],
+        html.app-dark [style*='background:#fafafa'],
+        html.app-dark [style*='background-color: #fff'],
+        html.app-dark [style*='background-color:#fff'],
+        html.app-dark [style*='background-color: white'],
+        html.app-dark [style*='background-color:white'] {
+            background: var(--app-dark-surface-soft) !important;
+            background-color: var(--app-dark-surface-soft) !important;
+        }
+        html.app-dark [class*='shadow-amber-'],
+        html.app-dark [class*='shadow-blue-'],
+        html.app-dark [class*='shadow-purple-'],
+        html.app-dark [class*='shadow-emerald-'],
+        html.app-dark [class*='shadow-red-'] {
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22) !important;
+        }
+        html.app-dark .bg-white .bg-slate-50,
+        html.app-dark .bg-white .bg-gray-50,
+        html.app-dark .bg-white .bg-slate-100,
+        html.app-dark .bg-white .bg-gray-100 {
+            background-color: var(--app-dark-surface) !important;
+        }
+        html.app-dark .border-white\/70,
+        html.app-dark .border-white\/60,
+        html.app-dark .border-white\/50 {
+            border-color: rgba(71, 85, 105, 0.45) !important;
+        }
+        html.app-dark .text-black,
+        html.app-dark .text-\[\#1e293b\],
+        html.app-dark .text-slate-800 {
+            color: var(--app-dark-text) !important;
+        }
+        html.app-dark .text-slate-500,
+        html.app-dark .text-gray-500,
+        html.app-dark .text-gray-400 {
+            color: var(--app-dark-muted) !important;
+        }
+        .app-dark aside .bg-white {
+            background-color: #ffffff !important;
+        }
+        .app-dark aside .text-black,
+        .app-dark aside .text-slate-900 {
+            color: #0f172a !important;
+        }
+>>>>>>> rama_pizzetos_erp
     </style>
 </head>
 
 {{-- APPSHELL: Congelamos el body (h-screen overflow-hidden) para que solo el main tenga scroll --}}
 <body class="bg-[#f8fafc] font-sans antialiased text-slate-900 h-screen overflow-hidden"
+      :class="darkMode ? 'app-dark' : ''"
       x-data="{ 
+          darkMode: localStorage.getItem('appDarkMode') === null ? true : localStorage.getItem('appDarkMode') === 'true',
           sidebarOpen: false, 
           sidebarExpanded: $persist(false), /* Magia: Guardamos el estado en LocalStorage */
 
           freezeSidebarScrollSave: false,
           sidebarNavScrollTop: parseInt(localStorage.getItem('sidebarNavScrollTop') || '0', 10),
+          toggleDarkMode() {
+              this.darkMode = !this.darkMode;
+              localStorage.setItem('appDarkMode', this.darkMode ? 'true' : 'false');
+              document.documentElement.classList.toggle('app-dark', this.darkMode);
+          },
           restoreSidebarScroll() {
               this.$nextTick(() => {
                   if (this.$refs.sidebarNav) {
@@ -320,6 +694,22 @@
                 </div>
 
                 <div class="flex items-center gap-4">
+                    <button
+                        type="button"
+                        @click="toggleDarkMode()"
+                        class="theme-toggle shrink-0"
+                        :aria-label="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
+                        :title="darkMode ? 'Activar modo claro' : 'Activar modo oscuro'"
+                    >
+                        <span class="theme-toggle__orb">
+                            <svg x-show="!darkMode" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 18a6 6 0 100-12 6 6 0 000 12Zm0 4a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1Zm0-18a1 1 0 01-1-1V2a1 1 0 112 0v1a1 1 0 01-1 1Zm10 8a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1ZM4 12a1 1 0 01-1 1H2a1 1 0 110-2h1a1 1 0 011 1Zm14.95 6.95a1 1 0 01-1.42 0l-.7-.7a1 1 0 111.41-1.42l.71.71a1 1 0 010 1.41ZM7.17 7.17a1 1 0 01-1.41 0l-.71-.71a1 1 0 011.41-1.41l.71.71a1 1 0 010 1.41Zm11.78-2.12a1 1 0 010 1.41l-.71.71a1 1 0 11-1.41-1.41l.7-.71a1 1 0 011.42 0ZM7.17 16.83a1 1 0 010 1.41l-.71.71a1 1 0 01-1.41-1.41l.71-.71a1 1 0 011.41 0Z"/>
+                            </svg>
+                            <svg x-show="darkMode" x-cloak class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 14.8A8.7 8.7 0 019.2 3 9 9 0 1012 21a8.9 8.9 0 009-6.2Z"/>
+                            </svg>
+                        </span>
+                    </button>
                     <div class="hidden sm:block text-right">
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Usuario Activo</p>
                         <p class="text-sm font-black text-gray-900 uppercase italic leading-none tracking-tighter">{{ Auth::user()->nombre ?? 'Admin' }}</p>

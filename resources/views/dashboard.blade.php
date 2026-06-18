@@ -1,12 +1,50 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .app-dark .dashboard-board {
+        background: #182235 !important;
+        border-color: #2f3c53 !important;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .app-dark .dashboard-board-soft {
+        background: #131c2e !important;
+        border-color: #2f3c53 !important;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16) !important;
+    }
+
+    .app-dark .dashboard-chip-green {
+        background: rgba(34, 197, 94, 0.14) !important;
+        border-color: rgba(34, 197, 94, 0.2) !important;
+    }
+
+    .app-dark .dashboard-chip-red {
+        background: rgba(239, 68, 68, 0.14) !important;
+        border-color: rgba(239, 68, 68, 0.2) !important;
+    }
+
+    .app-dark .dashboard-pay-efectivo {
+        background: linear-gradient(135deg, #14532d, #166534) !important;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .app-dark .dashboard-pay-tarjeta {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .app-dark .dashboard-pay-transferencia {
+        background: linear-gradient(135deg, #6d28d9, #7c3aed) !important;
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18) !important;
+    }
+</style>
 <div class="max-w-7xl mx-auto space-y-6 pb-12">
     
     @if(!$cajaAbierta)
         {{-- ESTADO: CAJA CERRADA --}}
         <div class="w-full flex flex-col items-center justify-center min-h-[75vh]">
-            <div class="bg-white rounded-[3.5rem] shadow-sm border border-slate-100 p-12 text-center max-w-lg relative overflow-hidden">
+            <div class="bg-white rounded-[3.5rem] shadow-sm border border-slate-100 p-12 text-center max-w-lg relative overflow-hidden dashboard-board">
                 {{-- Fondo decorativo --}}
                 <div class="absolute top-0 right-0 p-8 opacity-[0.03] rotate-12">
                     <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
@@ -32,7 +70,7 @@
         {{-- ESTADO: CAJA ABIERTA (TU DASHBOARD ORIGINAL) --}}
         
         {{-- HEADER COMPACTO --}}
-        <div class="flex justify-between items-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div class="flex justify-between items-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm dashboard-board">
             <div>
                 <h1 class="text-3xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">
                     Resumen de Hoy <span class="text-amber-400">.</span>
@@ -56,7 +94,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
             
             {{-- CARD: BALANCE EFECTIVO --}}
-            <div class="md:col-span-8 bg-white rounded-[3.5rem] p-10 border-4 border-amber-400/20 relative overflow-hidden shadow-sm">
+            <div class="md:col-span-8 bg-white rounded-[3.5rem] p-10 border-4 border-amber-400/20 relative overflow-hidden shadow-sm dashboard-board">
                 <div class="absolute top-0 right-0 p-12 opacity-[0.03] rotate-12">
                     <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
                 </div>
@@ -70,12 +108,12 @@
                     </div>
                     
                     <div class="mt-12 flex items-center gap-6">
-                        <div class="bg-emerald-50 p-5 rounded-[2rem] border border-emerald-100">
+                        <div class="bg-emerald-50 p-5 rounded-[2rem] border border-emerald-100 dashboard-chip-green">
                             <span class="block text-[9px] font-black text-emerald-600 uppercase italic mb-1">Entradas</span>
                             <span class="text-2xl font-black text-slate-800 italic">${{ number_format($efectivoVentas, 2) }}</span>
                         </div>
                         <div class="text-slate-300 font-black text-2xl italic">-</div>
-                        <div class="bg-red-50 p-5 rounded-[2rem] border border-red-100">
+                        <div class="bg-red-50 p-5 rounded-[2rem] border border-red-100 dashboard-chip-red">
                             <span class="block text-[9px] font-black text-red-500 uppercase italic mb-1">Salidas</span>
                             <span class="text-2xl font-black text-slate-800 italic">-${{ number_format($gastosHoy, 2) }}</span>
                         </div>
@@ -84,7 +122,7 @@
             </div>
 
             {{-- CARD: VENTA BRUTA --}}
-            <div class="md:col-span-4 bg-white rounded-[3.5rem] p-10 border border-slate-100 shadow-sm flex flex-col justify-center text-center">
+            <div class="md:col-span-4 bg-white rounded-[3.5rem] p-10 border border-slate-100 shadow-sm flex flex-col justify-center text-center dashboard-board">
                 <span class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em] mb-4">Venta Total Bruta</span>
                 <h2 class="text-5xl font-black text-slate-900 italic tracking-tighter leading-none mb-6">
                     ${{ number_format($ventasHoy, 2) }}
@@ -95,7 +133,7 @@
             </div>
 
             {{-- MÉTODOS DE PAGO --}}
-            <div class="md:col-span-4 bg-emerald-500 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 flex items-center justify-between group transition-all hover:-translate-y-1">
+            <div class="md:col-span-4 bg-emerald-500 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 flex items-center justify-between group transition-all hover:-translate-y-1 dashboard-pay-efectivo">
                 <div>
                     <span class="text-[9px] font-black uppercase italic opacity-70 tracking-widest block mb-1">Efectivo</span>
                     <h3 class="text-4xl font-black italic tracking-tighter leading-none">${{ number_format($efectivoVentas, 2) }}</h3>
@@ -105,7 +143,7 @@
                 </div>
             </div>
 
-            <div class="md:col-span-4 bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 flex items-center justify-between group transition-all hover:-translate-y-1">
+            <div class="md:col-span-4 bg-blue-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-100 flex items-center justify-between group transition-all hover:-translate-y-1 dashboard-pay-tarjeta">
                 <div>
                     <span class="text-[9px] font-black uppercase italic opacity-70 tracking-widest block mb-1">Tarjeta</span>
                     <h3 class="text-4xl font-black italic tracking-tighter leading-none">${{ number_format($tarjetasHoy, 2) }}</h3>
@@ -115,7 +153,7 @@
                 </div>
             </div>
 
-            <div class="md:col-span-4 bg-purple-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-purple-100 flex items-center justify-between group transition-all hover:-translate-y-1">
+            <div class="md:col-span-4 bg-purple-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-purple-100 flex items-center justify-between group transition-all hover:-translate-y-1 dashboard-pay-transferencia">
                 <div>
                     <span class="text-[9px] font-black uppercase italic opacity-70 tracking-widest block mb-1">Transferencia</span>
                     <h3 class="text-4xl font-black italic tracking-tighter leading-none">${{ number_format($transferenciasHoy, 2) }}</h3>

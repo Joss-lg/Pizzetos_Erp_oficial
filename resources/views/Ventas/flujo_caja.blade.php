@@ -47,6 +47,52 @@
         width: 100%;
     }
     .pizzetos-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.3); }
+
+    .app-dark .pizzetos-card {
+        background: #182235 !important;
+        border-color: #2f3c53 !important;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .app-dark .pizzetos-label {
+        color: #94a3b8 !important;
+    }
+
+    .app-dark .pizzetos-title,
+    .app-dark .pizzetos-card .text-slate-900,
+    .app-dark .pizzetos-card .text-slate-800 {
+        color: #f8fafc !important;
+    }
+
+    .app-dark .pizzetos-card .text-slate-400,
+    .app-dark .pizzetos-card .text-slate-500 {
+        color: #94a3b8 !important;
+    }
+
+    .app-dark .pay-badge-split {
+        border-color: #334155 !important;
+        background: #131c2e !important;
+    }
+
+    .app-dark .pay-amount {
+        background: #101828 !important;
+        color: #e2e8f0 !important;
+        border-left-color: #334155 !important;
+    }
+
+    .app-dark .bg-efectivo { background: rgba(34, 197, 94, 0.12) !important; color: #4ade80 !important; }
+    .app-dark .bg-tarjeta { background: rgba(59, 130, 246, 0.12) !important; color: #60a5fa !important; }
+    .app-dark .bg-transf { background: rgba(147, 51, 234, 0.14) !important; color: #c084fc !important; }
+
+    .app-dark .pizzetos-btn {
+        background: #d97706 !important;
+        color: #fff7ed !important;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22) !important;
+    }
+
+    .app-dark .pizzetos-btn:hover {
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28) !important;
+    }
 </style>
 
 {{-- LÓGICA DE AUTO-LANZAMIENTO DE PDF AL CERRAR --}}
@@ -295,7 +341,7 @@
 
             {{-- SIDEBAR ARQUEO --}}
             <div x-data="{ modal: false, contado: '', esperado: {{ $stats['efectivo_real_en_sobre'] }} }">
-                <div class="pizzetos-card" style="border-top: 10px solid var(--pizzetos-amber) !important; background: #fafafa !important;">
+                <div class="pizzetos-card" style="border-top: 10px solid var(--pizzetos-amber) !important;">
                     <h3 class="text-3xl pizzetos-title text-center mb-8 italic">Arqueo Final</h3>
                     <form id="formCerrar" action="{{ route('flujo.caja.cerrar', $cajaAbierta->id_caja) }}" method="POST" class="space-y-6">
                         @csrf

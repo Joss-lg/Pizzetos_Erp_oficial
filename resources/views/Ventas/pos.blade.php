@@ -13,6 +13,84 @@
     [x-cloak] { display: none !important; }
 
 
+.pos-pressable {
+    transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease, filter 150ms ease;
+    will-change: transform;
+}
+.pos-pressable:hover {
+    transform: translateY(-1px);
+}
+.pos-pressable:active {
+    transform: translateY(1px) scale(0.985);
+    filter: brightness(0.98);
+}
+.pos-product-card {
+    transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease, background-color 170ms ease;
+    will-change: transform;
+}
+.pos-product-card:hover {
+    transform: translateY(-2px);
+}
+.pos-product-card:active {
+    transform: translateY(1px) scale(0.985);
+}
+.pos-choice-card {
+    transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+    will-change: transform;
+}
+.pos-choice-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+.pos-choice-card:active {
+    transform: scale(0.98);
+}
+.pos-modal-overlay {
+    isolation: isolate;
+    will-change: opacity;
+}
+.pos-modal-panel {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: opacity, transform;
+}
+.pos-cart-flyer {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    pointer-events: none;
+    max-width: min(220px, 72vw);
+    padding: 0.65rem 0.85rem;
+    border-radius: 999px;
+    background: #ffc107;
+    color: #111827;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.18);
+    font-size: 0.78rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+    .pos-pressable,
+    .pos-product-card,
+    .pos-choice-card {
+        transition: none !important;
+    }
+    .pos-pressable:hover,
+    .pos-product-card:hover,
+    .pos-choice-card:hover,
+    .pos-pressable:active,
+    .pos-product-card:active,
+    .pos-choice-card:active {
+        transform: none !important;
+        filter: none !important;
+    }
+}
+
+
 @media (max-width: 767px) {
     :is(
         [x-show="modalMagno"],
@@ -267,27 +345,27 @@
             <div class="lg:col-span-8 flex flex-col gap-2 lg:h-full lg:min-h-0">
 
                 <div class="flex flex-row gap-2 overflow-x-auto w-full mb-4 pb-2" style="scrollbar-width: thin;">
-                    <button @click="abrirPaquete(1)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
-                    <button @click="abrirPaquete(2)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
-                    <button @click="abrirPaquete(3)" class="whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
+                    <button @click="abrirPaquete(1)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
+                    <button @click="abrirPaquete(2)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
+                    <button @click="abrirPaquete(3)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
 
-                    <button @click="abrirMagnoGeneral(); openExtras = false" class="whitespace-nowrap bg-[#343a40] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Magno</button>
+                    <button @click="abrirMagnoGeneral(); openExtras = false" class="pos-pressable whitespace-nowrap bg-[#343a40] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Magno</button>
                     
-                    <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Rectangular</button>
+                    <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Rectangular</button>
                     
-                    <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Barra</button>
+                    <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#17a2b8] shadow-inner' : 'bg-[#17a2b8] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Barra</button>
 
-                    <button @click="abrirModalIngredientes()" class="whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
+                    <button @click="abrirModalIngredientes()" class="pos-pressable whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
 
-                    <button @click="modalMitades = true; mitSel = []; mitTam = null; showIngs = false; tempIngs = [];" class="whitespace-nowrap bg-[#dc3545] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Mitad y Mitad</button>
+                    <button @click="modalMitades = true; mitSel = []; mitTam = null; showIngs = false; tempIngs = [];" :class="modalMitades ? 'bg-[#dc3545] shadow-inner' : 'bg-[#dc3545] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Mitad y Mitad</button>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
                     <div class="flex flex-wrap gap-1 items-center w-full xl:w-auto">
-                        <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
-                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 2 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
+                        <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
+                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 2 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
                         <div class="relative">
-                            <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
+                            <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
                                 Snacks <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
@@ -312,7 +390,7 @@
 
                     <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2">
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
-                            <button @click="abrirOpciones(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
+                            <button @click="abrirOpciones(p)" class="pos-product-card bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
                                 <span class="text-[#fd7e14] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
                                     Opciones <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
@@ -323,7 +401,7 @@
 
                     <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2" x-cloak>
                         <template x-for="b in getListaBebidas()" :key="'beb_'+b.nombre">
-                            <button @click="abrirBebida(b)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
+                            <button @click="abrirBebida(b)" class="pos-product-card bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="b.nombre"></span>
                                 <span class="text-[#17a2b8] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
                                     Elegir tamaño <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
@@ -334,7 +412,7 @@
 
                     <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start mt-1 pr-2" x-cloak>
                         <template x-for="p in getListaDirectos()" :key="p.id">
-                            <button @click="addDirecto(p)" class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
+                            <button @click="addDirecto(p, $event)" class="pos-product-card bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
                                 <div class="flex items-center gap-1 mt-3">
                                     <span class="text-blue-600 text-[14px] font-black group-hover:scale-110 transition-transform origin-left" x-text="'$' + parseFloat(p.precio).toFixed(2)"></span>
@@ -346,7 +424,7 @@
             </div>
 
 
-            <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col lg:h-full lg:min-h-0 max-lg:mt-4 pb-20 lg:pb-0">
+            <div x-ref="cartPanel" class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col lg:h-full lg:min-h-0 max-lg:mt-4 pb-20 lg:pb-0">
 
                 <div class="p-5 pb-4 border-b border-gray-100 flex justify-between items-end shrink-0">
                     <div>
@@ -361,13 +439,13 @@
                     <template x-for="(group, gIdx) in cartGroups" :key="group.id_grupo">
                         <div>
                             <template x-if="group.type === 'pizza_pair'">
-                                <div class="bg-white border-2 border-amber-400 rounded-xl shadow-sm mb-4 overflow-hidden">
-                                    <div class="bg-amber-400 px-4 py-2.5 flex justify-between items-center">
+                                <div class="bg-white border-2 rounded-xl shadow-sm mb-4 overflow-hidden" :style="pizzaPairShellStyle(group)">
+                                    <div class="px-4 py-2.5 flex justify-between items-center" :style="pizzaPairHeaderStyle(group)">
                                         <div class="flex items-center gap-2">
-                                            <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                                            <h3 class="font-black text-black text-[14px]" x-text="'Pizzas ' + group.size"></h3>
+                                            <svg class="w-5 h-5" :style="pizzaPairHeaderTextStyle(group)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                            <h3 class="font-black text-[14px]" :style="pizzaPairHeaderTextStyle(group)" x-text="pizzaPairHeaderLabel(group)"></h3>
                                         </div>
-                                        <button @click="eliminarGrupo(group)" class="text-black/60 hover:text-red-700 bg-amber-300/50 hover:bg-amber-300 p-1.5 rounded-md transition-colors" title="Borrar grupo completo">
+                                        <button @click="eliminarGrupo(group)" class="p-1.5 rounded-md transition-colors" :style="pizzaPairDeleteStyle(group)" title="Borrar grupo completo">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         </button>
                                     </div>
@@ -402,53 +480,60 @@
                             </template>
 
                             <template x-if="group.type === 'normal'">
-                                <div class="border border-gray-200 rounded-[8px] p-4 bg-white shadow-sm mb-4 relative" :class="group.item.is_old ? 'bg-gray-50' : ''">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h4 class="font-bold text-[#212529] text-[14px] pr-6 leading-tight" x-text="group.item.nombre_base"></h4>
-                                        <button @click="eliminarItemByUid(group.item.uid)" class="text-[#dc3545] hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded absolute right-4 top-4 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 10-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                <div class="bg-white border-2 rounded-xl shadow-sm mb-4 overflow-hidden" :style="cartItemShellStyle(group.item)">
+                                    <div class="px-4 py-2.5 flex justify-between items-center" :style="cartItemHeaderStyle(group.item)">
+                                        <div class="flex items-center gap-2 min-w-0" :style="cartItemHeaderTextStyle(group.item)">
+                                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                            <h3 class="font-black text-[14px] leading-tight truncate" x-text="cartItemHeaderLabel(group.item)"></h3>
+                                        </div>
+                                        <button @click="eliminarItemByUid(group.item.uid)" class="p-1.5 rounded-md transition-colors" :style="cartItemDeleteStyle(group.item)" title="Borrar producto">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 10-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                                         </button>
                                     </div>
 
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <div class="flex items-center bg-[#e9ecef] rounded border border-gray-200">
-                                            <button @click="group.item.qty > 1 ? updateNormalQty(group.item, -1) : null" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">-</button>
-                                            <span class="w-8 h-7 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[13px]" x-text="group.item.qty"></span>
-                                            <button @click="updateNormalQty(group.item, 1)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
-                                        </div>
-                                        <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| Base: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
-                                        <span x-show="group.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1">Enviado</span>
-                                    </div>
-                                    
-                                    <div x-show="group.item.variante" class="bg-[#f8f9fa] border border-gray-200 rounded-[6px] p-2 mt-2">
-                                        <span class="text-[12px] text-[#495057] block font-bold whitespace-pre-wrap" x-text="group.item.variante"></span>
-                                    </div>
-
-                                    <template x-if="group.item.is_magno || group.item.col === 'id_rec' || group.item.col === 'id_barr'">
-                                        <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
-                                            <input type="checkbox" x-model="group.item.orilla_queso" @change="if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">Orilla de queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
-                                        </label>
-                                    </template>
-
-                                    <template x-if="group.item.tipo === 'paq'">
-                                        <div class="mt-2 bg-[#f8f9fa] p-2.5 rounded-[8px] border border-gray-200 shadow-inner">
-                                            <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest block mb-2">Elegir Orilla Rellena (+$<span x-text="group.item.precio_orilla"></span>)</span>
-                                            <div class="space-y-1.5">
-                                                <template x-for="(pz, pIdx) in group.item.pizzas_paq" :key="pIdx">
-                                                    <label class="flex items-center gap-2 text-[12px] font-bold text-gray-700 cursor-pointer bg-white px-2.5 py-2 rounded shadow-sm border border-gray-100 hover:border-amber-400 transition-colors">
-                                                        <input type="checkbox" x-model="pz.orilla" @change="recalcPaqOrillas(group.item)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
-                                                        <span x-text="pz.nombre"></span>
-                                                    </label>
-                                                </template>
+                                    <div class="p-3 space-y-3 bg-white">
+                                        <div class="relative border border-gray-200 bg-white rounded-lg p-3 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+                                            <div class="flex items-center gap-3 mb-2">
+                                                <div class="flex items-center bg-[#e9ecef] rounded border border-gray-200">
+                                                    <button @click="group.item.qty > 1 ? updateNormalQty(group.item, -1) : null" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">-</button>
+                                                    <span class="w-8 h-7 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[13px]" x-text="group.item.qty"></span>
+                                                    <button @click="updateNormalQty(group.item, 1)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
+                                                </div>
+                                                <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| Base: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
+                                                <span x-show="group.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1">Enviado</span>
                                             </div>
-                                            <div x-show="group.item.extra_paq" class="mt-2 pt-2 border-t border-gray-200 text-[12px] font-bold text-slate-700 px-1">
-                                                <span class="text-amber-500 mr-1">+</span> <span x-text="group.item.extra_paq"></span>
-                                            </div>
-                                        </div>
-                                    </template>
 
-                                    <div class="text-right font-black text-[#212529] text-[16px] mt-3 border-t border-gray-100 pt-2">
-                                        <span x-text="'$' + group.subtotal.toFixed(2)"></span>
+                                            <div x-show="group.item.variante" class="bg-[#f8f9fa] border border-gray-200 rounded-[6px] p-2 mt-2">
+                                                <span class="text-[12px] text-[#495057] block font-bold whitespace-pre-wrap" x-text="group.item.variante"></span>
+                                            </div>
+
+                                            <template x-if="group.item.is_magno || group.item.col === 'id_rec' || group.item.col === 'id_barr'">
+                                                <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
+                                                    <input type="checkbox" x-model="group.item.orilla_queso" @change="if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">Orilla de queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
+                                                </label>
+                                            </template>
+
+                                            <template x-if="group.item.tipo === 'paq'">
+                                                <div class="mt-2 bg-[#f8f9fa] p-2.5 rounded-[8px] border border-gray-200 shadow-inner">
+                                                    <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest block mb-2">Elegir Orilla Rellena (+$<span x-text="group.item.precio_orilla"></span>)</span>
+                                                    <div class="space-y-1.5">
+                                                        <template x-for="(pz, pIdx) in group.item.pizzas_paq" :key="pIdx">
+                                                            <label class="flex items-center gap-2 text-[12px] font-bold text-gray-700 cursor-pointer bg-white px-2.5 py-2 rounded shadow-sm border border-gray-100 hover:border-amber-400 transition-colors">
+                                                                <input type="checkbox" x-model="pz.orilla" @change="recalcPaqOrillas(group.item)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                                                <span x-text="pz.nombre"></span>
+                                                            </label>
+                                                        </template>
+                                                    </div>
+                                                    <div x-show="group.item.extra_paq" class="mt-2 pt-2 border-t border-gray-200 text-[12px] font-bold text-slate-700 px-1">
+                                                        <span class="text-amber-500 mr-1">+</span> <span x-text="group.item.extra_paq"></span>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 py-3 bg-gray-50 text-right border-t border-gray-200">
+                                        <span class="text-gray-500 text-[12px] font-bold uppercase mr-2 tracking-wider">Subtotal:</span>
+                                        <span class="font-black text-[#212529] text-[20px]" x-text="'$' + group.subtotal.toFixed(2)"></span>
                                     </div>
                                 </div>
                             </template>
@@ -468,7 +553,7 @@
                         <span class="w-12 h-1.5 rounded-full bg-gray-300"></span>
                     </button>
 
-                    <div class="flex justify-between items-center font-black text-[#212529] mb-3 max-lg:min-h-[36px]" @click="mobilePayOpen = true">
+                    <div x-ref="payTarget" class="flex justify-between items-center font-black text-[#212529] mb-3 max-lg:min-h-[36px]" @click="mobilePayOpen = true">
 
                         <span class="text-[16px]">Total:</span>
                         <span x-text="'$' + getGranTotal().toFixed(2)" class="text-[26px]"></span>
@@ -541,15 +626,22 @@
             </div>
         </div>
 
-        <div x-show="modalOpc" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
+        <div x-show="modalOpc" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-y-6"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-180"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 translate-y-8"
+             class="pos-modal-overlay fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="pos-modal-panel bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
                 <div class="p-5 border-b border-gray-100 flex justify-between items-center">
                     <h2 class="text-[18px] font-bold text-[#212529]" x-text="opcItem?.nombre"></h2>
-                    <button @click="modalOpc = false" class="text-gray-400 hover:text-black font-bold text-xl">&times;</button>
+                    <button @click="modalOpc = false" class="pos-pressable text-gray-400 hover:text-black font-bold text-xl">&times;</button>
                 </div>
                 <div class="p-5 bg-[#f8f9fa] space-y-3 max-h-[50vh] overflow-y-auto scrollbar-hide">
                     <template x-for="t in opcItem?.tamanos" :key="t.id">
-                        <button @click="addOpc(t)" class="w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#fd7e14] hover:shadow-sm transition-all">
+                        <button @click="addOpc(t, $event)" class="pos-choice-card w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#fd7e14] hover:shadow-sm transition-all">
                             <span class="font-bold text-[#212529] text-[14px]" x-text="cleanSize(t.tamano)"></span>
                             <span class="font-black text-[#28a745] text-[15px]" x-text="'$' + parseFloat(t.precio).toFixed(2)"></span>
                         </button>
@@ -558,15 +650,22 @@
             </div>
         </div>
 
-        <div x-show="modalBebida" x-cloak class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalBebida = false">
+        <div x-show="modalBebida" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-y-6"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-180"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 translate-y-8"
+             class="pos-modal-overlay fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="pos-modal-panel bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalBebida = false">
                 <div class="bg-[#17a2b8] p-5 flex justify-between items-center text-white">
                     <h2 class="text-[18px] font-bold" x-text="bebidaItem?.nombre"></h2>
-                    <button @click="modalBebida = false" class="text-white hover:text-gray-200 font-bold text-xl">&times;</button>
+                    <button @click="modalBebida = false" class="pos-pressable text-white hover:text-gray-200 font-bold text-xl">&times;</button>
                 </div>
                 <div class="p-5 bg-[#f8f9fa] space-y-3 max-h-[50vh] overflow-y-auto scrollbar-hide">
                     <template x-for="opc in bebidaItem?.opciones" :key="opc.id">
-                        <button @click="addBebida(opc)" class="w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#17a2b8] hover:shadow-sm transition-all">
+                        <button @click="addBebida(opc, $event)" class="pos-choice-card w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#17a2b8] hover:shadow-sm transition-all">
                             <span class="font-bold text-[#212529] text-[14px]" x-text="opc.tamano"></span>
                             <span class="font-black text-[#17a2b8] text-[15px]" x-text="'$' + parseFloat(opc.precio).toFixed(2)"></span>
                         </button>
@@ -612,7 +711,7 @@
                             
                             <div x-show="!showIngs" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="addMagnoEsp(esp.nombre)" :disabled="magnoSel.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-black disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                    <button @click="addMagnoEsp(esp.nombre)" :disabled="magnoSel.length >= 2" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-black disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
                                 </template>
                             </div>
                             
@@ -625,7 +724,7 @@
                                         </label>
                                     </template>
                                 </div>
-                                <button @click="if(tempIngs.length > 0) { addMagnoEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || magnoSel.length >= 2" class="w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                <button @click="if(tempIngs.length > 0) { addMagnoEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || magnoSel.length >= 2" class="pos-pressable w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
                                     Añadir Personalizada
                                 </button>
                             </div>
@@ -645,7 +744,7 @@
                                 <span class="text-gray-500 text-[14px] font-bold">Total</span>
                                 <span class="font-black text-[#28a745] text-[26px] leading-none" x-text="'$' + (magnoItem ? parseFloat(magnoItem.precio).toFixed(2) : '0.00')"></span>
                             </div>
-                            <button @click="addMagno()" :disabled="magnoSel.length !== 2" :class="magnoSel.length !== 2 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#212529] text-white hover:bg-black'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px] transition-all mb-2">Añadir al Carrito</button>
+                            <button @click="addMagno($event)" :disabled="magnoSel.length !== 2" :class="magnoSel.length !== 2 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#212529] text-white hover:bg-black'" class="pos-pressable w-full font-bold py-3.5 rounded-[8px] text-[14px] transition-all mb-2">Añadir al Carrito</button>
                         </div>
                     </div>
                 </div>
@@ -687,7 +786,7 @@
                             </div>
                             <div x-show="!showIngs" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="addRectEsp(esp.nombre)" :disabled="rectSel.length >= 4" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-orange-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                    <button @click="addRectEsp(esp.nombre)" :disabled="rectSel.length >= 4" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-orange-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
                                 </template>
                             </div>
                             <div x-show="showIngs" x-cloak class="flex flex-col h-full overflow-hidden">
@@ -699,7 +798,7 @@
                                         </label>
                                     </template>
                                 </div>
-                                <button @click="if(tempIngs.length > 0) { addRectEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || rectSel.length >= 4" class="w-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                <button @click="if(tempIngs.length > 0) { addRectEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || rectSel.length >= 4" class="pos-pressable w-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
                                     Añadir Personalizada
                                 </button>
                             </div>
@@ -715,7 +814,7 @@
                                 <span class="text-gray-500 text-[14px] font-bold">Total</span>
                                 <span class="font-black text-[#28a745] text-[26px]" x-text="'$' + (rectItem ? parseFloat(rectItem.precio).toFixed(2) : '0.00')"></span>
                             </div>
-                            <button @click="addRectangular()" :disabled="rectSel.length !== 4" :class="rectSel.length !== 4 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#fd7e14] text-white hover:bg-[#e36b0c]'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
+                            <button @click="addRectangular($event)" :disabled="rectSel.length !== 4" :class="rectSel.length !== 4 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#fd7e14] text-white hover:bg-[#e36b0c]'" class="pos-pressable w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
                         </div>
                     </div>
                 </div>
@@ -757,7 +856,7 @@
                             </div>
                             <div x-show="!showIngs" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="addBarraEsp(esp.nombre)" :disabled="barraSel.length >= 2" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-[#17a2b8] disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                    <button @click="addBarraEsp(esp.nombre)" :disabled="barraSel.length >= 2" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-[#17a2b8] disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
                                 </template>
                             </div>
                             <div x-show="showIngs" x-cloak class="flex flex-col h-full overflow-hidden">
@@ -769,7 +868,7 @@
                                         </label>
                                     </template>
                                 </div>
-                                <button @click="if(tempIngs.length > 0) { addBarraEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || barraSel.length >= 2" class="w-full bg-[#17a2b8] hover:bg-[#138496] text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                <button @click="if(tempIngs.length > 0) { addBarraEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || barraSel.length >= 2" class="pos-pressable w-full bg-[#17a2b8] hover:bg-[#138496] text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
                                     Añadir Personalizada
                                 </button>
                             </div>
@@ -785,7 +884,7 @@
                                 <span class="text-gray-500 text-[14px] font-bold">Total</span>
                                 <span class="font-black text-[#28a745] text-[26px]" x-text="'$' + (barraItem ? parseFloat(barraItem.precio).toFixed(2) : '0.00')"></span>
                             </div>
-                            <button @click="addBarra()" :disabled="barraSel.length !== 2" :class="barraSel.length !== 2 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#17a2b8] text-white hover:bg-[#138496]'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
+                            <button @click="addBarra($event)" :disabled="barraSel.length !== 2" :class="barraSel.length !== 2 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#17a2b8] text-white hover:bg-[#138496]'" class="pos-pressable w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
                         </div>
                     </div>
                 </div>
@@ -806,7 +905,7 @@
                     <div class="w-full md:w-[65%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
                         <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 shrink-0">
                             <template x-for="tam in dbTamanosBase" :key="tam.id_tamañop">
-                                <button @click="mitTam = tam; mitSel = []" :class="mitTam?.id_tamañop === tam.id_tamañop ? 'border-red-500 bg-red-50 shadow' : 'border-gray-200 bg-white'" class="border rounded-[8px] py-4 text-center">
+                                <button @click="mitTam = tam; mitSel = []" :class="mitTam?.id_tamañop === tam.id_tamañop ? 'border-red-500 bg-red-50 shadow' : 'border-gray-200 bg-white'" class="pos-choice-card border rounded-[8px] py-4 text-center">
                                     <span class="block font-bold text-black text-[14px]" x-text="cleanSize(tam.tamano)"></span>
                                 </button>
                             </template>
@@ -820,7 +919,7 @@
                             
                             <div x-show="!showIngs" class="grid grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="toggleMitad(esp.nombre)" :class="mitSel.includes(esp.nombre) ? 'border-red-500 bg-red-50 text-red-700' : 'bg-white border-gray-200 text-gray-700'" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left shadow-sm transition-colors" x-text="esp.nombre"></button>
+                                    <button @click="toggleMitad(esp.nombre)" :class="mitSel.includes(esp.nombre) ? 'border-red-500 bg-red-50 text-red-700' : 'bg-white border-gray-200 text-gray-700'" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold text-left shadow-sm transition-colors" x-text="esp.nombre"></button>
                                 </template>
                             </div>
                             
@@ -833,7 +932,7 @@
                                         </label>
                                     </template>
                                 </div>
-                                <button @click="if(tempIngs.length > 0) { addMitadEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || mitSel.length >= 2" class="w-full bg-[#dc3545] hover:bg-red-700 text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                <button @click="if(tempIngs.length > 0) { addMitadEsp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || mitSel.length >= 2" class="pos-pressable w-full bg-[#dc3545] hover:bg-red-700 text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
                                     Añadir Personalizada
                                 </button>
                             </div>
@@ -852,7 +951,7 @@
                                 <span class="text-gray-500 text-[14px] font-bold">Total</span>
                                 <span class="font-black text-[#28a745] text-[26px] leading-none" x-text="'$' + (mitTam ? parseFloat(mitTam.precio).toFixed(2) : '0.00')"></span>
                             </div>
-                            <button @click="addMitad()" :disabled="mitSel.length !== 2 || !mitTam" :class="(mitSel.length !== 2 || !mitTam) ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#dc3545] text-white hover:bg-red-700'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
+                            <button @click="addMitad($event)" :disabled="mitSel.length !== 2 || !mitTam" :class="(mitSel.length !== 2 || !mitTam) ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#dc3545] text-white hover:bg-red-700'" class="pos-pressable w-full font-bold py-3.5 rounded-[8px] text-[14px]">Añadir</button>
                         </div>
                     </div>
                 </div>
@@ -897,8 +996,8 @@
                             </template>
                         </div>
                         <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white">
-                            <button @click="addPaq1Esp('HAWAIANA')" :disabled="paq1Pizzas.length >= 2" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">HAWAIANA</button>
-                            <button @click="addPaq1Esp('PEPPERONI')" :disabled="paq1Pizzas.length >= 2" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">PEPPERONI</button>
+                            <button @click="addPaq1Esp('HAWAIANA')" :disabled="paq1Pizzas.length >= 2" class="pos-choice-card border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">HAWAIANA</button>
+                            <button @click="addPaq1Esp('PEPPERONI')" :disabled="paq1Pizzas.length >= 2" class="pos-choice-card border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">PEPPERONI</button>
                         </div>
                     </div>
 
@@ -921,15 +1020,15 @@
                             </template>
                         </div>
                         <div class="grid grid-cols-2 gap-2 border border-gray-100 rounded-lg p-2 bg-white">
-                            <button @click="addPaq1Esp('HAWAIANA')" :disabled="paq1Halves.length >= 4" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">HAWAIANA</button>
-                            <button @click="addPaq1Esp('PEPPERONI')" :disabled="paq1Halves.length >= 4" class="border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">PEPPERONI</button>
+                            <button @click="addPaq1Esp('HAWAIANA')" :disabled="paq1Halves.length >= 4" class="pos-choice-card border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">HAWAIANA</button>
+                            <button @click="addPaq1Esp('PEPPERONI')" :disabled="paq1Halves.length >= 4" class="pos-choice-card border rounded-[8px] p-3 text-[13px] font-bold text-center text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]">PEPPERONI</button>
                         </div>
                     </div>
 
                 </div>
                 <div class="p-5 flex gap-3 border-t border-gray-100 bg-white items-center justify-between">
                     <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
-                    <button @click="addPaq1()" :disabled="paq1MitadesMode ? paq1Halves.length !== 4 : paq1Pizzas.length !== 2" :class="(paq1MitadesMode ? paq1Halves.length !== 4 : paq1Pizzas.length !== 2) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
+                    <button @click="addPaq1($event)" :disabled="paq1MitadesMode ? paq1Halves.length !== 4 : paq1Pizzas.length !== 2" :class="(paq1MitadesMode ? paq1Halves.length !== 4 : paq1Pizzas.length !== 2) ? 'opacity-50' : ''" class="pos-pressable bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
             </div>
         </div>
@@ -955,7 +1054,8 @@
 
                         <div class="paq2-extra-grid grid grid-cols-2 gap-2">
                             <template x-for="p in dbDirectos.filter(d => { return paq2Tipo === 'hamb' ? (d.cat === 6 && d.nombre.toLowerCase().includes('sencilla')) : (d.cat === 5); })" :key="p.id">
-                                <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="paq2-choice-card border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]"><span x-text="p.nombre"></span></button>
+
+                                <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="pos-choice-card paq2-choice-card border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]"><span x-text="p.nombre"></span></button>
 
                             </template>
                         </div>
@@ -978,8 +1078,8 @@
 
                             <div x-show="!paq2MitadesMode" class="paq2-specialty-grid grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
 
+                                    <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="pos-choice-card paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
                                 </template>
                             </div>
                             <div x-show="paq2MitadesMode" x-cloak class="flex flex-col h-full min-h-0">
@@ -998,8 +1098,8 @@
 
                                 <div class="paq2-specialty-grid grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
                                     <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                        <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
 
+                                        <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="pos-choice-card paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
                                     </template>
                                 </div>
                             </div>
@@ -1028,7 +1128,7 @@
                                     </label>
                                 </template>
                             </div>
-                            <button @click="if(tempIngs.length > 0) { addPaq2Esp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || (paq2MitadesMode ? paq2MitadesArr.length >= 2 : false)" class="w-full bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                            <button @click="if(tempIngs.length > 0) { addPaq2Esp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || (paq2MitadesMode ? paq2MitadesArr.length >= 2 : false)" class="pos-pressable w-full bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
                                 Añadir Personalizada
                             </button>
                         </div>
@@ -1038,7 +1138,7 @@
                 <div class="paq2-footer p-5 flex gap-3 border-t border-gray-100 bg-white justify-between items-center">
 
                     <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
-                    <button @click="addPaq2()" :disabled="!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)" :class="(!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)) ? 'opacity-50' : ''" class="bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
+                    <button @click="addPaq2($event)" :disabled="!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)" :class="(!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)) ? 'opacity-50' : ''" class="pos-pressable bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
             </div>
         </div>
@@ -1068,7 +1168,7 @@
 
                         <div x-show="paqTab === 'esp'" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
                             <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                <button @click="if(paq3Pizzas.length < 3) paq3Pizzas.push(esp.nombre)" :disabled="paq3Pizzas.length >= 3" class="border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                <button @click="if(paq3Pizzas.length < 3) paq3Pizzas.push(esp.nombre)" :disabled="paq3Pizzas.length >= 3" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold text-left bg-white text-gray-700 hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
                             </template>
                         </div>
 
@@ -1083,10 +1183,10 @@
                             </div>
                             <div class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
                                 <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-                                    <button @click="if(paqTempMitades.length < 2) paqTempMitades.push(esp.nombre)" :disabled="paqTempMitades.length >= 2 || paq3Pizzas.length >= 3" class="border rounded-[8px] p-2 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
+                                    <button @click="if(paqTempMitades.length < 2) paqTempMitades.push(esp.nombre)" :disabled="paqTempMitades.length >= 2 || paq3Pizzas.length >= 3" class="pos-choice-card border rounded-[8px] p-2 text-[12px] font-medium text-left text-black shadow-sm disabled:opacity-50 hover:border-[#ffc107] hover:bg-[#fffde7]" x-text="esp.nombre"></button>
                                 </template>
                             </div>
-                            <button @click="paq3Pizzas.push(paqTempMitades.join(' / ')); paqTempMitades = [];" :disabled="paqTempMitades.length !== 2 || paq3Pizzas.length >= 3" class="w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm mt-2 shrink-0">
+                            <button @click="paq3Pizzas.push(paqTempMitades.join(' / ')); paqTempMitades = [];" :disabled="paqTempMitades.length !== 2 || paq3Pizzas.length >= 3" class="pos-pressable w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm mt-2 shrink-0">
                                 Agregar Pizza Mitades al Paquete
                             </button>
                         </div>
@@ -1100,7 +1200,7 @@
                                     </label>
                                 </template>
                             </div>
-                            <button @click="if(tempIngs.length > 0) { paq3Pizzas.push('Ings: ' + tempIngs.join(', ')); tempIngs=[]; }" :disabled="tempIngs.length === 0 || paq3Pizzas.length >= 3" class="w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                            <button @click="if(tempIngs.length > 0) { paq3Pizzas.push('Ings: ' + tempIngs.join(', ')); tempIngs=[]; }" :disabled="tempIngs.length === 0 || paq3Pizzas.length >= 3" class="pos-pressable w-full bg-[#212529] hover:bg-black text-white font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
                                 Agregar Personalizada al Paquete
                             </button>
                         </div>
@@ -1135,7 +1235,7 @@
                                 <span class="text-gray-500 text-[14px] font-bold">Total</span>
                                 <span class="font-black text-[#28a745] text-[26px]" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
                             </div>
-                            <button @click="addPaq3()" :disabled="paq3Pizzas.length !== 3" :class="paq3Pizzas.length !== 3 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#ffc107] hover:bg-[#e0a800] text-black'" class="w-full font-bold py-3.5 rounded-[8px] text-[14px] transition-colors">
+                            <button @click="addPaq3($event)" :disabled="paq3Pizzas.length !== 3" :class="paq3Pizzas.length !== 3 ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#ffc107] hover:bg-[#e0a800] text-black'" class="pos-pressable w-full font-bold py-3.5 rounded-[8px] text-[14px] transition-colors">
                                 Añadir al Carrito
                             </button>
                         </div>
@@ -1162,7 +1262,7 @@
                     <div class="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-2">1. Selecciona el tamaño</div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <template x-for="tam in dbTamanosBase" :key="tam.id_tamañop">
-                            <button @click="ingTam = tam" :class="ingTam?.id_tamañop === tam.id_tamañop ? 'border-orange-500 bg-orange-50 shadow' : 'border-gray-200 bg-white'" class="border rounded-[8px] py-4 text-center transition-all">
+                            <button @click="ingTam = tam" :class="ingTam?.id_tamañop === tam.id_tamañop ? 'border-orange-500 bg-orange-50 shadow' : 'border-gray-200 bg-white'" class="pos-choice-card border rounded-[8px] py-4 text-center transition-all">
                                 <span class="block font-bold text-black text-[14px]" x-text="cleanSize(tam.tamano)"></span>
                             </button>
                         </template>
@@ -1220,7 +1320,7 @@
                     <span class="text-gray-500 font-bold">Total a cobrar:</span>
                     <span class="font-black text-[#28a745] text-2xl" x-text="'$' + (ingTam ? parseFloat(ingTam.precio).toFixed(2) : '0.00')"></span>
                 </div>
-                <button @click="addIngrediente()" :disabled="!ingresoValido()" :class="!ingresoValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md active:scale-95'" class="w-full font-black uppercase italic tracking-widest py-4 rounded-[8px] text-[13px] transition-all">Añadir a la Orden</button>
+                <button @click="addIngrediente($event)" :disabled="!ingresoValido()" :class="!ingresoValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md active:scale-95'" class="pos-pressable w-full font-black uppercase italic tracking-widest py-4 rounded-[8px] text-[13px] transition-all">Añadir a la Orden</button>
             </div>
         </div>
     </div>
@@ -1744,6 +1844,129 @@
                     }
                 },
 
+                cartItemTone(item) {
+                    if (!item) return 'default';
+                    const name = (item.nombre_base || '').toLowerCase();
+
+                    if (item.visual_tone) return item.visual_tone;
+                    if (item.tipo === 'paq' || item.col === 'id_paquete') return 'package';
+                    if (item.is_magno || item.col === 'id_magno' || name.includes('magno')) return 'magno';
+                    if (item.col === 'id_rec' || name.includes('rectangular')) return 'rectangular';
+                    if (item.col === 'id_barr' || name.includes('barra')) return 'barra';
+                    if (item.col === 'id_refresco' || name.includes('refresco') || name.includes('jarrito')) return 'drink';
+                    if (
+                        name.includes('alita') ||
+                        name.includes('hamburguesa') ||
+                        name.includes('costilla') ||
+                        name.includes('papa') ||
+                        name.includes('espagueti')
+                    ) return 'snack';
+                    if (item.tipo === 'directo') return 'snack';
+                    return 'default';
+                },
+
+                cartItemToneColors(item) {
+                    const tone = this.cartItemTone(item);
+                    const colors = {
+                        package: { main: '#ffc107', text: '#111827', soft: '#fff8db', deleteBg: 'rgba(255,255,255,0.22)', deleteText: '#7a5200' },
+                        magno: { main: '#343a40', text: '#ffffff', soft: '#f1f5f9', deleteBg: 'rgba(255,255,255,0.16)', deleteText: '#ffffff' },
+                        rectangular: { main: '#fd7e14', text: '#ffffff', soft: '#fff4e8', deleteBg: 'rgba(255,255,255,0.18)', deleteText: '#ffffff' },
+                        barra: { main: '#17a2b8', text: '#ffffff', soft: '#e9fbfd', deleteBg: 'rgba(255,255,255,0.18)', deleteText: '#ffffff' },
+                        drink: { main: '#17a2b8', text: '#ffffff', soft: '#e9fbfd', deleteBg: 'rgba(255,255,255,0.18)', deleteText: '#ffffff' },
+                        snack: { main: '#3b82f6', text: '#ffffff', soft: '#eff6ff', deleteBg: 'rgba(255,255,255,0.18)', deleteText: '#ffffff' },
+                        default: { main: '#cbd5e1', text: '#212529', soft: '#ffffff', deleteBg: '#fee2e2', deleteText: '#dc3545' }
+                    };
+                    return colors[tone] || colors.default;
+                },
+
+                cartItemShellStyle(item) {
+                    const colors = this.cartItemToneColors(item);
+                    return {
+                        borderColor: colors.main,
+                        backgroundColor: colors.soft
+                    };
+                },
+
+                cartItemHeaderStyle(item) {
+                    return {
+                        backgroundColor: this.cartItemToneColors(item).main
+                    };
+                },
+
+                cartItemHeaderTextStyle(item) {
+                    return {
+                        color: this.cartItemToneColors(item).text
+                    };
+                },
+
+                cartItemDeleteStyle(item) {
+                    const colors = this.cartItemToneColors(item);
+                    return {
+                        backgroundColor: colors.deleteBg,
+                        color: colors.deleteText
+                    };
+                },
+
+                pizzaPairTone(group) {
+                    const items = Array.isArray(group?.items) ? group.items : [];
+                    const hasMitades = items.some(entry => {
+                        const item = entry?.item || {};
+                        const name = (item.nombre_base || '').toLowerCase();
+                        return item.tipo === 'piz_mitad' || name.includes('mitad y mitad');
+                    });
+                    return hasMitades ? 'mitades' : 'default';
+                },
+
+                pizzaPairToneColors(group) {
+                    const palette = {
+                        mitades: { main: '#dc3545', text: '#ffffff', deleteBg: 'rgba(255,255,255,0.18)', deleteText: '#ffffff', border: '#dc3545' },
+                        default: { main: '#fbbf24', text: '#111827', deleteBg: 'rgba(255,255,255,0.22)', deleteText: '#7a5200', border: '#fbbf24' }
+                    };
+                    return palette[this.pizzaPairTone(group)] || palette.default;
+                },
+
+                pizzaPairShellStyle(group) {
+                    const colors = this.pizzaPairToneColors(group);
+                    return {
+                        borderColor: colors.border
+                    };
+                },
+
+                pizzaPairHeaderStyle(group) {
+                    return {
+                        backgroundColor: this.pizzaPairToneColors(group).main
+                    };
+                },
+
+                pizzaPairHeaderTextStyle(group) {
+                    return {
+                        color: this.pizzaPairToneColors(group).text
+                    };
+                },
+
+                pizzaPairDeleteStyle(group) {
+                    const colors = this.pizzaPairToneColors(group);
+                    return {
+                        backgroundColor: colors.deleteBg,
+                        color: colors.deleteText
+                    };
+                },
+
+                pizzaPairHeaderLabel(group) {
+                    return this.pizzaPairTone(group) === 'mitades'
+                        ? 'Mitad y Mitad ' + group.size
+                        : 'Pizzas ' + group.size;
+                },
+
+                cartItemHeaderLabel(item) {
+                    if (!item) return '';
+                    if (item.is_magno || item.col === 'id_magno') return 'Magno';
+                    if (item.col === 'id_rec') return 'Pizza Rectangular';
+                    if (item.col === 'id_barr') return 'Pizza de Barra';
+                    if (item.tipo === 'paq') return item.nombre_base;
+                    return item.nombre_base;
+                },
+
                 actualizarCarrito() {
                     let pizzasFlat = [];
                     let normals = [];
@@ -1822,28 +2045,97 @@
                     });
                 },
 
-                addPizzaToMainCart(obj) {
-                    this.cart.push({ ...obj, qty: 1, uid: this.generateUID() });
-                    this.actualizarCarrito();
+                getCartAnimationTarget() {
+                    const cartPanel = this.$refs.cartPanel;
+                    const payTarget = this.$refs.payTarget;
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const rect = el.getBoundingClientRect();
+                        return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < window.innerHeight && rect.left < window.innerWidth;
+                    };
+
+                    if (isVisible(cartPanel)) return cartPanel;
+                    if (isVisible(payTarget)) return payTarget;
+                    return cartPanel || payTarget || null;
                 },
 
-                addOpc(t) {
+                animateToCart(event, label = 'Agregado') {
+                    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+                    const source = event?.currentTarget || event?.target;
+                    const target = this.getCartAnimationTarget();
+                    if (!source || !target) return;
+
+                    const sourceRect = source.getBoundingClientRect();
+                    const targetRect = target.getBoundingClientRect();
+                    if (!sourceRect.width || !sourceRect.height || !targetRect.width || !targetRect.height) return;
+
+                    const flyer = document.createElement('div');
+                    flyer.className = 'pos-cart-flyer';
+                    flyer.textContent = '+ ' + label;
+                    document.body.appendChild(flyer);
+
+                    const flyerRect = flyer.getBoundingClientRect();
+                    const startX = sourceRect.left + sourceRect.width / 2 - flyerRect.width / 2;
+                    const startY = sourceRect.top + sourceRect.height / 2 - flyerRect.height / 2;
+                    const endX = targetRect.left + targetRect.width / 2 - flyerRect.width / 2;
+                    const endY = targetRect.top + Math.min(targetRect.height / 2, 70) - flyerRect.height / 2;
+                    const liftY = Math.min(startY, endY) - 45;
+
+                    if (!flyer.animate) {
+                        flyer.style.transform = `translate3d(${endX}px, ${endY}px, 0) scale(0.55)`;
+                        flyer.style.opacity = '0';
+                        setTimeout(() => flyer.remove(), 280);
+                        return;
+                    }
+
+                    flyer.animate([
+                        { transform: `translate3d(${startX}px, ${startY}px, 0) scale(1)`, opacity: 0.95 },
+                        { transform: `translate3d(${(startX + endX) / 2}px, ${liftY}px, 0) scale(0.92)`, opacity: 0.9, offset: 0.55 },
+                        { transform: `translate3d(${endX}px, ${endY}px, 0) scale(0.55)`, opacity: 0 }
+                    ], {
+                        duration: 680,
+                        easing: 'cubic-bezier(.22,.8,.25,1)',
+                        fill: 'forwards'
+                    }).onfinish = () => flyer.remove();
+
+                    if (target.animate) {
+                        target.animate([
+                            { boxShadow: '0 0 0 rgba(255, 193, 7, 0)' },
+                            { boxShadow: '0 0 0 5px rgba(255, 193, 7, 0.28)' },
+                            { boxShadow: '0 0 0 rgba(255, 193, 7, 0)' }
+                        ], {
+                            duration: 520,
+                            easing: 'ease-out'
+                        });
+                    }
+                },
+
+                addPizzaToMainCart(obj, event = null, label = 'Pizza') {
+                    this.cart.push({ ...obj, qty: 1, uid: this.generateUID() });
+                    this.actualizarCarrito();
+                    this.animateToCart(event, label);
+                },
+
+                addOpc(t, event = null) {
                     let cTam = this.cleanSize(t.tamano);
                     let nomFull = (this.cat === 12 ? 'Pizza ' : 'Mariscos ') + cTam;
                     this.addPizzaToMainCart({
                         db_id: t.id, col: (this.cat === 12 ? 'id_pizza' : 'id_maris'), tipo: 'pizza_normal', es_pizza: true, is_magno: false,
                         nombre_base: nomFull, variante: this.opcItem.nombre, precioBase: parseFloat(t.precio),
                         orilla_queso: false, precio_orilla: this.getPrecioOrilla(cTam)
-                    });
+                    }, event, this.opcItem.nombre);
                     this.modalOpc = false;
                 },
 
-                addBebida(opc) {
+                addBebida(opc, event = null) {
                     let nomFull = this.bebidaItem.nombre + ' ' + opc.tamano;
                     let idx = this.cart.findIndex(i => i.db_id === opc.id && i.col === 'id_refresco' && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { this.cart.push({ db_id: opc.id, col: 'id_refresco', tipo: 'directo', nombre_base: nomFull, variante: '', precioBase: parseFloat(opc.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); }
-                    this.actualizarCarrito(); this.modalBebida = false;
+                    this.actualizarCarrito();
+                    this.animateToCart(event, nomFull);
+                    this.modalBebida = false;
                 },
 
                 abrirMagnoGeneral() {
@@ -1864,13 +2156,15 @@
                     for(let k in counts) { parts.push(counts[k] + '/2 ' + k); }
                     return parts.join(' / ');
                 },
-                addMagno() {
+                addMagno(event = null) {
                     let pb = parseFloat(this.magnoItem.precio);
                     let varianteFinal = this.formatearMagnoPreview();
                     let idx = this.cart.findIndex(i => i.is_magno && i.variante === varianteFinal && !i.orilla_queso && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { this.cart.push({ db_id: null, col: 'id_magno', tipo: 'directo', nombre_base: 'Magno', variante: varianteFinal, medios: this.magnoSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: true, orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar, uid: this.generateUID() }); }
-                    this.actualizarCarrito(); this.modalMagno = false;
+                    this.actualizarCarrito();
+                    this.animateToCart(event, 'Magno');
+                    this.modalMagno = false;
                 },
 
                 abrirRectangularGeneral() {
@@ -1892,22 +2186,26 @@
                     for(let k in counts) { parts.push(counts[k] + '/4 ' + k); }
                     return parts.join(', ');
                 },
-                addRectangular() {
+                addRectangular(event = null) {
                     let pb = parseFloat(this.rectItem.precio);
                     let varianteFinal = this.formatearCuartosPreview();
                     let idx = this.cart.findIndex(i => i.db_id === this.rectItem.id && i.variante === varianteFinal && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { this.cart.push({ db_id: this.rectItem.id, col: this.rectItem.col, tipo: 'directo', nombre_base: this.rectItem.nombre, variante: varianteFinal, cuartos: this.rectSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar }); }
-                    this.actualizarCarrito(); this.modalRectangular = false;
+                    this.actualizarCarrito();
+                    this.animateToCart(event, this.rectItem.nombre);
+                    this.modalRectangular = false;
                 },
 
-                addBarra() {
+                addBarra(event = null) {
                     let pb = parseFloat(this.barraItem.precio);
                     let varianteFinal = this.formatearMediosPreview();
                     let idx = this.cart.findIndex(i => i.db_id === this.barraItem.id && i.variante === varianteFinal && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
                     else { this.cart.push({ db_id: this.barraItem.id, col: this.barraItem.col, tipo: 'directo', nombre_base: this.barraItem.nombre, variante: varianteFinal, medios: this.barraSel, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), orilla_queso: false, precio_orilla: dbPreciosOrilla.familiar }); }
-                    this.actualizarCarrito(); this.modalBarra = false;
+                    this.actualizarCarrito();
+                    this.animateToCart(event, this.barraItem.nombre);
+                    this.modalBarra = false;
                 },
 
                 abrirBarraGeneral() {
@@ -1930,14 +2228,15 @@
                     return parts.join(', ');
                 },
 
-                addDirecto(p) {
+                addDirecto(p, event = null) {
                     if(p.cat === 11) return this.abrirRectangularGeneral();
                     if(p.cat === 10) return this.abrirBarraGeneral();
 
                     let idx = this.cart.findIndex(i => i.db_id === p.id && i.col === p.col && !i.es_pizza && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
-                    else { this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID() }); }
+                    else { this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), visual_tone: 'snack' }); }
                     this.actualizarCarrito();
+                    this.animateToCart(event, p.nombre);
                 },
 
                 abrirPaquete(id) {
@@ -1967,11 +2266,12 @@
                     }
                 },
 
-                addPaq(id, pizzas_arr, extra_str) {
+                addPaq(id, pizzas_arr, extra_str, event = null) {
                     let pb = parseFloat(this.paqObj.precio);
                     let maxPizzas = id === 1 ? 2 : (id === 2 ? 1 : 3);
                     this.cart.push({ db_id: id, col: 'id_paquete', tipo: 'paq', nombre_base: 'Paquete '+id, pizzas_paq: pizzas_arr, extra_paq: extra_str, precioBase: pb, qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), orillas_qty: 0, max_orillas: maxPizzas, precio_orilla: dbPreciosOrilla.grande }); 
                     this.actualizarCarrito();
+                    this.animateToCart(event, 'Paquete ' + id);
                 },
 
                 addPaq1Esp(esp) {
@@ -1982,7 +2282,7 @@
                     if(this.paq1MitadesMode) this.paq1Halves.splice(index, 1);
                     else this.paq1Pizzas.splice(index, 1);
                 },
-                addPaq1() { 
+                addPaq1(event = null) {
                     let pizzasFinales = [];
                     if(this.paq1MitadesMode) {
                         if(this.paq1Halves.length < 4) return alert("Por favor selecciona las 4 mitades.");
@@ -1991,7 +2291,7 @@
                         if(this.paq1Pizzas.length < 2) return alert("Por favor selecciona las 2 pizzas completas.");
                         pizzasFinales = this.paq1Pizzas.map(p => ({nombre: p, orilla: false}));
                     }
-                    this.addPaq(1, pizzasFinales, ''); 
+                    this.addPaq(1, pizzasFinales, '', event);
                     this.paq1Pizzas = []; this.paq1Halves = [];
                     this.modalPaq1 = false; 
                 },
@@ -2001,10 +2301,10 @@
                     else { this.paq2Pizza = esp; }
                 },
                 removePaq2Mitad(index) { this.paq2MitadesArr.splice(index, 1); },
-                addPaq2() { 
+                addPaq2(event = null) {
                     let nombrePizza = this.paq2MitadesMode ? (this.paq2MitadesArr[0] + ' / ' + this.paq2MitadesArr[1]) : this.paq2Pizza;
                     let pizzas = [{nombre: nombrePizza, orilla: false}];
-                    this.addPaq(2, pizzas, this.paq2Extra); 
+                    this.addPaq(2, pizzas, this.paq2Extra, event);
                     this.modalPaq2 = false; 
                 },
 
@@ -2016,12 +2316,12 @@
                     this.paq3Pizzas.splice(index, 1); 
                 },
                 
-                addPaq3() { 
+                addPaq3(event = null) {
                     if (this.paq3Pizzas.length < 3) return alert("Por favor agrega las 3 pizzas al paquete.");
                     
                     let pizzasFinales = this.paq3Pizzas.map(p => ({nombre: p, orilla: false}));
                     
-                    this.addPaq(3, pizzasFinales, ''); 
+                    this.addPaq(3, pizzasFinales, '', event);
                     this.paq3Pizzas = []; 
                     this.paqTempMitades = [];
                     this.modalPaq3 = false; 
@@ -2044,10 +2344,10 @@
                 addMitadEsp(esp) { 
                     if(this.mitSel.length < 2) this.mitSel.push(esp); 
                 },
-                addMitad() {
+                addMitad(event = null) {
                     let cTam = this.cleanSize(this.mitTam.tamano);
                     let nomFull = 'Mitad y Mitad ' + cTam;
-                    this.addPizzaToMainCart({ db_id: null, col: 'id_pizza', tipo: 'piz_mitad', nombre_base: nomFull, variante: this.mitSel[0] + ' / ' + this.mitSel[1], precioBase: parseFloat(this.mitTam.precio), es_pizza: true, is_magno: false, orilla_queso: false, precio_orilla: this.getPrecioOrilla(cTam), mitad1: this.mitSel[0], mitad2: this.mitSel[1], tamano: this.mitTam.tamano });
+                    this.addPizzaToMainCart({ db_id: null, col: 'id_pizza', tipo: 'piz_mitad', nombre_base: nomFull, variante: this.mitSel[0] + ' / ' + this.mitSel[1], precioBase: parseFloat(this.mitTam.precio), es_pizza: true, is_magno: false, orilla_queso: false, precio_orilla: this.getPrecioOrilla(cTam), mitad1: this.mitSel[0], mitad2: this.mitSel[1], tamano: this.mitTam.tamano }, event, nomFull);
                     this.modalMitades = false; this.mitTam = null; this.mitSel = [];
                 },
                 
@@ -2074,7 +2374,7 @@
                     return true;
                 },
 
-                addIngrediente() {
+                addIngrediente(event = null) {
                     if(!this.ingresoValido()) return;
 
                     let strVariante = '';
@@ -2105,6 +2405,7 @@
                     });
                     
                     this.actualizarCarrito();
+                    this.animateToCart(event, 'Personalizada');
                     this.modalIngredientes = false;
                 },
                 precioPizzaIngredientes() { return !this.ingTam ? 0 : parseFloat(this.ingTam.precio); }, 
