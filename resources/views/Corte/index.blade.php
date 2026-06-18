@@ -3,28 +3,19 @@
 @section('content')
 <div x-data="modalDetalleDia()" class="max-w-[1600px] mx-auto relative">
     
-<<<<<<< HEAD
-    <div class="flex justify-between items-end mb-8">
-=======
+
     <div class="flex flex-col gap-4 mb-8 md:flex-row md:justify-between md:items-end">
->>>>>>> origin/rama_pizzetos_erp
+
         <div>
             <h2 class="text-3xl font-black text-gray-800 tracking-tight">Corte Mensual</h2>
             <p class="text-sm text-gray-500 mt-1">Resumen financiero de la sucursal</p>
         </div>
-<<<<<<< HEAD
-        <form method="GET" action="{{ route('corte.index') }}" class="flex items-center gap-3">
-            <div class="relative">
-                <input type="month" name="mes" value="{{ $mesSeleccionado }}" class="border border-gray-200 text-gray-600 text-sm rounded-lg px-4 py-2.5 focus:ring-amber-400 focus:border-amber-400 outline-none w-48 font-medium">
-            </div>
-            <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors shadow-sm cursor-pointer">
-=======
+
         <form method="GET" action="{{ route('corte.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
             <div class="relative">
                 <input type="month" name="mes" value="{{ $mesSeleccionado }}" class="border border-gray-200 text-gray-600 text-sm rounded-lg px-4 py-2.5 focus:ring-amber-400 focus:border-amber-400 outline-none w-full sm:w-48 font-medium">
             </div>
             <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer w-full sm:w-auto">
->>>>>>> origin/rama_pizzetos_erp
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                 Actualizar
             </button>
@@ -36,11 +27,9 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">Total Ingresos</p>
-<<<<<<< HEAD
-                    <h3 class="text-3xl font-black text-green-500 tracking-tighter">${{ number_format($totalIngresos, 2) }}</h3>
-=======
+
                     <h3 class="text-2xl sm:text-3xl font-black text-green-500 tracking-tighter">${{ number_format($totalIngresos, 2) }}</h3>
->>>>>>> origin/rama_pizzetos_erp
+
                 </div>
                 <div class="p-2 bg-green-50 rounded-lg text-green-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
             </div>
@@ -49,11 +38,9 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">Balance Neto</p>
-<<<<<<< HEAD
-                    <h3 class="text-3xl font-black {{ $balanceNeto >= 0 ? 'text-blue-500' : 'text-red-500' }} tracking-tighter">${{ number_format($balanceNeto, 2) }}</h3>
-=======
+
                     <h3 class="text-2xl sm:text-3xl font-black {{ $balanceNeto >= 0 ? 'text-blue-500' : 'text-red-500' }} tracking-tighter">${{ number_format($balanceNeto, 2) }}</h3>
->>>>>>> origin/rama_pizzetos_erp
+
                 </div>
                 <div class="p-2 bg-blue-50 rounded-lg text-blue-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg></div>
             </div>
@@ -62,11 +49,9 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">Total Gastos</p>
-<<<<<<< HEAD
-                    <h3 class="text-3xl font-black text-red-500 tracking-tighter">${{ number_format($totalGastos, 2) }}</h3>
-=======
+
                     <h3 class="text-2xl sm:text-3xl font-black text-red-500 tracking-tighter">${{ number_format($totalGastos, 2) }}</h3>
->>>>>>> origin/rama_pizzetos_erp
+
                 </div>
                 <div class="p-2 bg-red-50 rounded-lg text-red-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg></div>
             </div>

@@ -46,8 +46,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-<<<<<<< HEAD
-=======
+
         .theme-toggle {
             position: relative;
             width: 3.25rem;
@@ -404,7 +403,7 @@
         .app-dark aside .text-slate-900 {
             color: #0f172a !important;
         }
->>>>>>> rama_pizzetos_erp
+
     </style>
 </head>
 

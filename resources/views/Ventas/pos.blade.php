@@ -363,7 +363,7 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
                     <div class="flex flex-wrap gap-1 items-center w-full xl:w-auto">
                         <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
-                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 2 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
+                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
                         <div class="relative">
                             <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
                                 Snacks <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
