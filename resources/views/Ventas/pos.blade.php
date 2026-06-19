@@ -54,6 +54,57 @@
     transform: translateZ(0);
     will-change: opacity, transform;
 }
+.app-dark .pos-magno-action {
+    background-color: #374151 !important;
+    border: 1px solid #64748b;
+    color: #f9fafb !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+.app-dark .pos-magno-action:hover {
+    background-color: #4b5563 !important;
+}
+.app-dark .pos-category-tab {
+    background-color: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: #e2e8f0 !important;
+}
+.app-dark .pos-category-tab:hover {
+    background-color: #475569 !important;
+    color: #ffffff !important;
+}
+.app-dark .pos-category-tab-active {
+    background-color: #f97316 !important;
+    border-color: #fb923c !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.18);
+}
+.app-dark .pos-category-menu {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+}
+.app-dark .pos-category-menu button {
+    color: #e2e8f0 !important;
+}
+.app-dark .pos-category-menu button:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+}
+.app-dark .pos-qty-control {
+    background-color: #334155 !important;
+    border-color: #475569 !important;
+}
+.app-dark .pos-qty-button {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+}
+.app-dark .pos-qty-button:hover {
+    background-color: #475569 !important;
+}
+.app-dark .pos-qty-value {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
 .pos-cart-flyer {
     position: fixed;
     left: 0;
@@ -349,7 +400,7 @@
                     <button @click="abrirPaquete(2)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
                     <button @click="abrirPaquete(3)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
 
-                    <button @click="abrirMagnoGeneral(); openExtras = false" class="pos-pressable whitespace-nowrap bg-[#343a40] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Magno</button>
+                    <button @click="abrirMagnoGeneral(); openExtras = false" class="pos-pressable pos-magno-action whitespace-nowrap bg-[#343a40] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Magno</button>
                     
                     <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Rectangular</button>
                     
@@ -362,13 +413,14 @@
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
                     <div class="flex flex-wrap gap-1 items-center w-full xl:w-auto">
-                        <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
-                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 12 ? 'bg-[#fd7e14] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
+              <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'pos-category-tab-active bg-[#fd7e14] text-white shadow-sm' : 'pos-category-tab bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
+                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 2 ? 'pos-category-tab-active bg-[#fd7e14] text-white shadow-sm' : 'pos-category-tab bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
+
                         <div class="relative">
-                            <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'bg-[#adb5bd] text-white shadow-sm' : 'bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
+                            <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'pos-category-tab-active bg-[#adb5bd] text-white shadow-sm' : 'pos-category-tab bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
                                 Snacks <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
-                            <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
+                            <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="pos-category-menu absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
                                 <template x-for="catEx in dbCategoriasExtras" :key="catEx.id_cat">
                                     <button @click="cat = parseInt(catEx.id_cat); view = 'otros'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50" x-text="catEx.descripcion"></button>
                                 </template>
@@ -390,7 +442,7 @@
 
                     <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2">
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
-                            <button @click="abrirOpciones(p)" class="pos-product-card bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
+                            <button @click="abrirOpciones(p)" class="pos-product-card pos-product-card-pizza bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
                                 <span class="text-[#fd7e14] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
                                     Opciones <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
@@ -401,7 +453,7 @@
 
                     <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2" x-cloak>
                         <template x-for="b in getListaBebidas()" :key="'beb_'+b.nombre">
-                            <button @click="abrirBebida(b)" class="pos-product-card bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
+                            <button @click="abrirBebida(b)" class="pos-product-card pos-product-card-drink bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="b.nombre"></span>
                                 <span class="text-[#17a2b8] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
                                     Elegir tamaño <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
@@ -412,7 +464,7 @@
 
                     <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start mt-1 pr-2" x-cloak>
                         <template x-for="p in getListaDirectos()" :key="p.id">
-                            <button @click="addDirecto(p, $event)" class="pos-product-card bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
+                            <button @click="addDirecto(p, $event)" class="pos-product-card pos-product-card-direct bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
                                 <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
                                 <div class="flex items-center gap-1 mt-3">
                                     <span class="text-blue-600 text-[14px] font-black group-hover:scale-110 transition-transform origin-left" x-text="'$' + parseFloat(p.precio).toFixed(2)"></span>
@@ -494,10 +546,10 @@
                                     <div class="p-3 space-y-3 bg-white">
                                         <div class="relative border border-gray-200 bg-white rounded-lg p-3 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
                                             <div class="flex items-center gap-3 mb-2">
-                                                <div class="flex items-center bg-[#e9ecef] rounded border border-gray-200">
-                                                    <button @click="group.item.qty > 1 ? updateNormalQty(group.item, -1) : null" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">-</button>
-                                                    <span class="w-8 h-7 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[13px]" x-text="group.item.qty"></span>
-                                                    <button @click="updateNormalQty(group.item, 1)" class="w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
+                                                <div class="pos-qty-control flex items-center bg-[#e9ecef] rounded border border-gray-200">
+                                                    <button @click="group.item.qty > 1 ? updateNormalQty(group.item, -1) : null" class="pos-qty-button w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">-</button>
+                                                    <span class="pos-qty-value w-8 h-7 flex justify-center items-center font-bold text-[#212529] bg-white border-x border-gray-200 text-[13px]" x-text="group.item.qty"></span>
+                                                    <button @click="updateNormalQty(group.item, 1)" class="pos-qty-button w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
                                                 </div>
                                                 <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| Base: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
                                                 <span x-show="group.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1">Enviado</span>
