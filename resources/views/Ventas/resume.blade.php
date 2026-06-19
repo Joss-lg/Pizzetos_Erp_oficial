@@ -204,8 +204,8 @@
         <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4">
             <div>
                 <p class="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Filtros</p>
-                <h3 class="text-2xl font-black text-[#0f172a] tracking-tighter italic uppercase">Refina el historial</h3>
-                <p class="mt-1 text-xs font-bold text-slate-400 uppercase tracking-wider">Cruza fecha y estado para encontrar pedidos más rápido</p>
+                <h3 class="text-2xl font-black text-[#0f172a] tracking-tighter italic uppercase">Historial</h3>
+                <p class="mt-1 text-xs font-bold text-slate-400 uppercase tracking-wider">filtra para encontrar pedidos más rápido</p>
             </div>
 
             <form action="{{ route('ventas.resume') }}" method="GET" class="w-full lg:w-auto grid grid-cols-1 md:grid-cols-[minmax(180px,1fr)_minmax(190px,1fr)_auto] items-center gap-3">
