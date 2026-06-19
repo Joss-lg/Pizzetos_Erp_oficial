@@ -89,6 +89,8 @@
             --app-dark-surface-strong: #1d2940;
             --app-dark-border: #2f3c53;
             --app-dark-text: #e5e7eb;
+            --app-dark-text-soft: #e2e8f0;
+            --app-dark-text-muted: #cbd5e1;
             --app-dark-muted: #94a3b8;
             background: #0f172a !important;
             color: #e5e7eb !important;
@@ -153,7 +155,9 @@
         }
         .app-dark .text-gray-900,
         .app-dark .text-slate-900,
-        .app-dark .text-\[\#212529\] {
+        .app-dark .text-\[\#212529\],
+        .app-dark .text-\[\#1e293b\],
+        .app-dark .text-\[\#0f172a\] {
             color: #f9fafb !important;
         }
         .app-dark .bg-white .text-black,
@@ -164,17 +168,26 @@
         .app-dark .text-slate-600,
         .app-dark .text-gray-700,
         .app-dark .text-\[\#495057\] {
-            color: #cbd5e1 !important;
+            color: var(--app-dark-text-soft) !important;
         }
         .app-dark .text-slate-400,
         .app-dark .text-gray-500,
         .app-dark .text-\[\#6c757d\] {
-            color: #94a3b8 !important;
+            color: var(--app-dark-text-soft) !important;
         }
         .app-dark .text-gray-300,
         .app-dark .text-slate-300,
         .app-dark .text-gray-400 {
-            color: #cbd5e1 !important;
+            color: var(--app-dark-text-muted) !important;
+        }
+
+        /* Regla global para que los tonos neutros en dark mode se lean como blancos suaves */
+        .app-dark [class*="text-gray-"],
+        .app-dark [class*="text-slate-"],
+        .app-dark [class*="text-zinc-"],
+        .app-dark [class*="text-neutral-"],
+        .app-dark [class*="text-stone-"] {
+            color: var(--app-dark-text-soft) !important;
         }
         .app-dark .border-slate-200,
         .app-dark .border-gray-200,
@@ -393,13 +406,62 @@
         html.app-dark .text-slate-500,
         html.app-dark .text-gray-500,
         html.app-dark .text-gray-400 {
-            color: var(--app-dark-muted) !important;
+            color: var(--app-dark-text-soft) !important;
         }
         .app-dark aside .bg-white {
             background-color: #ffffff !important;
         }
         .app-dark aside .text-black,
         .app-dark aside .text-slate-900 {
+            color: #0f172a !important;
+        }
+        .app-dark aside .logo-container .bg-white,
+        html.app-dark aside .logo-container .bg-white {
+            background-color: #ffffff !important;
+        }
+        .app-dark aside a:not(.bg-black),
+        .app-dark aside button:not(.bg-black),
+        .app-dark aside a:not(.bg-black) span,
+        .app-dark aside button:not(.bg-black) span,
+        .app-dark aside [x-show] a,
+        .app-dark aside [x-show] button,
+        .app-dark aside [x-show] span {
+            color: #0f172a !important;
+        }
+        .app-dark aside a.bg-black,
+        .app-dark aside a.bg-black span,
+        .app-dark aside button.bg-black,
+        .app-dark aside button.bg-black span {
+            color: #fbbf24 !important;
+        }
+        .app-dark aside form button.bg-black,
+        .app-dark aside form button.bg-black span {
+            color: #ffffff !important;
+        }
+        .app-dark aside p {
+            color: rgba(15, 23, 42, 0.55) !important;
+        }
+        .app-dark aside nav div a:not(.bg-black),
+        .app-dark aside nav div a:not(.bg-black) span,
+        .app-dark aside nav div a:not(.bg-black) svg {
+            color: #ffffff !important;
+            stroke: currentColor !important;
+        }
+        html.app-dark aside .sidebar-logo-badge,
+        .app-dark aside .sidebar-logo-badge {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.14) !important;
+        }
+        html.app-dark aside .sidebar-logo-badge img,
+        .app-dark aside .sidebar-logo-badge img {
+            filter: none !important;
+            opacity: 1 !important;
+            mix-blend-mode: normal !important;
+        }
+        html.app-dark aside .sidebar-brand-text,
+        .app-dark aside .sidebar-brand-text {
             color: #0f172a !important;
         }
     </style>
@@ -509,10 +571,10 @@
                 <div class="h-20 lg:h-24 flex px-4 border-b border-black/5 shrink-0 transition-all items-center justify-between" :class="sidebarExpanded ? '' : 'lg:flex-col lg:items-center lg:justify-center lg:gap-2 lg:py-3'">
                     
                     <div class="flex items-center gap-2 logo-container" :class="sidebarExpanded ? '' : 'lg:justify-center'">
-                        <div class="bg-white p-1.5 rounded-xl shadow-sm shrink-0">
-                            <img src="{{ asset('pizzetos.png') }}" alt="Logo" class="h-7 w-7 lg:h-8 lg:w-8 object-contain">
+                        <div class="sidebar-logo-badge bg-white p-1.5 rounded-xl shadow-sm shrink-0" style="background: #ffffff !important; background-color: #ffffff !important;">
+                            <img src="{{ asset('pizzetos.png') }}" alt="Logo" class="h-7 w-7 lg:h-8 lg:w-8 object-contain bg-white rounded-lg" style="background: #ffffff !important; background-color: #ffffff !important;">
                         </div>
-                        <span :class="sidebarExpanded ? 'block' : 'block lg:hidden'" class="text-lg font-black italic tracking-tighter uppercase whitespace-nowrap transition-opacity">Pizzetos</span>
+                        <span :class="sidebarExpanded ? 'block' : 'block lg:hidden'" class="sidebar-brand-text text-lg font-black italic tracking-tighter uppercase whitespace-nowrap transition-opacity">Pizzetos</span>
                     </div>
 
                     {{-- Botón Toggle Escritorio --}}
@@ -717,5 +779,115 @@
             </main>
         </div>
     </div>
+
+    <style>
+        html.app-dark main [class*="text-gray-"],
+        html.app-dark main [class*="text-slate-"],
+        html.app-dark main [class*="text-zinc-"],
+        html.app-dark main [class*="text-neutral-"],
+        html.app-dark main [class*="text-stone-"] {
+            color: var(--app-dark-text-soft) !important;
+        }
+
+        html.app-dark main [class*="text-gray-900"],
+        html.app-dark main [class*="text-gray-800"],
+        html.app-dark main [class*="text-slate-900"],
+        html.app-dark main [class*="text-slate-800"],
+        html.app-dark main [class*="text-slate-700"],
+        html.app-dark main [class*="text-black"] {
+            color: var(--app-dark-text) !important;
+        }
+
+        html.app-dark main .text-\[\#212529\],
+        html.app-dark main .text-\[\#1e293b\],
+        html.app-dark main .text-\[\#0f172a\] {
+            color: var(--app-dark-text) !important;
+        }
+
+        html.app-dark main .text-\[\#495057\],
+        html.app-dark main .text-\[\#6c757d\] {
+            color: var(--app-dark-text-soft) !important;
+        }
+
+        html.app-dark main [class*="text-gray-500"],
+        html.app-dark main [class*="text-gray-400"],
+        html.app-dark main [class*="text-gray-300"],
+        html.app-dark main [class*="text-slate-500"],
+        html.app-dark main [class*="text-slate-400"],
+        html.app-dark main [class*="text-slate-300"],
+        html.app-dark main [class*="text-zinc-500"],
+        html.app-dark main [class*="text-zinc-400"],
+        html.app-dark main [class*="text-neutral-500"],
+        html.app-dark main [class*="text-neutral-400"],
+        html.app-dark main [class*="text-stone-500"],
+        html.app-dark main [class*="text-stone-400"] {
+            color: var(--app-dark-text-soft) !important;
+        }
+
+        body aside,
+        body aside nav a:not(.bg-black),
+        body aside nav a:not(.bg-black) *,
+        body aside nav button:not(.bg-black),
+        body aside nav button:not(.bg-black) *,
+        body aside .sidebar-brand-text {
+            color: #0f172a !important;
+            stroke: currentColor !important;
+        }
+
+        body aside nav a,
+        body aside nav button,
+        body aside nav span,
+        body aside nav p {
+            transition-property: background-color, border-color, box-shadow, transform, opacity !important;
+        }
+
+        body aside nav p {
+            color: rgba(15, 23, 42, 0.62) !important;
+        }
+
+        body aside nav a.bg-black,
+        body aside nav a.bg-black *,
+        body aside nav button.bg-black,
+        body aside nav button.bg-black * {
+            color: #fbbf24 !important;
+            stroke: currentColor !important;
+        }
+
+        body aside form button.bg-black,
+        body aside form button.bg-black * {
+            color: #ffffff !important;
+            stroke: currentColor !important;
+        }
+
+        html body aside nav div[x-collapse] a:not(.bg-black),
+        html body aside nav div[x-collapse] a:not(.bg-black) *,
+        html.app-dark body aside nav div[x-collapse] a:not(.bg-black),
+        html.app-dark body aside nav div[x-collapse] a:not(.bg-black) * {
+            color: #0f172a !important;
+            -webkit-text-fill-color: #0f172a !important;
+            stroke: currentColor !important;
+        }
+
+        html body aside nav div[x-collapse] a.bg-black,
+        html body aside nav div[x-collapse] a.bg-black *,
+        html.app-dark body aside nav div[x-collapse] a.bg-black,
+        html.app-dark body aside nav div[x-collapse] a.bg-black * {
+            color: #fbbf24 !important;
+            -webkit-text-fill-color: #fbbf24 !important;
+            stroke: currentColor !important;
+        }
+
+        html.app-dark main .pos-product-card-pizza {
+            border-left-color: #ffc107 !important;
+        }
+
+        html.app-dark main .pos-product-card-drink {
+            border-left-color: #17a2b8 !important;
+        }
+
+        html.app-dark main .pos-product-card-direct {
+            border-left-color: #60a5fa !important;
+        }
+    </style>
 </body>
 </html>
