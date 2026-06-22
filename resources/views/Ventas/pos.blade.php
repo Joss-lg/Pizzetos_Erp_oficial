@@ -105,6 +105,71 @@
     border-color: #475569 !important;
     color: #ffffff !important;
 }
+.app-dark .pos-client-row:hover {
+    background-color: #24324a !important;
+}
+.app-dark .pos-client-row:hover span:first-child {
+    color: #ffffff !important;
+}
+.app-dark .pos-client-row:hover span:last-child {
+    background-color: #0f172a !important;
+    border-color: #4b5f7f !important;
+    color: #ffffff !important;
+}
+.app-dark .pos-address-card {
+    background-color: #111827 !important;
+    border-color: #334155 !important;
+}
+.app-dark .pos-address-card:hover {
+    background-color: #24324a !important;
+}
+.app-dark .pos-address-card.is-selected {
+    background-color: #183a3d !important;
+    border-color: #17a2b8 !important;
+}
+.app-dark .pos-address-card span {
+    color: #e5e7eb !important;
+}
+.app-dark .pos-sent-badge {
+    background-color: #2563eb !important;
+    border-color: #93c5fd !important;
+    color: #ffffff !important;
+}
+.app-dark .pos-cart-check {
+    background-color: #1e293b !important;
+    border-color: #94a3b8 !important;
+}
+.app-dark .pos-cart-check:checked {
+    background-color: #fd7e14 !important;
+    border-color: #fd7e14 !important;
+}
+.app-dark .pos-options-modal-panel {
+    background-color: #0b1220 !important;
+    border: 1px solid #f59e0b !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 158, 11, 0.16) !important;
+}
+.app-dark .pos-options-modal-header {
+    background-color: #182235 !important;
+    border-color: #f59e0b !important;
+}
+.app-dark .pos-options-modal-title {
+    color: #ffffff !important;
+}
+.app-dark .pos-options-modal-body {
+    background-color: #0f172a !important;
+}
+.app-dark .pos-size-option {
+    background-color: #182235 !important;
+    border-color: #334155 !important;
+}
+.app-dark .pos-size-option:hover {
+    background-color: #24324a !important;
+    border-color: #fd7e14 !important;
+    box-shadow: 0 10px 24px rgba(253, 126, 20, 0.18) !important;
+}
+.app-dark .pos-size-option span:first-child {
+    color: #f8fafc !important;
+}
 .pos-cart-flyer {
     position: fixed;
     left: 0;
@@ -339,6 +404,27 @@
         user-select: none;
     }
 
+    .pos-special-client-row {
+        align-items: stretch !important;
+        flex-direction: column !important;
+    }
+
+    .pos-special-client-input {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .pos-special-client-or {
+        align-self: center;
+        line-height: 1;
+    }
+
+    .pos-special-client-button {
+        width: 100% !important;
+        justify-content: center !important;
+        white-space: normal !important;
+    }
+
 }
 
 </style>
@@ -508,7 +594,7 @@
                                                 <div class="flex justify-between items-start mb-3">
                                                     <div class="pr-8 flex items-center gap-2">
                                                         <h4 class="font-black text-[#212529] text-[15px] leading-tight" x-text="p.item.variante || p.item.nombre_base"></h4>
-                                                        <span x-show="p.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Enviado</span>
+                                                        <span x-show="p.item.is_old" class="pos-sent-badge text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider border border-transparent">Enviado</span>
                                                     </div>
                                                     <button @click="eliminarItemByUid(p.item.uid)" class="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-1.5 rounded transition-colors absolute right-3 top-3">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -516,7 +602,7 @@
                                                 </div>
                                                 <div class="flex justify-between items-center pt-2.5 border-t border-gray-100">
                                                     <label class="flex items-center gap-2 text-[13px] font-bold text-gray-600 cursor-pointer hover:text-[#fd7e14] transition-colors">
-                                                        <input type="checkbox" :checked="p.item.orilla_queso" @change="toggleOrilla(p.item.uid, $event.target.checked)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                                        <input type="checkbox" :checked="p.item.orilla_queso" @change="toggleOrilla(p.item.uid, $event.target.checked)" class="pos-cart-check rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                                                         Orilla Queso <span class="text-[#fd7e14]" x-text="'+$' + p.item.precio_orilla"></span>
                                                     </label>
                                                     <span class="text-[16px] font-black text-[#212529]" x-text="'$' + p.item.precioFinal.toFixed(2)"></span>
@@ -552,7 +638,7 @@
                                                     <button @click="updateNormalQty(group.item, 1)" class="pos-qty-button w-7 h-7 font-bold text-[#495057] hover:bg-gray-300 flex items-center justify-center">+</button>
                                                 </div>
                                                 <span class="text-[12px] text-[#6c757d] font-medium" x-text="'| Base: $' + parseFloat(group.item.precioBase).toFixed(2)"></span>
-                                                <span x-show="group.item.is_old" class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1">Enviado</span>
+                                                <span x-show="group.item.is_old" class="pos-sent-badge text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1 border border-transparent">Enviado</span>
                                             </div>
 
                                             <div x-show="group.item.variante" class="bg-[#f8f9fa] border border-gray-200 rounded-[6px] p-2 mt-2">
@@ -561,7 +647,7 @@
 
                                             <template x-if="group.item.is_magno || group.item.col === 'id_rec' || group.item.col === 'id_barr'">
                                                 <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
-                                                    <input type="checkbox" x-model="group.item.orilla_queso" @change="if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">Orilla de queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
+                                                    <input type="checkbox" x-model="group.item.orilla_queso" @change="if(group.item.orilla_queso) fixPrecioOrilla(group.item); if(group.item.is_old) group.item.is_old = false; recalc()" class="pos-cart-check rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-3.5 h-3.5">Orilla de queso <span class="font-bold text-[#fd7e14]" x-text="'+$' + (group.item.precio_orilla || dbPreciosOrilla.familiar)"></span>
                                                 </label>
                                             </template>
 
@@ -571,7 +657,7 @@
                                                     <div class="space-y-1.5">
                                                         <template x-for="(pz, pIdx) in group.item.pizzas_paq" :key="pIdx">
                                                             <label class="flex items-center gap-2 text-[12px] font-bold text-gray-700 cursor-pointer bg-white px-2.5 py-2 rounded shadow-sm border border-gray-100 hover:border-amber-400 transition-colors">
-                                                                <input type="checkbox" x-model="pz.orilla" @change="recalcPaqOrillas(group.item)" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                                                <input type="checkbox" x-model="pz.orilla" @change="recalcPaqOrillas(group.item)" class="pos-cart-check rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                                                                 <span x-text="pz.nombre"></span>
                                                             </label>
                                                         </template>
@@ -686,14 +772,14 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 translate-y-8"
              class="pos-modal-overlay fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="pos-modal-panel bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
-                <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-                    <h2 class="text-[18px] font-bold text-[#212529]" x-text="opcItem?.nombre"></h2>
+            <div class="pos-modal-panel pos-options-modal-panel bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
+                <div class="pos-options-modal-header p-5 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="pos-options-modal-title text-[18px] font-bold text-[#212529]" x-text="opcItem?.nombre"></h2>
                     <button @click="modalOpc = false" class="pos-pressable text-gray-400 hover:text-black font-bold text-xl">&times;</button>
                 </div>
-                <div class="p-5 bg-[#f8f9fa] space-y-3 max-h-[50vh] overflow-y-auto scrollbar-hide">
+                <div class="pos-options-modal-body p-5 bg-[#f8f9fa] space-y-3 max-h-[50vh] overflow-y-auto scrollbar-hide">
                     <template x-for="t in opcItem?.tamanos" :key="t.id">
-                        <button @click="addOpc(t, $event)" class="pos-choice-card w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#fd7e14] hover:shadow-sm transition-all">
+                        <button @click="addOpc(t, $event)" class="pos-choice-card pos-size-option w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#fd7e14] hover:shadow-sm transition-all">
                             <span class="font-bold text-[#212529] text-[14px]" x-text="cleanSize(t.tamano)"></span>
                             <span class="font-black text-[#28a745] text-[15px]" x-text="'$' + parseFloat(t.precio).toFixed(2)"></span>
                         </button>
@@ -1417,7 +1503,7 @@
                             </template>
 
                             <template x-for="cl in getClientesFiltrados()" :key="cl.id_cliente || cl.id_clie || Math.random()">
-                                <div @click="seleccionarCliente(cl)" class="px-6 py-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 flex justify-between items-center transition-colors">
+                                <div @click="seleccionarCliente(cl)" class="pos-client-row px-6 py-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 flex justify-between items-center transition-colors">
                                     <span class="font-bold text-[18px] text-gray-800" x-text="getClienteNombre(cl)"></span>
                                     <span class="text-[15px] text-gray-600 font-bold bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md shadow-sm" x-text="getClienteTelefono(cl)"></span>
                                 </div>
@@ -1467,7 +1553,7 @@
                     <div x-show="!dirFormVisible && direccionesCliente.length > 0" class="space-y-3 max-h-60 overflow-y-auto pr-1">
                         <template x-for="dir in direccionesCliente" :key="dir.id_direccion || dir.id_dir || Math.random()">
                             <label class="block cursor-pointer">
-                                <div class="border rounded-[8px] p-5 transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'border-2 border-[#fd7e14] bg-orange-50 shadow-md' : 'border-gray-200 hover:bg-gray-50'">
+                                <div class="pos-address-card border rounded-[8px] p-5 transition-colors" :class="dirSeleccionada === (dir.id_direccion || dir.id_dir) ? 'is-selected border-2 border-[#fd7e14] bg-orange-50 shadow-md' : 'border-gray-200 hover:bg-gray-50'">
                                     <div class="flex items-start gap-4">
                                         <input type="radio" :value="dir.id_direccion || dir.id_dir" x-model="dirSeleccionada" class="mt-1 text-[#fd7e14] focus:ring-[#fd7e14] w-6 h-6">
                                         <div class="text-[15px] text-gray-700 leading-snug">
@@ -1516,8 +1602,8 @@
 
             <div class="p-6 flex gap-4 bg-gray-50 border-t border-gray-200 shrink-0">
                 <button @click="modalCliente = false; if(servicio === 4) modalEspecial = true;" class="flex-1 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold py-4 rounded-[8px] text-[18px] transition-colors">Cancelar / Volver</button>
-                <button x-show="!soloClienteMode" @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Dirección</button>
-                <button x-show="soloClienteMode" @click="confirmarSoloCliente()" :disabled="!esClienteValido()" :class="!esClienteValido() ? 'bg-[#ced4da] text-white cursor-not-allowed' : 'bg-[#17a2b8] hover:bg-[#138496] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Cliente</button>
+                <button x-show="!soloClienteMode" @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#fd7e14]/55 text-white/85 cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Dirección</button>
+                <button x-show="soloClienteMode" @click="confirmarSoloCliente()" :disabled="!esClienteValido()" :class="!esClienteValido() ? 'bg-[#17a2b8]/50 text-white/80 cursor-not-allowed' : 'bg-[#17a2b8] hover:bg-[#138496] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Cliente</button>
             </div>
         </div>
     </div>
@@ -1553,10 +1639,10 @@
                         <button @click="modalEspecial = false; abrirModalCliente(true);" class="text-[10px] font-bold text-green-700 underline uppercase px-2 py-1">Cambiar</button>
                     </div>
                     
-                    <div x-show="!clienteSeleccionado && !clienteFormVisible" class="flex items-center gap-2">
-                        <input type="text" x-model="espData.nombre" placeholder="Nombre (Paso rápido)" class="flex-1 border-2 border-slate-200 rounded-xl py-3 px-4 font-bold text-sm focus:border-[#17a2b8] outline-none transition-all">
-                        <span class="text-sm font-bold text-slate-400 italic">Ó</span>
-                        <button @click="modalEspecial = false; abrirModalCliente(true);" class="bg-[#17a2b8] hover:bg-[#138496] text-white px-4 py-3 rounded-xl font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-sm whitespace-nowrap transition-colors">
+                    <div x-show="!clienteSeleccionado && !clienteFormVisible" class="pos-special-client-row flex items-center gap-2">
+                        <input type="text" x-model="espData.nombre" placeholder="Nombre (Paso rápido)" class="pos-special-client-input flex-1 border-2 border-slate-200 rounded-xl py-3 px-4 font-bold text-sm focus:border-[#17a2b8] outline-none transition-all">
+                        <span class="pos-special-client-or text-sm font-bold text-slate-400 italic">Ó</span>
+                        <button @click="modalEspecial = false; abrirModalCliente(true);" class="pos-special-client-button bg-[#17a2b8] hover:bg-[#138496] text-white px-4 py-3 rounded-xl font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-sm whitespace-nowrap transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             Buscar / Reg.
                         </button>
@@ -1655,7 +1741,7 @@
 
             <div class="p-6 bg-white border-t border-slate-50 flex gap-3 shadow-inner">
                 <button @click="modalEspecial = false" class="flex-1 font-black py-4 rounded-2xl text-[14px] uppercase italic text-slate-400 bg-slate-50 hover:bg-slate-100 transition-all">Cancelar</button>
-                <button @click="confirmarEspecial()" :disabled="!isEspValido() || isProcessing" :class="!isEspValido() || isProcessing ? 'bg-slate-200 text-white' : 'bg-black text-white shadow-xl'" class="flex-1 font-black py-4 rounded-2xl text-[14px] uppercase italic transition-all">
+                <button @click="confirmarEspecial()" :disabled="!isEspValido() || isProcessing" :class="!isEspValido() || isProcessing ? 'bg-[#17a2b8]/50 text-white/80' : 'bg-[#17a2b8] hover:bg-[#138496] text-white shadow-xl'" class="flex-1 font-black py-4 rounded-2xl text-[14px] uppercase italic transition-all">
                     <span x-show="!isProcessing" x-text="id_venta_edit ? 'Actualizar Especial' : 'Programar Especial'"></span>
                     <span x-show="isProcessing">Guardando...</span>
                 </button>

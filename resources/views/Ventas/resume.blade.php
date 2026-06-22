@@ -178,6 +178,13 @@
         box-shadow: none !important;
     }
 
+    html.app-dark .resume-page-shell .resume-item-badge {
+        background-color: #2563eb !important;
+        border: 1px solid #93c5fd !important;
+        color: #ffffff !important;
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2) !important;
+    }
+
     html.app-dark .resume-page-shell .rounded-\[30px\],
     html.app-dark .resume-page-shell .rounded-\[35px\],
     html.app-dark .resume-page-shell .rounded-2xl,
@@ -333,7 +340,7 @@
                             </td>
 
                             <td class="px-6 py-6 text-center">
-                                <span class="bg-slate-200 text-slate-700 font-black px-2.5 py-1 rounded-lg text-[10px]">
+                                <span class="resume-item-badge bg-slate-200 text-slate-700 font-black px-2.5 py-1 rounded-lg text-[10px]">
                                     {{ $venta->total_productos }}
                                 </span>
                             </td>
