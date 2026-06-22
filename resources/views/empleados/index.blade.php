@@ -1,6 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    html.app-dark .employee-status-switch {
+        background-color: #475569 !important;
+        border: 1px solid #94a3b8 !important;
+        box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.35), 0 8px 18px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    html.app-dark .peer:checked ~ .employee-status-switch {
+        background-color: #22c55e !important;
+        border-color: #86efac !important;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16), 0 8px 18px rgba(34, 197, 94, 0.16) !important;
+    }
+
+    html.app-dark .employee-status-switch::after {
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    html.app-dark .employee-status-text-active {
+        color: #4ade80 !important;
+    }
+
+    html.app-dark .employee-status-text-inactive {
+        color: #cbd5e1 !important;
+    }
+</style>
+
 <div class="max-w-[1600px] mx-auto">
     
     <div class="mb-12">
@@ -90,9 +118,9 @@
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="sr-only peer" onchange="this.form.submit()" {{ $empleado->status == 1 ? 'checked' : '' }}>
                                         
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-sm"></div>
+                                        <div class="employee-status-switch w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-sm"></div>
                                         
-                                        <span class="ml-3 inline-block w-16 text-left text-[10px] font-black uppercase tracking-widest {{ $empleado->status == 1 ? 'text-green-600' : 'text-gray-400' }}">
+                                        <span class="ml-3 inline-block w-16 text-left text-[10px] font-black uppercase tracking-widest {{ $empleado->status == 1 ? 'employee-status-text-active text-green-600' : 'employee-status-text-inactive text-gray-400' }}">
                                             {{ $empleado->status == 1 ? 'Activo' : 'Inactivo' }}
                                         </span>
                                     </label>

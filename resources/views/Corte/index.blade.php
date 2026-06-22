@@ -1,6 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    html.app-dark .corte-action-detail {
+        background-color: #1d4ed8 !important;
+        border: 1px solid #60a5fa !important;
+        color: #ffffff !important;
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
+    }
+
+    html.app-dark .corte-action-detail:hover {
+        background-color: #2563eb !important;
+        border-color: #93c5fd !important;
+        color: #ffffff !important;
+    }
+
+    html.app-dark .corte-payment-card {
+        background-color: #24324a !important;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22) !important;
+    }
+
+    html.app-dark .corte-payment-card-green {
+        border-color: #4ade80 !important;
+    }
+
+    html.app-dark .corte-payment-card-blue {
+        border-color: #60a5fa !important;
+    }
+
+    html.app-dark .corte-payment-card-purple {
+        border-color: #c084fc !important;
+    }
+
+    html.app-dark .corte-payment-card-green,
+    html.app-dark .corte-payment-card-green * {
+        color: #4ade80 !important;
+    }
+
+    html.app-dark .corte-payment-card-blue,
+    html.app-dark .corte-payment-card-blue * {
+        color: #60a5fa !important;
+    }
+
+    html.app-dark .corte-payment-card-purple,
+    html.app-dark .corte-payment-card-purple * {
+        color: #c084fc !important;
+    }
+</style>
+
 <div x-data="modalDetalleDia()" class="max-w-[1600px] mx-auto relative">
     
     <div class="flex flex-col gap-4 mb-8 md:flex-row md:justify-between md:items-end">
@@ -94,7 +141,7 @@
                             <td class="px-6 py-4 text-center text-red-500 font-medium">${{ number_format($dia['gastos'], 2) }}</td>
                             <td class="px-6 py-4 text-center {{ $balanceDia >= 0 ? 'text-blue-600' : 'text-red-600' }} font-bold">${{ number_format($balanceDia, 2) }}</td>
                             <td class="px-6 py-4 text-center">
-                                <button type="button" @click="abrirModal('{{ $dia['fecha_db'] }}', '{{ $dia['fecha_format'] }}')" class="p-2.5 bg-blue-50/50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full transition-all inline-flex justify-center items-center group shadow-sm hover:shadow-md" title="Ver detalle del día">
+                                <button type="button" @click="abrirModal('{{ $dia['fecha_db'] }}', '{{ $dia['fecha_format'] }}')" class="corte-action-detail p-2.5 bg-blue-50/50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full transition-all inline-flex justify-center items-center group shadow-sm hover:shadow-md" title="Ver detalle del día">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 </button>
                             </td>
@@ -156,17 +203,17 @@
 
                 <h4 class="font-bold text-gray-800 mb-3 text-sm">Desglose de Ingresos por Método de Pago</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div class="border border-green-100 bg-green-50/50 rounded-xl p-4">
+                    <div class="corte-payment-card corte-payment-card-green border border-green-100 bg-green-50/50 rounded-xl p-4">
                         <div class="flex items-center gap-2 text-green-600 mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg> <span class="font-bold text-sm">Efectivo</span></div>
                         <h4 class="text-xl font-black text-green-600 tracking-tight" x-text="formatMoney(datos.metodos.efectivo.monto)"></h4>
                         <p class="text-[10px] text-green-500 font-medium mt-1" x-text="datos.metodos.efectivo.pct + '% del total'"></p>
                     </div>
-                    <div class="border border-blue-100 bg-blue-50/50 rounded-xl p-4">
+                    <div class="corte-payment-card corte-payment-card-blue border border-blue-100 bg-blue-50/50 rounded-xl p-4">
                         <div class="flex items-center gap-2 text-blue-600 mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> <span class="font-bold text-sm">Tarjeta</span></div>
                         <h4 class="text-xl font-black text-blue-600 tracking-tight" x-text="formatMoney(datos.metodos.tarjeta.monto)"></h4>
                         <p class="text-[10px] text-blue-500 font-medium mt-1" x-text="datos.metodos.tarjeta.pct + '% del total'"></p>
                     </div>
-                    <div class="border border-purple-100 bg-purple-50/50 rounded-xl p-4">
+                    <div class="corte-payment-card corte-payment-card-purple border border-purple-100 bg-purple-50/50 rounded-xl p-4">
                         <div class="flex items-center gap-2 text-purple-600 mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg> <span class="font-bold text-sm">Transferencia</span></div>
                         <h4 class="text-xl font-black text-purple-600 tracking-tight" x-text="formatMoney(datos.metodos.transferencia.monto)"></h4>
                         <p class="text-[10px] text-purple-500 font-medium mt-1" x-text="datos.metodos.transferencia.pct + '% del total'"></p>

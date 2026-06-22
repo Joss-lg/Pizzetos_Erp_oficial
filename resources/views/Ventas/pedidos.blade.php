@@ -2,6 +2,33 @@
 
 @section('content')
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    html.app-dark .orders-route-panel {
+        background-color: #182235 !important;
+        border-color: #334155 !important;
+        box-shadow: inset 0 0 0 1px rgba(51, 65, 85, 0.5) !important;
+    }
+
+    html.app-dark .orders-route-panel h3 {
+        color: #fd7e14 !important;
+        border-color: #475569 !important;
+    }
+
+    html.app-dark .orders-route-empty {
+        color: #fb923c !important;
+    }
+
+    html.app-dark .orders-route-card {
+        background-color: #111827 !important;
+        border-color: #475569 !important;
+    }
+
+    html.app-dark .orders-route-info {
+        background-color: #1f2937 !important;
+        border-color: #475569 !important;
+        color: #e5e7eb !important;
+    }
+</style>
 
 @if(session('success'))
 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" class="fixed top-6 right-6 z-50 bg-[#00b300] text-white px-5 py-3.5 rounded shadow-lg flex items-center gap-3">
@@ -97,7 +124,7 @@
             </div>
         </div>
 
-        <div class="bg-orange-50 rounded-2xl p-5 border border-orange-200 shadow-inner">
+        <div class="orders-route-panel bg-orange-50 rounded-2xl p-5 border border-orange-200 shadow-inner">
             <h3 class="font-black text-[18px] text-orange-800 mb-4 flex items-center gap-2 border-b border-orange-200 pb-3">
                 <svg class="w-6 h-6 text-[#fd7e14]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                 En Camino (<span x-text="pedidosEnCamino.length"></span>)
@@ -105,11 +132,11 @@
             
             <div class="space-y-4">
                 <template x-if="pedidosEnCamino.length === 0">
-                    <div class="text-center py-10 text-orange-400 font-medium">Ningún pedido está en ruta actualmente.</div>
+                    <div class="orders-route-empty text-center py-10 text-orange-400 font-medium">Ningún pedido está en ruta actualmente.</div>
                 </template>
 
                 <template x-for="p in pedidosEnCamino" :key="p.id_venta">
-                    <div class="bg-white rounded-xl shadow-sm border border-orange-200 p-4 border-l-4 border-l-[#fd7e14] hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div class="orders-route-card bg-white rounded-xl shadow-sm border border-orange-200 p-4 border-l-4 border-l-[#fd7e14] hover:shadow-md transition-shadow relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-orange-100 text-orange-800 px-3 py-1 rounded-bl-lg font-black text-[13px] flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span x-text="tiempoTranscurrido(p.fecha_hora)"></span> min totales
@@ -118,7 +145,7 @@
                         <h4 class="font-black text-[18px] text-gray-900 mb-1 mt-1">Ticket #<span x-text="p.id_venta"></span></h4>
                         <p class="font-bold text-gray-700 text-[15px] mb-3 leading-none" x-text="formatearNombre(p)"></p>
 
-                        <div class="bg-orange-50 border border-orange-100 rounded-lg p-3 mb-4 text-sm text-gray-700">
+                        <div class="orders-route-info bg-orange-50 border border-orange-100 rounded-lg p-3 mb-4 text-sm text-gray-700">
                             <p class="font-black text-[#fd7e14] text-[15px] flex items-center gap-2 mb-1.5">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 <span x-text="'Repartidor: ' + p.repartidorAsignado"></span>
