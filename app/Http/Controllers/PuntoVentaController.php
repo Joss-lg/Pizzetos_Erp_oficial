@@ -5,10 +5,38 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class PuntoVentaController extends Controller
 {
+    /**
+     * Autoriza la edición de un pedido ya guardado.
+     * - Si el usuario logueado ya es Administrador (id_ca = 1), se autoriza directo.
+     * - Si no, se exige una contraseña de administrador válida (input 'admin_password'),
+     *   verificada contra cualquier empleado activo con cargo Admin.
+     */
+    private function autorizarEdicionAdmin(Request $request): bool
+    {
+        if (Auth::check() && Auth::user()->id_ca == 1) {
+            return true;
+        }
+
+        $password = $request->input('admin_password');
+        if (!$password) {
+            return false;
+        }
+
+        $admins = DB::table('Empleados')->where('id_ca', 1)->where('status', 1)->get();
+        foreach ($admins as $admin) {
+            if ($admin->password && Hash::check($password, $admin->password)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function getPreciosOrilla() {
         return [
             'chica' => 40.00,
@@ -153,6 +181,17 @@ class PuntoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            // Editar un pedido ya guardado requiere autorización de administrador.
+            if ($request->filled('id_venta_edit') && !$this->autorizarEdicionAdmin($request)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Se requiere la contraseña de un administrador para editar un pedido ya guardado.',
+                    'requiere_admin' => true
+                ], 403);
+            }
+
             $id_sucursal = 1; 
             $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
             if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
@@ -357,6 +396,16 @@ class PuntoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            if (!$this->autorizarEdicionAdmin($request)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Se requiere la contraseña de un administrador para editar el pago de un pedido.',
+                    'requiere_admin' => true
+                ], 403);
+            }
+
             $id_venta = $request->id_venta;
             $venta = DB::table('Venta')->where('id_venta', $id_venta)->first();
 
@@ -778,6 +827,16 @@ class PuntoVentaController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            if (!$this->autorizarEdicionAdmin($request)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Se requiere la contraseña de un administrador para cancelar un pedido.',
+                    'requiere_admin' => true
+                ], 403);
+            }
+
             $venta = DB::table('Venta')->where('id_venta', $request->id_venta)->first();
             if(!$venta) {
                 return response()->json(['success' => false, 'message' => 'Venta no encontrada']);

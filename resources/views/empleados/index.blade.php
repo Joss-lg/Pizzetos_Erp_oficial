@@ -54,9 +54,11 @@
         <div class="p-10 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
             <p class="text-[10px] text-gray-400 font-black uppercase tracking-[0.4em]">Listado oficial de colaboradores</p>
             
+            @if(auth()->user()->tienePermiso('empleados','crear'))
             <a href="{{ route('empleados.create') }}" class="bg-[#eab308] hover:bg-black hover:text-white text-black px-8 py-4 rounded-2xl font-black text-xs transition-all shadow-xl shadow-yellow-500/20 uppercase tracking-[0.2em] inline-block text-center decoration-0">
                 + Registrar Empleado
             </a>
+            @endif
         </div>
 
         <div class="overflow-x-auto">
@@ -69,6 +71,7 @@
                         <th class="px-8 py-6 border-b border-gray-50">Cargo</th>
                         <th class="px-8 py-6 border-b border-gray-50">Sucursal</th>
                         <th class="px-8 py-6 border-b border-gray-50">Usuario</th>
+                        <th class="px-8 py-6 border-b border-gray-50">Permisos</th>
                         <th class="px-8 py-6 border-b border-gray-50 text-center">Estado</th>
                         <th class="px-8 py-6 border-b border-gray-50 text-right">Acciones</th>
                     </tr>
@@ -92,7 +95,7 @@
                         </td>
 
                         <td class="px-8 py-8">
-                            <span class="text-gray-800 font-black text-sm uppercase italic">
+                            <span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest {{ $empleado->id_ca == 1 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }}">
                                 {{ $empleado->cargo->nombre ?? 'Staff' }}
                             </span>
                         </td>
@@ -107,6 +110,20 @@
                             <span class="text-gray-400 font-bold text-xs">
                                 @ {{ $empleado->nickName }}
                             </span>
+                        </td>
+
+                        <td class="px-8 py-8">
+                            @if($empleado->id_ca == 1)
+                                <span class="text-gray-300 font-bold text-[10px] uppercase tracking-widest">Acceso total</span>
+                            @elseif(auth()->user()->tienePermiso('empleados','gestionar'))
+                                <a href="{{ route('empleados.permisos.edit', $empleado->id_emp) }}"
+                                   class="inline-flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    Configurar
+                                </a>
+                            @endif
                         </td>
 
                         <td class="px-8 py-8">
@@ -131,6 +148,7 @@
                         <td class="px-8 py-8 text-right">
                             <div class="flex justify-end gap-2 transition-all">
                                 
+                                @if(auth()->user()->tienePermiso('empleados','editar'))
                                 <a href="{{ route('empleados.edit', $empleado->id_emp) }}" 
                                    class="p-3 bg-white text-gray-400 hover:text-black hover:bg-[#eab308] rounded-xl shadow-sm border border-gray-100 transition-all flex items-center justify-center"
                                    title="Editar colaborador">
@@ -138,7 +156,9 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                 </a>
+                                @endif
 
+                                @if(auth()->user()->tienePermiso('empleados','eliminar'))
                                 <form action="{{ route('empleados.destroy', $empleado->id_emp) }}" method="POST" 
                                       onsubmit="return confirm('¿Estás SEGURO de eliminar a {{ $empleado->nombre }}? Esta acción no se puede deshacer.');">
                                     @csrf
@@ -152,13 +172,14 @@
                                         </svg>
                                     </button>
                                 </form>
+                                @endif
 
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-8 py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">
+                        <td colspan="9" class="px-8 py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">
                             <div class="flex flex-col items-center gap-4">
                                 <span class="bg-gray-100 p-4 rounded-full">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

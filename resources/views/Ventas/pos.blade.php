@@ -764,6 +764,24 @@
             </div>
         </div>
 
+        <div x-show="modalAdminPass" x-cloak class="fixed inset-0 bg-black/40 z-[200] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-[400px] flex flex-col overflow-hidden" @click.away="modalAdminPass = false">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 class="text-[18px] font-bold text-[#212529]">Autorización de Administrador</h2>
+                    <button @click="modalAdminPass = false" class="text-gray-400 hover:text-black font-bold text-xl">&times;</button>
+                </div>
+                <div class="p-5 bg-white">
+                    <p class="text-[13px] text-gray-500 mb-3">Editar un pedido ya guardado requiere la contraseña de un administrador.</p>
+                    <input type="password" x-model="adminPasswordInput" @keyup.enter="confirmarAdminPass()" placeholder="Contraseña de administrador" class="w-full border border-gray-300 rounded-[8px] p-3 text-[14px] focus:outline-none focus:border-[#fd7e14]">
+                    <p x-show="adminPassError" x-text="adminPassError" class="text-[12px] text-red-600 font-bold mt-2"></p>
+                </div>
+                <div class="p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                    <button @click="modalAdminPass = false" class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-600 font-bold">Cancelar</button>
+                    <button @click="confirmarAdminPass()" class="px-4 py-2 bg-[#fd7e14] text-white rounded font-bold shadow-sm">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
         <div x-show="modalOpc" x-cloak
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 translate-y-6"
@@ -1845,6 +1863,11 @@
                 mesa: '{{ $venta_edit->mesa ?? '' }}', 
                 nombreClienteMesa: '{{ $venta_edit->nombreClie ?? '' }}',
                 id_venta_edit: {{ $venta_edit->id_venta ?? 'null' }},
+                esAdmin: {{ (auth()->check() && auth()->user()->id_ca == 1) ? 'true' : 'false' }},
+                modalAdminPass: false,
+                adminPasswordInput: '',
+                adminPassError: '',
+                _pendingEsAbierta: false,
                 comentariosGenerales: '{{ $venta_edit->comentarios ?? '' }}', comentariosGeneralesTemp: '', modalComentarios: false,
                 modalOpc: false, opcItem: null,
 
@@ -2831,7 +2854,27 @@
                     }
                 },
 
+                confirmarAdminPass() {
+                    if (!this.adminPasswordInput) {
+                        this.adminPassError = 'Ingresa la contraseña.';
+                        return;
+                    }
+                    this.adminPassError = '';
+                    this.modalAdminPass = false;
+                    this.procesarOrdenFinal(this._pendingEsAbierta);
+                },
+
                 procesarOrdenFinal(esAbierta = false) {
+                    // Si se está editando un pedido ya guardado y quien lo hace no es Admin,
+                    // se pide la contraseña de un administrador antes de continuar.
+                    if (this.id_venta_edit && !this.esAdmin && !this.adminPasswordInput) {
+                        this._pendingEsAbierta = esAbierta;
+                        this.adminPassError = '';
+                        this.modalPago = false;
+                        this.modalEspecial = false;
+                        this.modalAdminPass = true;
+                        return;
+                    }
                     if(!esAbierta && !this.pagosValidos()) return;
                     this.isProcessing = true;
 
@@ -2880,7 +2923,8 @@
                         total: this.getGranTotal(), 
                         carrito: cartPayload, 
                         pagos: pagosToSend,
-                        id_venta_edit: this.id_venta_edit
+                        id_venta_edit: this.id_venta_edit,
+                        admin_password: this.adminPasswordInput || null
                     };
 
                     if(this.servicio === 3) {
@@ -2947,7 +2991,13 @@
                                 this.isProcessing = false;
                             }
                         } else {
-                            alert("Error al guardar: " + res.message);
+                            if (res.requiere_admin) {
+                                this.adminPasswordInput = '';
+                                this.adminPassError = res.message;
+                                this.modalAdminPass = true;
+                            } else {
+                                alert("Error al guardar: " + res.message);
+                            }
                             this.isProcessing = false;
                         }
                     }).catch(e => {
@@ -3087,4 +3137,3 @@
 @endif
 
 @endsection
-

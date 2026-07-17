@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // REGISTRAMOS EL ALIAS PARA EL MIDDLEWARE DE ADMINISTRADOR
         $middleware->alias([
             'admin' => \App\Http\Middleware\SoloAdmin::class,
+            'permiso' => \App\Http\Middleware\PermisoModulo::class,
         ]);
 
     })

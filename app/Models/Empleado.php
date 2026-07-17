@@ -34,4 +34,23 @@ class Empleado extends Authenticatable
     public function sucursal() {
         return $this->belongsTo(Sucursal::class, 'id_suc', 'id_suc');
     }
+
+    public function permisos() {
+        return $this->hasMany(EmpleadoPermiso::class, 'id_emp', 'id_emp');
+    }
+
+    /**
+     * Un Admin (id_ca = 1) siempre tiene acceso total, sin importar la tabla
+     * de permisos. Cualquier otro cargo depende de lo configurado en
+     * EmpleadoPermisos para ese módulo/acción específica.
+     */
+    public function tienePermiso(string $modulo, string $accion): bool
+    {
+        if ($this->id_ca == 1) {
+            return true;
+        }
+
+        $permiso = $this->permisos->firstWhere('modulo', $modulo);
+        return $permiso ? (bool) $permiso->{$accion} : false;
+    }
 }

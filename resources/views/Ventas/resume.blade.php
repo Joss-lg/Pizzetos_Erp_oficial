@@ -416,6 +416,10 @@
             <div class="p-8 bg-white space-y-4 text-center">
                 <p class="text-slate-500 font-bold uppercase italic text-[11px] leading-tight">Esta acción es irreversible y anulará el ingreso de caja.</p>
                 <textarea x-model="motivo_cancelacion" rows="3" placeholder="Ingresa el motivo de cancelación..." class="w-full border-2 border-slate-100 bg-slate-50 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-red-400 transition-colors"></textarea>
+                <div x-show="!esAdmin">
+                    <input type="password" x-model="admin_password_cancelar" placeholder="Contraseña de administrador" class="w-full border-2 border-slate-100 bg-slate-50 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-red-400 transition-colors">
+                    <p x-show="adminPassErrorCancelar" x-text="adminPassErrorCancelar" class="text-[11px] text-red-600 font-bold mt-1"></p>
+                </div>
             </div>
             <div class="p-6 bg-slate-50 flex gap-3">
                 <button @click="modalCancelar = false" class="flex-1 bg-white border border-gray-200 text-slate-400 font-black italic uppercase text-[10px] py-4 rounded-2xl transition-all">Volver</button>
@@ -508,6 +512,11 @@
                 </div>
             </div>
 
+            <div x-show="es_edicion_pago && !esAdmin" class="px-6 pb-2">
+                <input type="password" x-model="admin_password_pago" placeholder="Contraseña de administrador" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-black focus:outline-none focus:border-blue-400">
+                <p x-show="adminPassErrorPago" x-text="adminPassErrorPago" class="text-[11px] text-red-600 font-bold mt-1"></p>
+            </div>
+
             <div class="p-6 bg-white border-t border-gray-50 flex flex-col gap-2">
                 <button @click="procesarPagoFinal()" :disabled="!pagosValidos() || isProcessing" :class="(!pagosValidos() || isProcessing) ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-black hover:bg-slate-800 text-white shadow-xl'" class="w-full font-black italic uppercase text-xs py-5 rounded-2xl transition-all active:scale-95">
                     <span x-show="!isProcessing" x-text="es_edicion_pago ? 'Actualizar Pago' : 'Confirmar Venta'"></span>
@@ -522,6 +531,11 @@
             Alpine.data('historialApp', () => ({
                 modalPago: false,
                 modalCancelar: false,
+                esAdmin: {{ (auth()->check() && auth()->user()->id_ca == 1) ? 'true' : 'false' }},
+                admin_password_cancelar: '',
+                adminPassErrorCancelar: '',
+                admin_password_pago: '',
+                adminPassErrorPago: '',
                 id_venta_pago: null,
                 id_venta_cancelar: null,
                 folio_virtual_pago: '',
@@ -554,6 +568,8 @@
                     this.id_venta_cancelar = id;
                     this.folio_virtual_cancelar = folio;
                     this.motivo_cancelacion = '';
+                    this.admin_password_cancelar = '';
+                    this.adminPassErrorCancelar = '';
                     this.modalCancelar = true;
                 },
 
@@ -561,9 +577,21 @@
                     if(!this.motivo_cancelacion.trim()) return alert("Ingresa el motivo.");
                     fetch("{{ route('ventas.cancelar') }}", {
                         method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ _token: '{{ csrf_token() }}', id_venta: this.id_venta_cancelar, motivo: this.motivo_cancelacion })
+                        body: JSON.stringify({ 
+                            _token: '{{ csrf_token() }}', 
+                            id_venta: this.id_venta_cancelar, 
+                            motivo: this.motivo_cancelacion,
+                            admin_password: this.admin_password_cancelar
+                        })
                     }).then(r => r.json()).then(res => {
-                        if(res.success) { window.location.reload(); } else { alert("Error: " + res.message); }
+                        if(res.success) { 
+                            window.location.reload(); 
+                        } else if (res.requiere_admin) {
+                            this.admin_password_cancelar = '';
+                            this.adminPassErrorCancelar = res.message;
+                        } else { 
+                            alert("Error: " + res.message); 
+                        }
                     });
                 },
 
@@ -574,6 +602,8 @@
                     this.cortesia = 0; 
                     this.es_edicion_pago = esEdicion;
                     this.isProcessing = false;
+                    this.admin_password_pago = '';
+                    this.adminPassErrorPago = '';
                     this.pagos = {
                         efectivo: { activo: false, monto: null, entregado: null },
                         tarjeta: { activo: false, monto: null },
@@ -654,7 +684,8 @@
                             id_venta: this.id_venta_pago, 
                             pagos: pagosToSend,
                             cortesia: this.cortesia,
-                            nuevo_total: this.getGranTotal()
+                            nuevo_total: this.getGranTotal(),
+                            admin_password: this.admin_password_pago
                         })
                     }).then(r => r.json()).then(res => {
                         if(res.success) {
@@ -663,6 +694,10 @@
                                 this.imprimirTicketPop(this.id_venta_pago);
                             }
                             setTimeout(() => { window.location.reload(); }, 1000);
+                        } else if (res.requiere_admin) {
+                            this.admin_password_pago = '';
+                            this.adminPassErrorPago = res.message;
+                            this.isProcessing = false;
                         } else { 
                             alert("Error: " + res.message); 
                             this.isProcessing = false;
