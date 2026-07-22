@@ -15,7 +15,7 @@ class CorteController extends Controller
         $fecha = Carbon::createFromFormat('Y-m', $mesSeleccionado);
         $year = $fecha->year;
         $month = $fecha->month;
-        
+
         $sucursalId = Auth::user()->id_suc;
 
         // TOTALES DEL MES
@@ -30,9 +30,9 @@ class CorteController extends Controller
 
         $ingresosEfectivo = 0; $ingresosTarjeta = 0; $ingresosTransferencia = 0;
         foreach ($pagos as $pago) {
-            if ($pago->id_metpago == 1) $ingresosEfectivo = $pago->total_monto;
-            if ($pago->id_metpago == 2) $ingresosTarjeta = $pago->total_monto;
-            if ($pago->id_metpago == 3) $ingresosTransferencia = $pago->total_monto;
+            if ($pago->id_metpago == 1) $ingresosTarjeta = $pago->total_monto;      // 1 = Tarjeta
+            if ($pago->id_metpago == 2) $ingresosEfectivo = $pago->total_monto;     // 2 = Efectivo
+            if ($pago->id_metpago == 3) $ingresosTransferencia = $pago->total_monto; // 3 = Transferencia
         }
 
         $totalIngresos = $ingresosEfectivo + $ingresosTarjeta + $ingresosTransferencia;
@@ -63,9 +63,9 @@ class CorteController extends Controller
             ->groupBy('dia', 'Pago.id_metpago')->get();
 
         foreach ($pagosDiarios as $pd) {
-            if ($pd->id_metpago == 1) $desgloseDiario[$pd->dia]['efectivo'] = $pd->total_monto;
-            if ($pd->id_metpago == 2) $desgloseDiario[$pd->dia]['tarjeta'] = $pd->total_monto;
-            if ($pd->id_metpago == 3) $desgloseDiario[$pd->dia]['transferencia'] = $pd->total_monto;
+            if ($pd->id_metpago == 1) $desgloseDiario[$pd->dia]['tarjeta'] = $pd->total_monto;      // 1 = Tarjeta
+            if ($pd->id_metpago == 2) $desgloseDiario[$pd->dia]['efectivo'] = $pd->total_monto;     // 2 = Efectivo
+            if ($pd->id_metpago == 3) $desgloseDiario[$pd->dia]['transferencia'] = $pd->total_monto; // 3 = Transferencia
         }
 
         $gastosDiarios = DB::table('Gastos')
@@ -98,9 +98,9 @@ class CorteController extends Controller
             ->select('Pago.id_metpago', 'Pago.monto')
             ->get();
 
-        $efectivo = $pagos->where('id_metpago', 1)->sum('monto');
-        $tarjeta = $pagos->where('id_metpago', 2)->sum('monto');
-        $transferencia = $pagos->where('id_metpago', 3)->sum('monto');
+        $tarjeta = $pagos->where('id_metpago', 1)->sum('monto');      // 1 = Tarjeta
+        $efectivo = $pagos->where('id_metpago', 2)->sum('monto');      // 2 = Efectivo
+        $transferencia = $pagos->where('id_metpago', 3)->sum('monto'); // 3 = Transferencia
         $totalIngresos = $efectivo + $tarjeta + $transferencia;
 
         $pctEfectivo = $totalIngresos > 0 ? round(($efectivo / $totalIngresos) * 100) : 0;
