@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="{{ asset('pizzetos2.png') }}">
 
     {{-- CONFIGURACIÓN PARA IPHONE / IPAD (iOS) --}}
-    <link rel="apple-touch-icon" href="{{ asset('pizzetos.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logocelular.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pizzetos">
