@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzetos - ERP</title>
     
-    {{-- FAVICON --}}
+{{-- FAVICON ESTÁNDAR --}}
     <link rel="icon" type="image/png" href="{{ asset('pizzetos2.png') }}">
+
+    {{-- CONFIGURACIÓN PARA IPHONE / IPAD (iOS) --}}
+    <link rel="apple-touch-icon" href="{{ asset('pizzetos2.png') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pizzetos">
+
+    {{-- CONFIGURACIÓN PARA ANDROID (PWA) --}}
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
