@@ -6,7 +6,7 @@
     <title>Pizzetos - ERP</title>
     
 {{-- FAVICON ESTÁNDAR --}}
-    <link rel="icon" type="image/png" href="{{ asset('pizzetos2.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logocelular.png') }}">
 
     {{-- CONFIGURACIÓN PARA IPHONE / IPAD (iOS) --}}
     <link rel="apple-touch-icon" href="{{ asset('logocelular.png') }}">
