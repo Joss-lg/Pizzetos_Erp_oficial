@@ -764,23 +764,7 @@
             </div>
         </div>
 
-        <div x-show="modalAdminPass" x-cloak class="fixed inset-0 bg-black/40 z-[200] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[400px] flex flex-col overflow-hidden" @click.away="modalAdminPass = false">
-                <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h2 class="text-[18px] font-bold text-[#212529]">Autorización de Administrador</h2>
-                    <button @click="modalAdminPass = false" class="text-gray-400 hover:text-black font-bold text-xl">&times;</button>
-                </div>
-                <div class="p-5 bg-white">
-                    <p class="text-[13px] text-gray-500 mb-3">Editar un pedido ya guardado requiere la contraseña de un administrador.</p>
-                    <input type="password" x-model="adminPasswordInput" @keyup.enter="confirmarAdminPass()" placeholder="Contraseña de administrador" class="w-full border border-gray-300 rounded-[8px] p-3 text-[14px] focus:outline-none focus:border-[#fd7e14]">
-                    <p x-show="adminPassError" x-text="adminPassError" class="text-[12px] text-red-600 font-bold mt-2"></p>
-                </div>
-                <div class="p-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                    <button @click="modalAdminPass = false" class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-600 font-bold">Cancelar</button>
-                    <button @click="confirmarAdminPass()" class="px-4 py-2 bg-[#fd7e14] text-white rounded font-bold shadow-sm">Confirmar</button>
-                </div>
-            </div>
-        </div>
+
 
         <div x-show="modalOpc" x-cloak
              x-transition:enter="transition ease-out duration-200"
@@ -2864,147 +2848,134 @@
                     this.procesarOrdenFinal(this._pendingEsAbierta);
                 },
 
-                procesarOrdenFinal(esAbierta = false) {
-                    // Si se está editando un pedido ya guardado y quien lo hace no es Admin,
-                    // se pide la contraseña de un administrador antes de continuar.
-                    if (this.id_venta_edit && !this.esAdmin && !this.adminPasswordInput) {
-                        this._pendingEsAbierta = esAbierta;
-                        this.adminPassError = '';
-                        this.modalPago = false;
-                        this.modalEspecial = false;
-                        this.modalAdminPass = true;
-                        return;
-                    }
-                    if(!esAbierta && !this.pagosValidos()) return;
-                    this.isProcessing = true;
+procesarOrdenFinal(esAbierta = false) {
+    // Se eliminó el bloque if(this.id_venta_edit && !this.esAdmin...) que abría el modal
 
-                    let cartPayload = [];
-                    this.cartGroups.forEach(g => {
-                        if(g.type === 'pizza_pair') {
-                            g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
-                        } else {
-                            cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
-                        }
-                    });
+    if(!esAbierta && !this.pagosValidos()) return;
+    this.isProcessing = true;
 
-                    let pagosToSend = [];
-                    if(!esAbierta) {
-                        this.pagosPreviosRAW.forEach(p => {
-                            pagosToSend.push({ 
-                                id_metpago: p.id_metpago, 
-                                monto: p.monto, 
-                                referencia: p.referencia || '', 
-                                entregado: p.referencia || p.monto 
-                            });
-                        });
+    let cartPayload = [];
+    this.cartGroups.forEach(g => {
+        if(g.type === 'pizza_pair') {
+            g.items.forEach(p => { cartPayload.push({ ...p.item, precioFinal: p.item.precioFinal, qty: 1 }); });
+        } else {
+            cartPayload.push({ ...g.item, precioFinal: g.item.precioFinal });
+        }
+    });
 
-                        if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
-                            pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
-                        }
-                        if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
-                            pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
-                        }
-                        if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
-                            pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
-                        }
-                    }
+    let pagosToSend = [];
+    if(!esAbierta) {
+        this.pagosPreviosRAW.forEach(p => {
+            pagosToSend.push({ 
+                id_metpago: p.id_metpago, 
+                monto: p.monto, 
+                referencia: p.referencia || '', 
+                entregado: p.referencia || p.monto 
+            });
+        });
 
-                    let baseComments = this.comentariosGenerales.replace(/ \| CORTESÍA \d+%/ig, '').replace(/CORTESÍA \d+%/ig, '').replace(/ \| CORTESIA \d+%/ig, '').replace(/CORTESIA \d+%/ig, '').replace(/ \| DESCUENTO \d+%/ig, '').replace(/DESCUENTO \d+%/ig, '').trim();
-                    if (baseComments.endsWith('|')) baseComments = baseComments.slice(0, -1).trim();
-                    
-                    let finalComments = baseComments + (this.cortesia > 0 ? (baseComments ? " | " : "") + "DESCUENTO " + this.cortesia + "%" : "");
+        if(this.pagos.efectivo.activo && this.pagos.efectivo.monto > 0) {
+            pagosToSend.push({ id_metpago: 2, monto: this.pagos.efectivo.monto, entregado: this.pagos.efectivo.entregado || this.pagos.efectivo.monto });
+        }
+        if(this.pagos.tarjeta.activo && this.pagos.tarjeta.monto > 0) {
+            pagosToSend.push({ id_metpago: 1, monto: this.pagos.tarjeta.monto }); 
+        }
+        if(this.pagos.transferencia.activo && this.pagos.transferencia.monto > 0) {
+            pagosToSend.push({ id_metpago: 3, monto: this.pagos.transferencia.monto, referencia: this.pagos.transferencia.referencia });
+        }
+    }
 
-                    let reqBody = {
-                        _token: '{{ csrf_token() }}', 
-                        tipo_servicio: this.servicio, 
-                        mesa: this.mesa, 
-                        nombre_cliente: this.nombreClienteMesa,
-                        comentarios: finalComments, 
-                        total: this.getGranTotal(), 
-                        carrito: cartPayload, 
-                        pagos: pagosToSend,
-                        id_venta_edit: this.id_venta_edit,
-                        admin_password: this.adminPasswordInput || null
-                    };
+    let baseComments = this.comentariosGenerales.replace(/ \| CORTESÍA \d+%/ig, '').replace(/CORTESÍA \d+%/ig, '').replace(/ \| CORTESIA \d+%/ig, '').replace(/CORTESIA \d+%/ig, '').replace(/ \| DESCUENTO \d+%/ig, '').replace(/DESCUENTO \d+%/ig, '').trim();
+    if (baseComments.endsWith('|')) baseComments = baseComments.slice(0, -1).trim();
+    
+    let finalComments = baseComments + (this.cortesia > 0 ? (baseComments ? " | " : "") + "DESCUENTO " + this.cortesia + "%" : "");
 
-                    if(this.servicio === 3) {
-                        if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
-                        else reqBody.id_clie = this.clienteSeleccionado ? (this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie) : null;
+    let reqBody = {
+        _token: '{{ csrf_token() }}', 
+        tipo_servicio: this.servicio, 
+        mesa: this.mesa, 
+        nombre_cliente: this.nombreClienteMesa,
+        comentarios: finalComments, 
+        total: this.getGranTotal(), 
+        carrito: cartPayload, 
+        pagos: pagosToSend,
+        id_venta_edit: this.id_venta_edit
+        // Se eliminó admin_password del payload ya que no se usará
+    };
 
-                        if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
-                        else reqBody.id_dir = this.dirSeleccionada;
-                    }
+    if(this.servicio === 3) {
+        if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
+        else reqBody.id_clie = this.clienteSeleccionado ? (this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie) : null;
 
-                    fetch("{{ route('ventas.pos.store') }}", {
-                        method: 'POST', 
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json' 
-                        },
-                        body: JSON.stringify(reqBody)
-                    }).then(async r => {
-                        if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
-                        return r.json();
-                    }).then(res => {
-                        if(res.success) { 
-                            if (res.nuevo_cliente) {
-                            const existeClie = dbClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
-                            if (!existeClie) {
-                                dbClientes.push(res.nuevo_cliente);
-                            }
-                        }
-                        if (res.nueva_direccion) {
-                            const existeDir = dbDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
-                            if (!existeDir) {
-                                dbDirecciones.push(res.nueva_direccion);
-                            }
-                        }
-                            this.cart = []; 
-                            this.actualizarCarrito(); 
-                            this.mesa = ''; 
-                            this.nombreClienteMesa = ''; 
-                            this.comentariosGenerales = '';
-                            this.comentariosGeneralesTemp = ''; 
-                            this.cortesia = 0;
-                            this.modalPago = false;
-                            
-                            this.clienteSeleccionado = null;
-                            this.searchClienteText = '';
-                            this.direccionesCliente = [];
-                            this.dirSeleccionada = null;
-                            this.clienteFormVisible = false;
-                            this.dirFormVisible = false;
+        if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
+        else reqBody.id_dir = this.dirSeleccionada;
+    }
 
-                            let urlTicket = '/venta/pos/ticket/' + res.id_venta;
-                            if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
+    fetch("{{ route('ventas.pos.store') }}", {
+        method: 'POST', 
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json' 
+        },
+        body: JSON.stringify(reqBody)
+    }).then(async r => {
+        if(!r.ok) { throw new Error("Error del servidor: " + r.status); }
+        return r.json();
+    }).then(res => {
+        if(res.success) { 
+            if (res.nuevo_cliente) {
+                const existeClie = dbClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
+                if (!existeClie) {
+                    dbClientes.push(res.nuevo_cliente);
+                }
+            }
+            if (res.nueva_direccion) {
+                const existeDir = dbDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
+                if (!existeDir) {
+                    dbDirecciones.push(res.nueva_direccion);
+                }
+            }
+            this.cart = []; 
+            this.actualizarCarrito(); 
+            this.mesa = ''; 
+            this.nombreClienteMesa = ''; 
+            this.comentariosGenerales = '';
+            this.comentariosGeneralesTemp = ''; 
+            this.cortesia = 0;
+            this.modalPago = false;
+            
+            this.clienteSeleccionado = null;
+            this.searchClienteText = '';
+            this.direccionesCliente = [];
+            this.dirSeleccionada = null;
+            this.clienteFormVisible = false;
+            this.dirFormVisible = false;
 
-                            const width = 420;
-                            const height = 700;
-                            const left = (window.screen.width / 2) - (width / 2);
-                            const top = (window.screen.height / 2) - (height / 2);
+            let urlTicket = '/venta/pos/ticket/' + res.id_venta;
+            if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
 
-                            window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
-                            
-                            if(this.id_venta_edit) {
-                                setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
-                            } else {
-                                this.isProcessing = false;
-                            }
-                        } else {
-                            if (res.requiere_admin) {
-                                this.adminPasswordInput = '';
-                                this.adminPassError = res.message;
-                                this.modalAdminPass = true;
-                            } else {
-                                alert("Error al guardar: " + res.message);
-                            }
-                            this.isProcessing = false;
-                        }
-                    }).catch(e => {
-                        alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
-                        this.isProcessing = false;
-                    });
-                },
+            const width = 420;
+            const height = 700;
+            const left = (window.screen.width / 2) - (width / 2);
+            const top = (window.screen.height / 2) - (height / 2);
+
+            window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
+            
+            if(this.id_venta_edit) {
+                setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
+            } else {
+                this.isProcessing = false;
+            }
+        } else {
+            // Se eliminó la validación que mostraba el modal reactivo (res.requiere_admin)
+            alert("Error al guardar: " + res.message);
+            this.isProcessing = false;
+        }
+    }).catch(e => {
+        alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);
+        this.isProcessing = false;
+    });
+},
 
                 espData: {
                     fecha: '',
