@@ -9,7 +9,7 @@
 
     <div class="bg-white p-10 rounded-2xl shadow-xl text-center">
         <h1 class="text-4xl font-bold text-red-600">
-            🍕 Bienvenido a Pizzetos
+             Bienvenido a Pizzetos
         </h1>
         <p class="mt-4 text-gray-600">
             Proyecto Laravel + Blade + Tailwind v3

@@ -182,10 +182,18 @@ class PuntoVentaController extends Controller
         try {
         DB::beginTransaction();
 
-        // Se eliminó la validación que requería autorización de administrador
-        // para editar un pedido ya guardado.
+        // Validar contraseña de admin cuando se aplica una cortesía
+        if ($request->filled('cortesia') && $request->cortesia > 0) {
+            if (!$this->autorizarEdicionAdmin($request)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Se requiere la contraseña de un administrador para aplicar descuentos.',
+                ], 403);
+            }
+        }
 
-        $id_sucursal = 1; 
+        $id_sucursal = 1;
         $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
         if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
 
@@ -194,28 +202,12 @@ class PuntoVentaController extends Controller
 
         if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
             $id_clie = DB::table('Clientes')->insertGetId([
-                'nombre' => $request->nuevo_cliente['nombre'], 
-                'apellido' => $request->nuevo_cliente['apellido'] ?? '', 
-                'telefono' => $request->nuevo_cliente['telefono'] ?? '', 
+                'nombre' => $request->nuevo_cliente['nombre'],
+                'apellido' => $request->nuevo_cliente['apellido'] ?? '',
+                'telefono' => $request->nuevo_cliente['telefono'] ?? '',
                 'status' => 1
             ]);
         }
-
-            $id_sucursal = 1; 
-            $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
-            if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
-
-            $id_clie = $request->id_clie ?? null;
-            $id_dir = $request->id_dir ?? null;
-
-            if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
-                $id_clie = DB::table('Clientes')->insertGetId([
-                    'nombre' => $request->nuevo_cliente['nombre'], 
-                    'apellido' => $request->nuevo_cliente['apellido'] ?? '', 
-                    'telefono' => $request->nuevo_cliente['telefono'] ?? '', 
-                    'status' => 1
-                ]);
-            }
 
             if ($request->has('nueva_direccion') && is_array($request->nueva_direccion) && !empty($request->nueva_direccion['calle']) && $id_clie) {
                 $id_dir = DB::table('Direcciones')->insertGetId([
@@ -365,9 +357,16 @@ class PuntoVentaController extends Controller
             $updateData = ['status' => 1];
 
             if ($request->has('cortesia') && $request->cortesia > 0) {
+                if (!$this->autorizarEdicionAdmin($request)) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Se requiere la contraseña de un administrador para aplicar descuentos.',
+                    ], 403);
+                }
                 $updateData['total'] = $request->nuevo_total;
                 $comentarios = $venta->comentarios ?? '';
-                
+
                 $partes = explode('|', $comentarios);
                 $limpios = [];
                 foreach($partes as $p) {

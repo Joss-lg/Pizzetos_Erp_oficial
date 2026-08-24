@@ -428,6 +428,45 @@
         </div>
     </div>
 
+    {{-- MODAL: Autorización de Admin para Cortesías --}}
+    <div x-show="modalCortesia" x-cloak class="fixed inset-0 bg-black/60 z-[150] flex items-center justify-center p-4 backdrop-blur-sm"
+         @keydown.enter.window="if(modalCortesia) confirmarCortesia()">
+        <div class="bg-white rounded-2xl shadow-2xl w-[380px]" @click.away="modalCortesia = false; _pendingCortesia = null;">
+            <div class="bg-amber-500 p-5 rounded-t-2xl flex justify-between items-center text-white">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Autorización Requerida</p>
+                    <h3 class="font-black text-[18px] uppercase italic tracking-wide leading-tight">Aplicar Descuento</h3>
+                </div>
+                <button @click="modalCortesia = false; _pendingCortesia = null;" class="font-black text-2xl leading-none hover:text-amber-200 transition-colors">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-600 font-medium leading-relaxed">
+                    Para aplicar un descuento del <strong class="text-amber-600" x-text="_pendingCortesia + '%'"></strong>
+                    se necesita la contraseña de un administrador.
+                </p>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Contraseña de Administrador</label>
+                    <input type="password"
+                           x-model="cortesiaPassInput"
+                           @keydown.enter="confirmarCortesia()"
+                           placeholder="Contraseña..."
+                           class="w-full border-2 border-gray-200 rounded-xl py-3 px-4 text-[14px] font-bold focus:outline-none focus:border-amber-400 transition-colors">
+                    <p x-show="cortesiaPassError" x-text="cortesiaPassError" class="text-red-500 text-xs font-bold mt-2" x-cloak></p>
+                </div>
+            </div>
+            <div class="p-5 bg-gray-50 rounded-b-2xl flex gap-3 border-t border-gray-100">
+                <button @click="modalCortesia = false; _pendingCortesia = null;"
+                        class="flex-1 font-bold text-gray-500 bg-white border border-gray-200 rounded-xl py-3 hover:bg-gray-100 transition-colors">
+                    Cancelar
+                </button>
+                <button @click="confirmarCortesia()"
+                        class="flex-1 font-black bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-3 uppercase italic tracking-wide transition-colors">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     {{-- MODAL MULTIPAGO CON CORTESÍAS --}}
     <div x-show="modalPago" x-cloak class="fixed inset-0 bg-slate-900/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-white rounded-[35px] shadow-2xl w-[450px] max-w-full flex flex-col h-auto max-h-[90vh] overflow-hidden" @click.away="modalPago = false">
@@ -443,8 +482,8 @@
                 {{-- BOTONES DE DESCUENTO --}}
                 <div class="grid grid-cols-3 gap-2 mb-4">
                     <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Sin Descuento</button>
-                    <button @click="cortesia = 40; autoFillAfterCortesia()" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Descuento 40%</button>
-                    <button @click="cortesia = 100; autoFillAfterCortesia()" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Descuento 100%</button>
+                    <button @click="pedirCortesia(40)" :class="cortesia === 40 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Descuento 40%</button>
+                    <button @click="pedirCortesia(100)" :class="cortesia === 100 ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'" class="py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">Descuento 100%</button>
                 </div>
 
                 <div class="text-[10px] font-black text-slate-400 uppercase italic mb-1 tracking-widest">Total a Cobrar</div>
@@ -536,6 +575,10 @@
                 adminPassErrorCancelar: '',
                 admin_password_pago: '',
                 adminPassErrorPago: '',
+                modalCortesia: false,
+                _pendingCortesia: null,
+                cortesiaPassInput: '',
+                cortesiaPassError: '',
                 id_venta_pago: null,
                 id_venta_cancelar: null,
                 folio_virtual_pago: '',
@@ -592,6 +635,33 @@
                         } else { 
                             alert("Error: " + res.message); 
                         }
+                    });
+                },
+
+                pedirCortesia(valor) {
+                    this._pendingCortesia = valor;
+                    this.cortesiaPassInput = '';
+                    this.cortesiaPassError = '';
+                    this.modalCortesia = true;
+                },
+
+                confirmarCortesia() {
+                    if (!this.cortesiaPassInput.trim()) {
+                        this.cortesiaPassError = 'Ingresa la contraseña de administrador.';
+                        return;
+                    }
+                    // La contraseña se reusa en admin_password_pago para que
+                    // el servidor la valide al ejecutar el pago
+                    this.admin_password_pago = this.cortesiaPassInput;
+                    this.cortesia = this._pendingCortesia;
+                    this._pendingCortesia = null;
+                    this.modalCortesia = false;
+                    // $nextTick garantiza que modalPago se reabra DESPUÉS de que Alpine
+                    // procese el @click.away del modal de pago (que se dispara al cerrar
+                    // el modal de contraseña cerrando el de pago sin querer).
+                    this.$nextTick(() => {
+                        this.modalPago = true;
+                        this.autoFillAfterCortesia();
                     });
                 },
 
