@@ -355,7 +355,7 @@ class PuntoVentaController extends Controller
         }
     }
 
-    public function pagarOrden(Request $request)
+public function pagarOrden(Request $request)
     {
         try {
             DB::beginTransaction();
@@ -365,6 +365,19 @@ class PuntoVentaController extends Controller
             $updateData = ['status' => 1];
 
             if ($request->has('cortesia') && $request->cortesia > 0) {
+                
+                // --- VALIDACIÓN DE SEGURIDAD PARA DESCUENTOS ---
+                // Verifica si es admin o si envió una contraseña válida
+                if (!$this->autorizarEdicionAdmin($request)) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Se requiere la contraseña de un administrador para aplicar este descuento.',
+                        'requiere_admin' => true
+                    ], 403);
+                }
+                // -----------------------------------------------
+
                 $updateData['total'] = $request->nuevo_total;
                 $comentarios = $venta->comentarios ?? '';
                 
