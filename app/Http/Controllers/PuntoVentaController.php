@@ -227,28 +227,12 @@ class PuntoVentaController extends Controller
 
         if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
             $id_clie = DB::table('Clientes')->insertGetId([
-                'nombre' => $request->nuevo_cliente['nombre'], 
-                'apellido' => $request->nuevo_cliente['apellido'] ?? '', 
-                'telefono' => $request->nuevo_cliente['telefono'] ?? '', 
+                'nombre' => $request->nuevo_cliente['nombre'],
+                'apellido' => $request->nuevo_cliente['apellido'] ?? '',
+                'telefono' => $request->nuevo_cliente['telefono'] ?? '',
                 'status' => 1
             ]);
         }
-
-            $id_sucursal = 1; 
-            $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();
-            if(!$cajaAbierta) throw new \Exception("No hay caja abierta.");
-
-            $id_clie = $request->id_clie ?? null;
-            $id_dir = $request->id_dir ?? null;
-
-            if ($request->has('nuevo_cliente') && is_array($request->nuevo_cliente) && !empty($request->nuevo_cliente['nombre'])) {
-                $id_clie = DB::table('Clientes')->insertGetId([
-                    'nombre' => $request->nuevo_cliente['nombre'], 
-                    'apellido' => $request->nuevo_cliente['apellido'] ?? '', 
-                    'telefono' => $request->nuevo_cliente['telefono'] ?? '', 
-                    'status' => 1
-                ]);
-            }
 
             if ($request->has('nueva_direccion') && is_array($request->nueva_direccion) && !empty($request->nueva_direccion['calle']) && $id_clie) {
                 $id_dir = DB::table('Direcciones')->insertGetId([
