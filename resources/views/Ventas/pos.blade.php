@@ -2752,8 +2752,10 @@
                     this.clienteFormVisible = false;
                     this.dirFormVisible = false;
                     
-                    let idClieBuscar = cl.id_cliente || cl.id_clie || cl.id;
-                    this.direccionesCliente = dbDirecciones.filter(d => d.id_cliente == idClieBuscar || d.id_clie == idClieBuscar);
+                    let idClieBuscar = cl.id_clie ?? cl.id_cliente ?? cl.id ?? null;
+                    this.direccionesCliente = idClieBuscar !== null
+                        ? dbDirecciones.filter(d => d.id_clie == idClieBuscar)
+                        : [];
                     
                     if(this.direccionesCliente.length > 0) {
                         this.dirSeleccionada = this.direccionesCliente[0].id_direccion || this.direccionesCliente[0].id_dir;
