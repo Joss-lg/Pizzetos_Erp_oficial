@@ -81,7 +81,7 @@ class FlujoCajaController extends Controller
             ->get();
 
         foreach($ventas_detalle as $v) {
-            $v->folio_virtual = str_pad($v->id_venta, 5, STR_PAD_LEFT);
+            $v->folio_virtual = str_pad($v->id_venta, STR_PAD_LEFT);
         }
 
         // 3. TOTALES POR MÉTODO
@@ -122,7 +122,7 @@ class FlujoCajaController extends Controller
 
         if (!$caja) abort(404);
 
-        $caja->folio_virtual = str_pad($caja->id_caja, 5, STR_PAD_LEFT);
+        $caja->folio_virtual = str_pad($caja->id_caja, STR_PAD_LEFT);
 
         try {
             $gastos = DB::table('Gastos')
