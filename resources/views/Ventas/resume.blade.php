@@ -640,6 +640,17 @@
 
                 pedirCortesia(valor) {
                     this._pendingCortesia = valor;
+                    // Si ya es admin, no hace falta pedir contraseña — el backend lo autoriza automáticamente
+                    if (this.esAdmin) {
+                        this.admin_password_pago = '';
+                        this.cortesia = valor;
+                        this._pendingCortesia = null;
+                        this.$nextTick(() => {
+                            this.modalPago = true;
+                            this.autoFillAfterCortesia();
+                        });
+                        return;
+                    }
                     this.cortesiaPassInput = '';
                     this.cortesiaPassError = '';
                     this.modalCortesia = true;

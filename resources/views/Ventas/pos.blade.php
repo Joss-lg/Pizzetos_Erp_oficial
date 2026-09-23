@@ -2893,6 +2893,17 @@
 
                 pedirCortesia(valor) {
                     this._pendingCortesia = valor;
+                    // Si ya es admin, no hace falta pedir contraseña — el backend lo autoriza automáticamente
+                    if (this.esAdmin) {
+                        this.adminPasswordInput = '';
+                        this.cortesia = valor;
+                        this._pendingCortesia = null;
+                        this.$nextTick(() => {
+                            this.modalPago = true;
+                            this.autoFillAfterCortesia();
+                        });
+                        return;
+                    }
                     this.cortesiaPassInput = '';
                     this.cortesiaPassError = '';
                     this.modalCortesia = true;
@@ -3038,9 +3049,19 @@ procesarOrdenFinal(esAbierta = false) {
                 this.isProcessing = false;
             }
         } else {
-            // Se eliminó la validación que mostraba el modal reactivo (res.requiere_admin)
-            alert("Error al guardar: " + res.message);
             this.isProcessing = false;
+            if (res.requiere_admin) {
+                // Contraseña de admin inválida — volver a pedir
+                this.adminPasswordInput = '';
+                this.cortesiaPassInput = '';
+                this.cortesiaPassError = 'Contraseña incorrecta. Intenta de nuevo.';
+                this._pendingCortesia = this.cortesia;
+                this.cortesia = 0;
+                this.modalCortesia = true;
+                this.modalPago = false;
+            } else {
+                alert("Error al guardar: " + res.message);
+            }
         }
     }).catch(e => {
         alert("Ocurrió un error. Intenta de nuevo.\n" + e.message);

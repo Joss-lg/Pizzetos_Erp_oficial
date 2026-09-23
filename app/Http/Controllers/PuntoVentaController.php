@@ -182,8 +182,16 @@ class PuntoVentaController extends Controller
         try {
         DB::beginTransaction();
 
-        // Se eliminó la validación que requería autorización de administrador
-        // para editar un pedido ya guardado.
+        // Validar autorización de admin si se aplica descuento/cortesía
+        if ($request->has('cortesia') && $request->cortesia > 0) {
+            if (!$this->autorizarEdicionAdmin($request)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Se requiere la contraseña de un administrador para aplicar este descuento.',
+                    'requiere_admin' => true
+                ], 403);
+            }
+        }
 
         $id_sucursal = 1; 
         $cajaAbierta = DB::table('Caja')->where('status', 1)->where('id_suc', $id_sucursal)->first();

@@ -51,6 +51,30 @@ class EmpleadoController extends Controller
             // Guardamos
             $empleado->save();
 
+            // Permisos por defecto para empleados no-administradores
+            if ($request->id_ca != 1) {
+                $permisosDefault = [
+                    // módulo            mostrar crear  editar eliminar gestionar
+                    ['modulo' => 'dashboard',      'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'pos',            'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'historial',      'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'especiales',     'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'pedidos',        'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'flujo_caja',     'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'clientes',       'mostrar' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1, 'gestionar' => 1],
+                    ['modulo' => 'gastos',         'mostrar' => 1, 'crear' => 1, 'editar' => 0, 'eliminar' => 0, 'gestionar' => 1],
+                    ['modulo' => 'empleados',      'mostrar' => 0, 'crear' => 0, 'editar' => 0, 'eliminar' => 0, 'gestionar' => 0],
+                    ['modulo' => 'productos',      'mostrar' => 0, 'crear' => 0, 'editar' => 0, 'eliminar' => 0, 'gestionar' => 0],
+                    ['modulo' => 'recursos',       'mostrar' => 0, 'crear' => 0, 'editar' => 0, 'eliminar' => 0, 'gestionar' => 0],
+                    ['modulo' => 'caja',           'mostrar' => 0, 'crear' => 0, 'editar' => 0, 'eliminar' => 0, 'gestionar' => 0],
+                    ['modulo' => 'configuracion',  'mostrar' => 0, 'crear' => 0, 'editar' => 0, 'eliminar' => 0, 'gestionar' => 0],
+                ];
+
+                foreach ($permisosDefault as $p) {
+                    \App\Models\EmpleadoPermiso::create(array_merge(['id_emp' => $empleado->id_emp], $p));
+                }
+            }
+
             return redirect()->route('empleados.index')->with('success', '¡Empleado registrado correctamente!');
             
         } catch (\Exception $e) {
