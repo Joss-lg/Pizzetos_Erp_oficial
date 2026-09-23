@@ -40,11 +40,24 @@ use Carbon\Carbon;
 
 // Redirección inicial
 Route::get('/', function () {
-    if (auth()->check()) {
-        return auth()->user()->id_ca == 1 ? redirect('/dashboard') : redirect('/venta/flujo-caja');
+    if (!auth()->check()) {
+        return redirect('/login');
     }
-    return redirect('/login');
+    $user = auth()->user();
+    if ($user->id_ca == 1) {
+        return redirect('/dashboard');
+    }
+    if ($user->tienePermiso('flujo_caja', 'mostrar')) return redirect('/venta/flujo-caja');
+    if ($user->tienePermiso('pos', 'mostrar'))        return redirect('/venta/pos');
+    if ($user->tienePermiso('pedidos', 'mostrar'))    return redirect('/venta/pedidos');
+    if ($user->tienePermiso('especiales', 'mostrar')) return redirect('/pedidos-especiales');
+    return redirect('/sin-permiso');
 });
+
+// Página segura para empleados sin permisos configurados (sin middleware de permiso)
+Route::middleware(['auth'])->get('/sin-permiso', function () {
+    return view('errors.sin_permiso');
+})->name('sin.permiso');
 
 // --- AUTENTICACIÓN ---
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -72,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     // --- SEGURIDAD FINANCIERA (requieren autorización de admin dentro del controlador) ---
     Route::post('/venta/cancelar', [PuntoVentaController::class, 'cancelarPedido'])->name('ventas.cancelar');
     Route::post('/venta/editar-pago', [PuntoVentaController::class, 'editarPago'])->name('ventas.editar_pago');
+    Route::post('/venta/verificar-admin', [PuntoVentaController::class, 'verificarPasswordAdmin'])->name('ventas.verificar_admin');
 
     // --- MÓDULO PEDIDOS ESPECIALES ---
     Route::get('/pedidos-especiales', [PedidosEspecialesController::class, 'index'])->name('especiales.index')

@@ -2909,20 +2909,39 @@
                     this.modalCortesia = true;
                 },
 
-                confirmarCortesia() {
+                async confirmarCortesia() {
                     if (!this.cortesiaPassInput.trim()) {
                         this.cortesiaPassError = 'Ingresa la contraseña de administrador.';
                         return;
                     }
-                    // Guardamos la contraseña en adminPasswordInput para que
-                    // procesarOrdenFinal la incluya en la petición al servidor
+
+                    // Verificar contraseña con el backend ANTES de aplicar el descuento
+                    try {
+                        const res = await fetch("{{ route('ventas.verificar_admin') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ admin_password: this.cortesiaPassInput })
+                        });
+                        const data = await res.json();
+
+                        if (!data.ok) {
+                            this.cortesiaPassError = data.message || 'Contraseña incorrecta.';
+                            this.cortesiaPassInput = '';
+                            return;
+                        }
+                    } catch (e) {
+                        this.cortesiaPassError = 'Error al verificar. Intenta de nuevo.';
+                        return;
+                    }
+
+                    // Contraseña válida: aplicar cortesía
                     this.adminPasswordInput = this.cortesiaPassInput;
                     this.cortesia = this._pendingCortesia;
                     this._pendingCortesia = null;
                     this.modalCortesia = false;
-                    // $nextTick garantiza que modalPago se reabra DESPUÉS de que Alpine
-                    // procese el @click.away del modal de pago (que se dispara al cerrar
-                    // el modal de contraseña cerrando el de pago sin querer).
                     this.$nextTick(() => {
                         this.modalPago = true;
                         this.autoFillAfterCortesia();

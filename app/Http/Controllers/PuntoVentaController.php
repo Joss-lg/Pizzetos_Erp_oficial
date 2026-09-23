@@ -37,6 +37,31 @@ class PuntoVentaController extends Controller
         return false;
     }
 
+    /**
+     * Endpoint público (auth) para verificar contraseña de admin desde el frontend
+     * antes de aplicar una cortesía. Solo valida, no guarda nada.
+     */
+    public function verificarPasswordAdmin(Request $request)
+    {
+        if (Auth::check() && Auth::user()->id_ca == 1) {
+            return response()->json(['ok' => true]);
+        }
+
+        $password = $request->input('admin_password');
+        if (!$password) {
+            return response()->json(['ok' => false, 'message' => 'Contraseña requerida.'], 422);
+        }
+
+        $admins = DB::table('Empleados')->where('id_ca', 1)->where('status', 1)->get();
+        foreach ($admins as $admin) {
+            if ($admin->password && Hash::check($password, $admin->password)) {
+                return response()->json(['ok' => true]);
+            }
+        }
+
+        return response()->json(['ok' => false, 'message' => 'Contraseña incorrecta.'], 403);
+    }
+
     private function getPreciosOrilla() {
         return [
             'chica' => 40.00,
