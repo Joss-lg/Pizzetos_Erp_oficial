@@ -189,6 +189,100 @@ class ClientesController extends Controller
     }
 
     /**
+     * Endpoint JSON exclusivo para el POS.
+     * Guarda un cliente nuevo (y opcionalmente su dirección) al instante
+     * y devuelve los datos para que el POS los use sin recargar la página.
+     */
+    public function storeDesdePos(Request $request)
+    {
+        $request->validate([
+            'nombre'   => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'telefono' => 'required|string|max:20',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Insertar el cliente
+            $id_clie = DB::table('Clientes')->insertGetId([
+                'nombre'   => trim($request->nombre),
+                'apellido' => trim($request->apellido),
+                'telefono' => trim($request->telefono),
+                'status'   => 1,
+            ]);
+
+            $cliente = DB::table('Clientes')->where('id_clie', $id_clie)->first();
+
+            // 2. Insertar dirección si viene con la petición
+            $direccion = null;
+            if ($request->filled('calle')) {
+                $id_dir = DB::table('Direcciones')->insertGetId([
+                    'id_clie'    => $id_clie,
+                    'calle'      => trim($request->calle),
+                    'manzana'    => trim($request->manzana ?? ''),
+                    'lote'       => trim($request->lote ?? ''),
+                    'colonia'    => trim($request->colonia ?? ''),
+                    'referencia' => trim($request->referencia ?? ''),
+                    'status'     => 1,
+                ]);
+                $direccion = DB::table('Direcciones')->where('id_dir', $id_dir)->first();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success'    => true,
+                'cliente'    => $cliente,
+                'direccion'  => $direccion,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Endpoint JSON para guardar solo una dirección nueva desde el POS
+     * para un cliente que ya existe en la DB.
+     */
+    public function storeDireccionDesdePos(Request $request, $id_clie)
+    {
+        $request->validate([
+            'calle' => 'required|string|max:255',
+        ]);
+
+        try {
+            $id_dir = DB::table('Direcciones')->insertGetId([
+                'id_clie'    => $id_clie,
+                'calle'      => trim($request->calle),
+                'manzana'    => trim($request->manzana ?? ''),
+                'lote'       => trim($request->lote ?? ''),
+                'colonia'    => trim($request->colonia ?? ''),
+                'referencia' => trim($request->referencia ?? ''),
+                'status'     => 1,
+            ]);
+
+            $direccion = DB::table('Direcciones')->where('id_dir', $id_dir)->first();
+
+            return response()->json([
+                'success'   => true,
+                'direccion' => $direccion,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Guarda una nueva dirección para un cliente específico desde el modal.
      */
     public function storeDireccion(Request $request, $id)

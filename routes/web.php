@@ -77,6 +77,10 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permiso:pos,crear');
     Route::get('/venta/pos/ticket/{id}', [PuntoVentaController::class, 'ticket'])->name('ventas.pos.ticket')
         ->middleware('permiso:pos,mostrar');
+
+    // Registro rápido de cliente y dirección desde el POS (devuelve JSON)
+    Route::post('/venta/pos/cliente-rapido', [ClientesController::class, 'storeDesdePos'])->name('pos.cliente.rapido');
+    Route::post('/venta/pos/direccion-rapida/{id_clie}', [ClientesController::class, 'storeDireccionDesdePos'])->name('pos.direccion.rapida');
     Route::get('/venta/resume', [VentasController::class, 'resume'])->name('ventas.resume')
         ->middleware('permiso:historial,mostrar');
     Route::post('/venta/pagar', [PuntoVentaController::class, 'pagarOrden'])->name('ventas.pagar')

@@ -592,9 +592,10 @@
             setTimeout(iniciarImpresion, 500);
         });
 
-        // El botón lanza el diálogo de impresión de la impresora térmica
+        // El botón lanza el diálogo de impresión y cierra la ventana al terminar
         printBtn.addEventListener('click', function () {
             window.print();
+            window.close();
         });
 
     })();

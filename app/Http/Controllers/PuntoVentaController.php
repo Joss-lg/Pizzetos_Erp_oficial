@@ -292,6 +292,7 @@ class PuntoVentaController extends Controller
 
                 if(!empty($item['comentario'])) $extraData['nota'] = $item['comentario'];
                 if(!empty($item['ingredientes_extra'])) $extraData['extras'] = $item['ingredientes_extra'];
+                if(!empty($item['refresco_600'])) $extraData['refresco_600'] = true;
                 
                 $col = $item['col'] ?? null;
                 
@@ -602,12 +603,23 @@ public function pagarOrden(Request $request)
                     $clean_comp = trim(str_ireplace(['alitas', 'hamburguesas', 'hamburguesa', 'orden de', 'costillas', 'spaguetty', 'paquete', 'orden', ' de '], '', mb_strtolower($name_comp)));
                     if (empty($clean_comp)) $clean_comp = mb_strtoupper($name_comp); 
                     else $clean_comp = mb_strtoupper($clean_comp);
+
+                    // Verificar si pidió refresco de 600ml
+                    $extra_json = json_decode($det->ingredientes ?? '{}', true);
+                    $tiene_refresco_600 = !empty($extra_json['refresco_600']);
                     
                     for ($i = 0; $i < $det->cantidad; $i++) {
+                        $sub_texto = "1 " . $clean_comp;
                         $grouped_complementos[$cat_comp]['subs'][] = [
-                            'texto' => "1 " . $clean_comp,
-                            'precio' => $det->precio_unitario
+                            'texto' => $sub_texto,
+                            'precio' => $tiene_refresco_600 ? ($det->precio_unitario - 10) : $det->precio_unitario
                         ];
+                        if ($tiene_refresco_600) {
+                            $grouped_complementos[$cat_comp]['subs'][] = [
+                                'texto' => '+ Refresco 600ml',
+                                'precio_ext' => '+$10.00'
+                            ];
+                        }
                     }
                 } 
                 elseif ($det->id_papa) {

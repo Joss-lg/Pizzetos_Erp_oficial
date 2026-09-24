@@ -651,6 +651,12 @@
                                                 </label>
                                             </template>
 
+                                            <template x-if="group.item.refresco_600 !== undefined">
+                                                <label class="flex items-center gap-2 text-[12px] text-[#495057] cursor-pointer mt-2 w-max bg-white px-2 py-1 rounded border border-gray-200 shadow-sm hover:bg-gray-50">
+                                                    <input type="checkbox" x-model="group.item.refresco_600" @change="if(group.item.is_old) group.item.is_old = false; recalc()" class="pos-cart-check rounded border-gray-300 text-[#17a2b8] focus:ring-[#17a2b8] w-3.5 h-3.5">+600ml <span class="font-bold text-[#17a2b8]">+$10</span>
+                                                </label>
+                                            </template>
+
                                             <template x-if="group.item.tipo === 'paq'">
                                                 <div class="mt-2 bg-[#f8f9fa] p-2.5 rounded-[8px] border border-gray-200 shadow-inner">
                                                     <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest block mb-2">Elegir Orilla Rellena (+$<span x-text="group.item.precio_orilla"></span>)</span>
@@ -1661,8 +1667,11 @@
             </div>
 
             <div class="p-6 flex gap-4 bg-gray-50 border-t border-gray-200 shrink-0">
-                <button @click="modalCliente = false; if(servicio === 4) modalEspecial = true;" class="flex-1 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold py-4 rounded-[8px] text-[18px] transition-colors">Cancelar / Volver</button>
-                <button x-show="!soloClienteMode" @click="confirmarDomicilio()" :disabled="!esDomicilioValido()" :class="!esDomicilioValido() ? 'bg-[#fd7e14]/55 text-white/85 cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Dirección</button>
+                <button @click="modalCliente = false; nuevoClienteData = {nombre:'',apellido:'',telefono:''}; nuevaDirData = {calle:'',manzana:'',lote:'',colonia:'',referencia:''}; clienteFormVisible = false; dirFormVisible = false; clienteSeleccionado = null; direccionesCliente = []; dirSeleccionada = null; if(servicio === 4) modalEspecial = true;" class="flex-1 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold py-4 rounded-[8px] text-[18px] transition-colors">Cancelar / Volver</button>
+                <button x-show="!soloClienteMode" @click="confirmarDomicilio()" :disabled="!esDomicilioValido() || guardandoCliente" :class="!esDomicilioValido() || guardandoCliente ? 'bg-[#fd7e14]/55 text-white/85 cursor-not-allowed' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors flex items-center justify-center gap-2">
+                    <svg x-show="guardandoCliente" class="animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    <span x-text="guardandoCliente ? 'Guardando...' : 'Confirmar Dirección'"></span>
+                </button>
                 <button x-show="soloClienteMode" @click="confirmarSoloCliente()" :disabled="!esClienteValido()" :class="!esClienteValido() ? 'bg-[#17a2b8]/50 text-white/80 cursor-not-allowed' : 'bg-[#17a2b8] hover:bg-[#138496] text-white shadow-md'" class="flex-1 font-black py-4 rounded-[8px] text-[18px] transition-colors">Confirmar Cliente</button>
             </div>
         </div>
@@ -1921,7 +1930,7 @@
                 </div>
 
                 <div class="p-5 bg-gray-50 border-t border-gray-100 flex gap-3">
-                    <button @click="modalPago = false" class="flex-1 font-bold text-gray-500 bg-white border border-gray-200 rounded-xl py-3">Volver</button>
+                    <button @click="modalPago = false; if(servicio === 3) abrirModalCliente(false, true);" class="flex-1 font-bold text-gray-500 bg-white border border-gray-200 rounded-xl py-3">Volver</button>
                     <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="!pagosValidos() || isProcessing ? 'bg-[#ced4da] text-gray-500' : 'bg-[#28a745] hover:bg-[#218838] text-white shadow-md'" class="flex-1 font-black rounded-xl py-3 uppercase italic disabled:opacity-50 transition-colors">
                         <span x-show="!isProcessing">Confirmar Pago</span>
                         <span x-show="isProcessing">Procesando...</span>
@@ -1976,9 +1985,13 @@
                 isProcessing: false,
                 searchClienteText: '', showClientesList: false,
                 clienteSeleccionado: null, direccionesCliente: [], dirSeleccionada: null,
-                clienteFormVisible: false, dirFormVisible: false,
+                clienteFormVisible: false, dirFormVisible: false, guardandoCliente: false,
                 nuevoClienteData: { nombre: '', apellido: '', telefono: '' }, 
                 nuevaDirData: { calle: '', manzana: '', lote: '', colonia: '', referencia: '' },
+
+                // Listas reactivas — Alpine detecta cambios y refresca el dropdown automáticamente
+                listaClientes: dbClientes,
+                listaDirecciones: dbDirecciones,
 
                 pagos: {
                     efectivo: { activo: false, monto: null, entregado: null },
@@ -1997,7 +2010,7 @@
                     }
                     
                     if (this.domicilioPrevio) {
-                        let clie = dbClientes.find(c => c.id_clie == this.domicilioPrevio.id_clie || c.id_cliente == this.domicilioPrevio.id_clie);
+                        let clie = this.listaClientes.find(c => c.id_clie == this.domicilioPrevio.id_clie || c.id_cliente == this.domicilioPrevio.id_clie);
                         if (clie) {
                             this.seleccionarCliente(clie);
                             this.dirSeleccionada = this.domicilioPrevio.id_dir;
@@ -2040,7 +2053,7 @@
                 },
 
                 getClientesFiltrados() {
-                    let listaSegura = Array.isArray(dbClientes) ? dbClientes : [];
+                    let listaSegura = Array.isArray(this.listaClientes) ? this.listaClientes : [];
                     if(!this.searchClienteText || this.searchClienteText.trim() === '') return listaSegura; 
                     let txt = this.searchClienteText.toLowerCase().trim();
                     return listaSegura.filter(c => {
@@ -2235,9 +2248,10 @@
                             cItem.subtotalBase = cItem.precioBase * cItem.qty;
                             let extraOrillasPaq = (cItem.orillas_qty || 0) * (cItem.precio_orilla || 0) * cItem.qty;
                             let extraOrillaUnica = (cItem.orilla_queso ? cItem.precio_orilla * cItem.qty : 0);
-                            cItem.subtotal = cItem.subtotalBase + extraOrillaUnica + extraOrillasPaq;
+                            let extraRefresco = (cItem.refresco_600 ? 10 * cItem.qty : 0);
+                            cItem.subtotal = cItem.subtotalBase + extraOrillaUnica + extraOrillasPaq + extraRefresco;
                             cItem.descuentoPromo = 0;
-                            cItem.precioFinal = cItem.precioBase + (cItem.orilla_queso ? cItem.precio_orilla : 0) + ((cItem.orillas_qty || 0) * (cItem.precio_orilla || 0));
+                            cItem.precioFinal = cItem.precioBase + (cItem.orilla_queso ? cItem.precio_orilla : 0) + ((cItem.orillas_qty || 0) * (cItem.precio_orilla || 0)) + (cItem.refresco_600 ? 10 : 0);
                             normals.push({ cartIndex: index, item: cItem });
                         }
                     });
@@ -2478,9 +2492,10 @@
                     if(p.cat === 11) return this.abrirRectangularGeneral();
                     if(p.cat === 10) return this.abrirBarraGeneral();
 
+                    const tieneRefresco = [5, 6, 7].includes(p.cat);
                     let idx = this.cart.findIndex(i => i.db_id === p.id && i.col === p.col && !i.es_pizza && !i.is_old);
                     if(idx > -1) { this.cart[idx].qty++; } 
-                    else { this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), visual_tone: 'snack' }); }
+                    else { this.cart.push({ db_id: p.id, col: p.col, tipo: 'directo', nombre_base: p.nombre, variante: '', precioBase: parseFloat(p.precio), qty: 1, es_pizza: false, is_magno: false, uid: this.generateUID(), visual_tone: 'snack', ...(tieneRefresco ? { refresco_600: false } : {}) }); }
                     this.actualizarCarrito();
                     this.animateToCart(event, p.nombre);
                 },
@@ -2781,16 +2796,21 @@
                 },
 
                 // --- MODIFICADO: AHORA RECIBE EL PARÁMETRO soloCliente ---
-                abrirModalCliente(soloCliente = false) {
+                abrirModalCliente(soloCliente = false, preservarDatos = false) {
                     this.soloClienteMode = soloCliente;
-                    this.clienteSeleccionado = null;
-                    this.searchClienteText = '';
-                    this.direccionesCliente = [];
-                    this.dirSeleccionada = null;
-                    this.clienteFormVisible = false;
-                    this.dirFormVisible = false;
-                    this.nuevoClienteData = { nombre: '', apellido: '', telefono: '' }; 
-                    this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
+                    
+                    // Si ya hay datos en progreso (cliente form o cliente seleccionado),
+                    // no reseteamos — el usuario vuelve desde el modal de pago
+                    if (!preservarDatos) {
+                        this.clienteSeleccionado = null;
+                        this.searchClienteText = '';
+                        this.direccionesCliente = [];
+                        this.dirSeleccionada = null;
+                        this.clienteFormVisible = false;
+                        this.dirFormVisible = false;
+                        this.nuevoClienteData = { nombre: '', apellido: '', telefono: '' }; 
+                        this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
+                    }
                     this.modalCliente = true;
                 },
 
@@ -2812,7 +2832,7 @@
                     
                     let idClieBuscar = cl.id_clie ?? cl.id_cliente ?? cl.id ?? null;
                     this.direccionesCliente = idClieBuscar !== null
-                        ? dbDirecciones.filter(d => d.id_clie == idClieBuscar)
+                        ? this.listaDirecciones.filter(d => d.id_clie == idClieBuscar)
                         : [];
                     
                     if(this.direccionesCliente.length > 0) {
@@ -2856,14 +2876,99 @@
                     }
                     return true;
                 },
-                confirmarDomicilio() {
-                    if(this.esDomicilioValido()) {
-                        this.modalCliente = false;
-                        if (this.servicio === 4) {
-                            this.modalEspecial = true;
-                        } else {
-                            this.abrirModalPago();
+                async confirmarDomicilio() {
+                    if (!this.esDomicilioValido()) return;
+
+                    // Si el cliente ya fue guardado en la DB (tiene id_clie real), saltamos el guardado
+                    if (this.clienteFormVisible && !this.nuevoClienteData.id_clie) {
+                        // Guardar cliente (y dirección si aplica) en la DB antes de avanzar
+                        this.guardandoCliente = true;
+                        try {
+                            const payload = {
+                                nombre:   this.nuevoClienteData.nombre,
+                                apellido: this.nuevoClienteData.apellido,
+                                telefono: this.nuevoClienteData.telefono,
+                            };
+                            // Si también tiene dirección nueva, la mandamos en la misma petición
+                            if (this.dirFormVisible && this.nuevaDirData.calle) {
+                                payload.calle      = this.nuevaDirData.calle;
+                                payload.manzana    = this.nuevaDirData.manzana || '';
+                                payload.lote       = this.nuevaDirData.lote || '';
+                                payload.colonia    = this.nuevaDirData.colonia || '';
+                                payload.referencia = this.nuevaDirData.referencia || '';
+                            }
+
+                            const res = await fetch('{{ route("pos.cliente.rapido") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify(payload),
+                            }).then(r => r.json());
+
+                            if (!res.success) throw new Error(res.error || 'Error al guardar cliente');
+
+                            // Guardar el id_clie real para que procesarOrdenFinal lo use como cliente existente
+                            this.nuevoClienteData.id_clie = res.cliente.id_clie;
+
+                            // Registrar el cliente en dbClientes para que aparezca en búsquedas futuras
+                            if (!this.listaClientes.find(c => c.id_clie == res.cliente.id_clie)) {
+                                this.listaClientes.push(res.cliente);
+                            }
+
+                            // Si se guardó la dirección, actualizar el estado
+                            if (res.direccion) {
+                                this.nuevaDirData.id_dir = res.direccion.id_dir;
+                                if (!this.listaDirecciones.find(d => d.id_dir == res.direccion.id_dir)) {
+                                    this.listaDirecciones.push(res.direccion);
+                                }
+                            }
+
+                        } catch (e) {
+                            this.guardandoCliente = false;
+                            alert('No se pudo guardar el cliente: ' + e.message);
+                            return;
                         }
+                        this.guardandoCliente = false;
+
+                    } else if (this.clienteSeleccionado && this.dirFormVisible && this.nuevaDirData.calle && !this.nuevaDirData.id_dir) {
+                        // Cliente ya existe pero la dirección es nueva — guardarla sola
+                        this.guardandoCliente = true;
+                        const idClie = this.clienteSeleccionado.id_clie ?? this.clienteSeleccionado.id_cliente;
+                        try {
+                            const res = await fetch(`{{ url('/venta/pos/direccion-rapida') }}/${idClie}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify(this.nuevaDirData),
+                            }).then(r => r.json());
+
+                            if (!res.success) throw new Error(res.error || 'Error al guardar dirección');
+
+                            this.nuevaDirData.id_dir = res.direccion.id_dir;
+                            if (!this.listaDirecciones.find(d => d.id_dir == res.direccion.id_dir)) {
+                                this.listaDirecciones.push(res.direccion);
+                            }
+
+                        } catch (e) {
+                            this.guardandoCliente = false;
+                            alert('No se pudo guardar la dirección: ' + e.message);
+                            return;
+                        }
+                        this.guardandoCliente = false;
+                    }
+
+                    // Avanzar al siguiente paso
+                    this.modalCliente = false;
+                    if (this.servicio === 4) {
+                        this.modalEspecial = true;
+                    } else {
+                        this.abrirModalPago();
                     }
                 },
 
@@ -2934,7 +3039,9 @@
                         if (this.id_venta_edit && this.domicilioPrevio) {
                             this.abrirModalPago(); 
                         } else {
-                            this.abrirModalCliente();
+                            // Preservar datos si ya hay un formulario en progreso
+                            const hayDatosEnProgreso = this.clienteFormVisible || this.clienteSeleccionado;
+                            this.abrirModalCliente(false, hayDatosEnProgreso);
                         }
                     } else if(this.servicio === 4) {
                         this.abrirModalEspecial();
@@ -3065,11 +3172,27 @@ procesarOrdenFinal(esAbierta = false) {
     };
 
     if(this.servicio === 3) {
-        if(this.clienteFormVisible) reqBody.nuevo_cliente = this.nuevoClienteData;
-        else reqBody.id_clie = this.clienteSeleccionado ? (this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie) : null;
+        if(this.clienteFormVisible) {
+            // Si ya se guardó en la DB (tiene id_clie real), mandarlo como cliente existente
+            if (this.nuevoClienteData.id_clie) {
+                reqBody.id_clie = this.nuevoClienteData.id_clie;
+            } else {
+                reqBody.nuevo_cliente = this.nuevoClienteData;
+            }
+        } else {
+            reqBody.id_clie = this.clienteSeleccionado ? (this.clienteSeleccionado.id_cliente || this.clienteSeleccionado.id_clie) : null;
+        }
 
-        if(this.dirFormVisible) reqBody.nueva_direccion = this.nuevaDirData;
-        else reqBody.id_dir = this.dirSeleccionada;
+        if(this.dirFormVisible) {
+            // Si la dirección ya fue guardada en la DB, mandar el id
+            if (this.nuevaDirData.id_dir) {
+                reqBody.id_dir = this.nuevaDirData.id_dir;
+            } else {
+                reqBody.nueva_direccion = this.nuevaDirData;
+            }
+        } else {
+            reqBody.id_dir = this.dirSeleccionada;
+        }
     }
 
     fetch("{{ route('ventas.pos.store') }}", {
@@ -3085,15 +3208,15 @@ procesarOrdenFinal(esAbierta = false) {
     }).then(res => {
         if(res.success) { 
             if (res.nuevo_cliente) {
-                const existeClie = dbClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
+                const existeClie = this.listaClientes.find(c => (c.id_clie || c.id_cliente) == res.nuevo_cliente.id_clie);
                 if (!existeClie) {
-                    dbClientes.push(res.nuevo_cliente);
+                    this.listaClientes.push(res.nuevo_cliente);
                 }
             }
             if (res.nueva_direccion) {
-                const existeDir = dbDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
+                const existeDir = this.listaDirecciones.find(d => (d.id_dir || d.id_direccion) == res.nueva_direccion.id_dir);
                 if (!existeDir) {
-                    dbDirecciones.push(res.nueva_direccion);
+                    this.listaDirecciones.push(res.nueva_direccion);
                 }
             }
             this.cart = []; 
@@ -3111,6 +3234,8 @@ procesarOrdenFinal(esAbierta = false) {
             this.dirSeleccionada = null;
             this.clienteFormVisible = false;
             this.dirFormVisible = false;
+            this.nuevoClienteData = { nombre: '', apellido: '', telefono: '' };
+            this.nuevaDirData = { calle: '', manzana: '', lote: '', colonia: '', referencia: '' };
 
             let urlTicket = '/venta/pos/ticket/' + res.id_venta;
             if (this.id_venta_edit) { urlTicket += '?solo_nuevos=1'; }
@@ -3194,7 +3319,7 @@ procesarOrdenFinal(esAbierta = false) {
 
                 getDireccionResumen() {
                     if (!this.dirSeleccionada) return '';
-                    let dir = dbDirecciones.find(d => (d.id_direccion || d.id_dir) == this.dirSeleccionada);
+                    let dir = this.listaDirecciones.find(d => (d.id_direccion || d.id_dir) == this.dirSeleccionada);
                     return dir ? `${dir.calle || dir.Calle}, Col. ${dir.colonia || dir.Colonia}` : '';
                 },
 
