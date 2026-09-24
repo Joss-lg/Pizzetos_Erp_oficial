@@ -130,10 +130,14 @@ class EmpleadoController extends Controller
     {
         try {
             $empleado = Empleado::where('id_emp', $id)->firstOrFail();
+
+            // Eliminar permisos del empleado primero (evita FK constraint)
+            \App\Models\EmpleadoPermiso::where('id_emp', $id)->delete();
+
             $empleado->delete();
             return redirect()->route('empleados.index')->with('success', 'Empleado eliminado del sistema');
         } catch (\Exception $e) {
-            return back()->with('error', 'No se pudo eliminar el empleado.');
+            return back()->with('error', 'No se pudo eliminar el empleado: ' . $e->getMessage());
         }
     }
 

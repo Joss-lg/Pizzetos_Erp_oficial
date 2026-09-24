@@ -18,7 +18,7 @@ class PermisoModulo
         $user = Auth::user();
 
         if (!$user || !$user->tienePermiso($modulo, $accion)) {
-            return redirect('/venta/flujo-caja')->with('error', 'No tienes permiso para acceder a esta sección.');
+            return redirect('/sin-permiso')->with('error', 'No tienes permiso para acceder a esta sección.');
         }
 
         return $next($request);

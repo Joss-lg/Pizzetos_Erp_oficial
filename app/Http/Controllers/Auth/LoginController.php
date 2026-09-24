@@ -22,12 +22,29 @@ class LoginController extends Controller
 
         if (Auth::attempt(['nickName' => $credentials['nickName'], 'password' => $credentials['password'], 'status' => 1])) {
             $request->session()->regenerate();
-            
-            if (Auth::user()->id_ca == 1) {
+
+            $user = Auth::user();
+
+            if ($user->id_ca == 1) {
                 return redirect()->intended('dashboard');
-            } else {
+            }
+
+            // Para no-admins: redirigir al primer módulo que tengan habilitado
+            if ($user->tienePermiso('flujo_caja', 'mostrar')) {
                 return redirect()->intended('venta/flujo-caja');
             }
+            if ($user->tienePermiso('pos', 'mostrar')) {
+                return redirect()->intended('venta/pos');
+            }
+            if ($user->tienePermiso('pedidos', 'mostrar')) {
+                return redirect()->intended('venta/pedidos');
+            }
+            if ($user->tienePermiso('especiales', 'mostrar')) {
+                return redirect()->intended('pedidos-especiales');
+            }
+
+            // Sin permisos configurados
+            return redirect('sin-permiso');
         }
 
         return back()->withErrors([

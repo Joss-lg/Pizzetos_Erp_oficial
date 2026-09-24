@@ -11,7 +11,7 @@ class SoloAdmin
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::check() || Auth::user()->id_ca != 1) {
-            return redirect('/venta/flujo-caja')->with('error', 'No tienes permisos de Administrador para entrar aquí.');
+            return redirect('/sin-permiso')->with('error', 'No tienes permisos de Administrador para entrar aquí.');
         }
 
         return $next($request);
