@@ -1173,112 +1173,170 @@
             </div>
         </div>
 
-        {{-- MODAL PAQUETE 2 --}}
+        {{-- MODAL PAQUETE 2 — Diseño 2 columnas igual al Paquete 3 --}}
 
-        <div x-show="modalPaq2" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[450px] flex flex-col max-h-[90vh] overflow-hidden" @click.away="modalPaq2 = false">
+        <div x-show="modalPaq2" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-2 sm:p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-[600px] flex flex-col h-[92vh] sm:h-[85vh] overflow-hidden" @click.away="modalPaq2 = false">
+
+                {{-- HEADER --}}
                 <div
-                    class="mobile-sheet-header p-6 relative border-b border-gray-100 bg-[#ffc107]"
+                    class="mobile-sheet-header p-6 relative border-b border-gray-100 bg-[#ffc107] shrink-0"
                     @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
                     @touchend.passive="if (($event.changedTouches[0].clientY - productModalTouchStartY) > 45) modalPaq2 = false"
-                ><h2 class="text-2xl font-black text-black mb-1">Paquete 2</h2><button @click="modalPaq2 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button></div>
-                <div class="paq2-body p-6 overflow-y-auto flex-1 space-y-5 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                >
+                    <h2 class="text-2xl font-black text-black mb-1">Paquete 2</h2>
+                    <button @click="modalPaq2 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
+                </div>
 
-                    <ul class="list-disc pl-5 text-[14px] font-medium text-gray-600 mb-2 mt-0 shrink-0"><li>1 Hamburguesa o Alitas</li><li>1 Pizza Grande</li><li>1 Refresco de 2L Jarrito</li></ul>
-                    
-                    <div class="shrink-0">
-                        <div class="flex rounded-md overflow-hidden border border-gray-300 bg-white mb-2">
-                            <button @click="paq2Tipo = 'hamb'; paq2Extra = ''" :class="paq2Tipo === 'hamb' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Hamburguesa</button>
-                            <button @click="paq2Tipo = 'alitas'; paq2Extra = ''" :class="paq2Tipo === 'alitas' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Alitas</button>
+                {{-- BODY: 2 columnas --}}
+                <div class="flex flex-row flex-1 overflow-hidden">
+
+                    {{-- COLUMNA IZQUIERDA — Selección --}}
+                    <div class="w-[58%] p-3 sm:p-5 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col gap-3 sm:gap-4">
+
+                        {{-- Paso 1: Hamburguesa o Alitas --}}
+                        <div class="shrink-0">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">1. Elige Hamburguesa o Alitas</p>
+                            <div class="flex rounded-md overflow-hidden border border-gray-300 bg-white mb-2">
+                                <button @click="paq2Tipo = 'hamb'; paq2Extra = ''" :class="paq2Tipo === 'hamb' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Hamburguesa</button>
+                                <button @click="paq2Tipo = 'alitas'; paq2Extra = ''" :class="paq2Tipo === 'alitas' ? 'bg-black text-white font-bold' : 'text-gray-600'" class="flex-1 py-2 text-[13px]">Alitas</button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <template x-for="p in dbDirectos.filter(d => { return paq2Tipo === 'hamb' ? (d.cat === 6 && d.nombre.toLowerCase().includes('sencilla')) : (d.cat === 5); })" :key="p.id">
+                                    <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="pos-choice-card border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]">
+                                        <span x-text="p.nombre"></span>
+                                    </button>
+                                </template>
+                            </div>
                         </div>
 
-                        <div class="paq2-extra-grid grid grid-cols-2 gap-2">
-                            <template x-for="p in dbDirectos.filter(d => { return paq2Tipo === 'hamb' ? (d.cat === 6 && d.nombre.toLowerCase().includes('sencilla')) : (d.cat === 5); })" :key="p.id">
+                        {{-- Paso 2: Pizza --}}
+                        <div class="flex-1 flex flex-col min-h-0 pt-3 border-t border-gray-200">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 shrink-0">2. Elige la Pizza Grande</p>
 
-                                <button @click="paq2Extra = p.nombre" :class="paq2Extra === p.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="pos-choice-card paq2-choice-card border rounded-[8px] p-3 text-[13px] font-bold transition-all hover:border-[#ffc107]"><span x-text="p.nombre"></span></button>
+                            {{-- Checkbox mitad y mitad --}}
+                            <label class="flex items-center gap-2 mb-2 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm shrink-0">
+                                <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
+                                <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
+                            </label>
 
-                            </template>
+                            {{-- Tabs Especialidades / Por Ingrediente --}}
+                            <div class="mb-2 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
+                                <button @click="showIngs = false" :class="!showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
+                                <button @click="showIngs = true" :class="showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
+                            </div>
+
+                            {{-- Tab Especialidades --}}
+                            <div x-show="!showIngs" class="flex flex-col min-h-0 flex-1">
+                                {{-- Modo normal: selección única --}}
+                                <div x-show="!paq2MitadesMode" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
+                                    <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                        <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
+                                    </template>
+                                </div>
+                                {{-- Modo mitad y mitad --}}
+                                <div x-show="paq2MitadesMode" x-cloak class="flex flex-col h-full min-h-0">
+                                    <div class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
+                                        <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                                            <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="pos-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Tab Por Ingrediente --}}
+                            <div x-show="showIngs" x-cloak class="flex flex-col h-full min-h-0">
+                                <div class="grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide bg-white border border-gray-100 rounded-lg p-2">
+                                    <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
+                                        <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
+                                            <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-amber-500 rounded border-gray-300 focus:ring-amber-500">
+                                            <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                                <button @click="if(tempIngs.length > 0) { addPaq2Esp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || (paq2MitadesMode ? paq2MitadesArr.length >= 2 : false)" class="pos-pressable w-full bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                                    Añadir Personalizada
+                                </button>
+                            </div>
                         </div>
                     </div>
 
+                    {{-- COLUMNA DERECHA — Resumen del paquete --}}
+                    <div class="w-[42%] bg-white p-3 sm:p-5 flex flex-col justify-between overflow-y-auto scrollbar-hide">
+                        <div>
+                            <h3 class="text-[13px] sm:text-[14px] font-black text-black border-b border-gray-200 pb-2 mb-3">Contenido del Paquete</h3>
+                            <ul class="list-disc pl-4 text-[12px] font-medium text-gray-500 mb-4">
+                                <li>1 Hamburguesa o Alitas</li>
+                                <li>1 Pizza Grande</li>
+                                <li>1 Refresco de 2L Jarrito</li>
+                            </ul>
 
-                    <div class="paq2-pizza-section flex-1 flex flex-col min-h-0 pt-4 border-t border-gray-200">
-
-                        <label class="flex items-center gap-2 mb-3 cursor-pointer bg-white border border-gray-200 p-2.5 rounded-[8px] shadow-sm shrink-0">
-                            <input type="checkbox" x-model="paq2MitadesMode" @change="paq2MitadesArr=[]; paq2Pizza=''" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
-                            <span class="text-[13px] font-bold text-gray-700">Hacer pizza Mitad y Mitad</span>
-                        </label>
-
-                        <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
-                            <button @click="showIngs = false" :class="!showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Especialidades</button>
-                            <button @click="showIngs = true" :class="showIngs ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Por Ingrediente</button>
-                        </div>
-
-                        <div x-show="!showIngs" class="flex flex-col min-h-0 flex-1">
-
-                            <div x-show="!paq2MitadesMode" class="paq2-specialty-grid grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2">
-                                <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
-
-                                    <button @click="addPaq2Esp(esp.nombre)" :class="paq2Pizza === esp.nombre ? 'border-[#ffc107] bg-[#fff9c4]' : 'bg-white border-gray-200'" class="pos-choice-card paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold hover:border-amber-400 transition-colors" x-text="esp.nombre"></button>
+                            {{-- Slot: Hamburguesa / Alitas --}}
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Hamburguesa / Alitas</p>
+                            <div class="border-2 rounded-[8px] p-2 text-center h-[50px] flex items-center justify-center mb-3"
+                                :class="paq2Extra ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-gray-50'">
+                                <template x-if="paq2Extra">
+                                    <div class="w-full flex justify-between items-center px-1">
+                                        <span class="text-[11px] font-bold text-[#212529] truncate" x-text="paq2Extra"></span>
+                                        <button @click="paq2Extra = ''" class="text-red-500 font-black text-[14px] ml-1">&times;</button>
+                                    </div>
+                                </template>
+                                <template x-if="!paq2Extra">
+                                    <span class="text-[10px] font-bold text-gray-400">Sin seleccionar</span>
                                 </template>
                             </div>
-                            <div x-show="paq2MitadesMode" x-cloak class="flex flex-col h-full min-h-0">
-                                <div class="grid grid-cols-2 gap-2 mb-3 shrink-0">
-                                    <template x-for="i in 2">
-                                        <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative" :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
-                                            <template x-if="paq2MitadesArr[i-1]">
-                                                <div class="w-full flex justify-between items-center px-1">
-                                                    <span class="text-[11px] font-bold text-[#212529] truncate" x-text="'1/2 ' + paq2MitadesArr[i-1]"></span>
-                                                    <button @click="removePaq2Mitad(i-1)" class="text-red-500 font-bold text-[12px] ml-1">&times;</button>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </template>
-                                </div>
 
-                                <div class="paq2-specialty-grid grid grid-cols-2 gap-2 overflow-y-auto pr-1 scrollbar-hide pb-2 flex-1">
-                                    <template x-for="esp in dbEspecialidades" :key="esp.id_esp">
+                            {{-- Slot: Pizza --}}
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Pizza Grande</p>
 
-                                        <button @click="addPaq2Esp(esp.nombre)" :disabled="paq2MitadesArr.length >= 2" class="pos-choice-card paq2-choice-card border rounded-[8px] p-2.5 text-[12px] font-bold bg-white hover:border-amber-400 disabled:opacity-50 transition-colors" x-text="esp.nombre"></button>
-                                    </template>
-                                </div>
+                            {{-- Modo normal --}}
+                            <div x-show="!paq2MitadesMode" class="border-2 rounded-[8px] p-2 text-center h-[50px] flex items-center justify-center"
+                                :class="paq2Pizza ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-gray-50'">
+                                <template x-if="paq2Pizza">
+                                    <div class="w-full flex justify-between items-center px-1">
+                                        <span class="text-[11px] font-bold text-[#212529] truncate" x-text="paq2Pizza"></span>
+                                        <button @click="paq2Pizza = ''" class="text-red-500 font-black text-[14px] ml-1">&times;</button>
+                                    </div>
+                                </template>
+                                <template x-if="!paq2Pizza">
+                                    <span class="text-[10px] font-bold text-gray-400">Pizza vacía</span>
+                                </template>
                             </div>
-                        </div>
 
-                        <div x-show="showIngs" x-cloak class="flex flex-col h-full min-h-0">
-                            <div x-show="paq2MitadesMode" class="grid grid-cols-2 gap-2 mb-3 shrink-0">
+                            {{-- Modo mitad y mitad --}}
+                            <div x-show="paq2MitadesMode" x-cloak class="space-y-2">
                                 <template x-for="i in 2">
-                                    <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative" :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-white'">
+                                    <div class="border-2 rounded-[8px] p-2 text-center h-[45px] flex items-center justify-center relative"
+                                        :class="paq2MitadesArr[i-1] ? 'border-[#ffc107] bg-[#fff9c4]' : 'border-dashed border-gray-300 bg-gray-50'">
                                         <template x-if="paq2MitadesArr[i-1]">
                                             <div class="w-full flex justify-between items-center px-1">
                                                 <span class="text-[11px] font-bold text-[#212529] truncate" x-text="'1/2 ' + paq2MitadesArr[i-1]"></span>
                                                 <button @click="removePaq2Mitad(i-1)" class="text-red-500 font-bold text-[12px] ml-1">&times;</button>
                                             </div>
                                         </template>
+                                        <template x-if="!paq2MitadesArr[i-1]">
+                                            <span class="text-[10px] font-bold text-gray-400" x-text="'Mitad ' + i + ' vacía'"></span>
+                                        </template>
                                     </div>
                                 </template>
                             </div>
+                        </div>
 
-                            <div class="paq2-ingredient-grid grid grid-cols-2 gap-1.5 overflow-y-auto pr-1 mb-2 flex-1 scrollbar-hide bg-white border border-gray-100 rounded-lg p-2">
-
-                                <template x-for="ing in dbIngredientes" :key="ing.id_ingrediente">
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-600 p-1.5 border border-gray-100 rounded hover:bg-gray-50 bg-white transition-colors">
-                                        <input type="checkbox" :value="ing.ingrediente" x-model="tempIngs" class="w-3.5 h-3.5 text-amber-500 rounded border-gray-300 focus:ring-amber-500">
-                                        <span x-text="ing.ingrediente" class="truncate leading-tight"></span>
-                                    </label>
-                                </template>
+                        {{-- Footer con precio y botón --}}
+                        <div class="mt-6">
+                            <div class="flex justify-between items-end mb-4">
+                                <span class="text-gray-500 text-[14px] font-bold">Total</span>
+                                <span class="font-black text-[#28a745] text-[26px]" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
                             </div>
-                            <button @click="if(tempIngs.length > 0) { addPaq2Esp(tempIngs.join(', ')); tempIngs=[]; showIngs=false; }" :disabled="tempIngs.length === 0 || (paq2MitadesMode ? paq2MitadesArr.length >= 2 : false)" class="pos-pressable w-full bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-2 rounded-[6px] text-[12px] disabled:opacity-50 transition-colors shadow-sm shrink-0">
-                                Añadir Personalizada
+                            <button @click="addPaq2($event)"
+                                :disabled="!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)"
+                                :class="(!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)) ? 'bg-[#ced4da] text-gray-500 cursor-not-allowed' : 'bg-[#ffc107] hover:bg-[#e0a800] text-black'"
+                                class="pos-pressable w-full font-bold py-3.5 rounded-[8px] text-[14px] transition-colors">
+                                Añadir al Carrito
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <div class="paq2-footer p-5 flex gap-3 border-t border-gray-100 bg-white justify-between items-center">
-
-                    <span class="font-black text-[#28a745] text-[20px] mb-0" x-text="'$' + (paqObj ? parseFloat(paqObj.precio).toFixed(2) : '0.00')"></span>
-                    <button @click="addPaq2($event)" :disabled="!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)" :class="(!paq2Extra || (!paq2MitadesMode && !paq2Pizza) || (paq2MitadesMode && paq2MitadesArr.length !== 2)) ? 'opacity-50' : ''" class="pos-pressable bg-[#ffc107] hover:bg-[#e0a800] text-[#212529] font-bold py-3 px-6 rounded-lg text-[14px]">Agregar</button>
                 </div>
             </div>
         </div>
@@ -1286,7 +1344,7 @@
         {{-- MODAL PAQUETE 3 ACTUALIZADO PARA PIZZAS TOTALMENTE MIXTAS --}}
 
         <div x-show="modalPaq3" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-180" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-8" class="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-[600px] flex flex-col h-[85vh] overflow-hidden" @click.away="modalPaq3 = false">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-[600px] flex flex-col h-[92vh] sm:h-[85vh] overflow-hidden" @click.away="modalPaq3 = false">
                 <div
                     class="mobile-sheet-header p-6 relative border-b border-gray-100 bg-[#ffc107] shrink-0"
                     @touchstart.passive="productModalTouchStartY = $event.touches[0].clientY"
@@ -1297,8 +1355,8 @@
                     <button @click="modalPaq3 = false" class="absolute top-4 right-4 text-black/60 hover:text-black font-bold text-2xl">&times;</button>
                 </div>
                 
-                <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                    <div class="w-full md:w-[60%] p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
+                <div class="flex flex-row flex-1 overflow-hidden">
+                    <div class="w-[58%] p-3 sm:p-6 overflow-y-auto border-r border-gray-100 bg-[#f8f9fa] scrollbar-hide flex flex-col">
                         
                         <div class="mb-3 flex rounded-md overflow-hidden border border-gray-300 bg-white shrink-0">
                             <button @click="paqTab = 'esp'" :class="paqTab === 'esp' ? 'bg-[#ffc107] text-[#212529] font-black' : 'text-gray-600'" class="flex-1 py-1.5 text-[12px] transition-colors">Enteras</button>
@@ -1346,10 +1404,10 @@
                         </div>
                     </div>
 
-                    <div class="w-full md:w-[40%] bg-white p-6 flex flex-col justify-between">
+                    <div class="w-[42%] bg-white p-3 sm:p-6 flex flex-col justify-between overflow-y-auto scrollbar-hide">
                         <div>
-                            <h3 class="text-[14px] font-black text-black border-b border-gray-200 pb-2 mb-3">Pizzas del Paquete</h3>
-                            <ul class="list-disc pl-4 text-[12px] font-medium text-gray-600 mb-3 mt-0">
+                            <h3 class="text-[13px] sm:text-[14px] font-black text-black border-b border-gray-200 pb-2 mb-3">Pizzas del Paquete</h3>
+                            <ul class="list-disc pl-4 text-[11px] sm:text-[12px] font-medium text-gray-600 mb-3 mt-0">
                                 <li>3 Pizzas Grandes</li>
                                 <li>1 Refresco de 2L Jarrito</li>
                             </ul>

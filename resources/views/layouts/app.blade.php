@@ -477,6 +477,91 @@
             color: #0f172a !important;
         }
 
+        /* =====================================================
+           POS — SLOTS DE PAQUETES (fondo amarillo seleccionado)
+           ===================================================== */
+        .app-dark .bg-\[\#fff9c4\] {
+            background-color: rgba(180, 130, 10, 0.22) !important;
+            border-color: #d97706 !important;
+        }
+        .app-dark .bg-\[\#fff9c4\] .text-\[\#212529\],
+        .app-dark .bg-\[\#fff9c4\] span,
+        .app-dark .bg-\[\#fff9c4\] .text-\[10px\] {
+            color: #fde68a !important;
+        }
+
+        /* Botones deshabilitados en POS */
+        .app-dark .bg-\[\#ced4da\] {
+            background-color: #1e2a3a !important;
+            color: #4b5563 !important;
+        }
+
+        /* Slots de Rectangular y Barra (fondo naranja) */
+        .app-dark .bg-orange-50 {
+            background-color: rgba(194, 65, 12, 0.15) !important;
+        }
+        .app-dark .border-\[\#fd7e14\] {
+            border-color: #c2410c !important;
+        }
+
+        /* =====================================================
+           MODAL COBRAR PEDIDO — selector de descuento y footer
+           ===================================================== */
+        /* Contenedor de botones Sin Desc / 40% / 100% */
+        .app-dark .bg-gray-100.p-1\.5.rounded-lg,
+        .app-dark [class*="bg-gray-100"][class*="rounded-lg"] {
+            background-color: var(--app-dark-surface) !important;
+        }
+        /* Botón activo dentro del selector (bg-white shadow) */
+        .app-dark .bg-gray-100 .bg-white,
+        .app-dark [class*="bg-gray-100"] .bg-white {
+            background-color: var(--app-dark-surface-strong) !important;
+            color: #f9fafb !important;
+        }
+        /* Botones inactivos del selector de descuento */
+        .app-dark .bg-gray-100 .text-gray-500,
+        .app-dark [class*="bg-gray-100"] .text-gray-500 {
+            color: var(--app-dark-text-muted) !important;
+        }
+        /* Footer del modal (bg-gray-50 border-t) */
+        .app-dark .bg-gray-50.border-t {
+            background-color: var(--app-dark-surface) !important;
+            border-color: var(--app-dark-border) !important;
+        }
+        /* Botón Volver en footer */
+        .app-dark .bg-gray-50.border-t .bg-white {
+            background-color: var(--app-dark-surface-strong) !important;
+            border-color: var(--app-dark-border) !important;
+            color: var(--app-dark-text-soft) !important;
+        }
+        /* Bloque "Falta Cobrar / Completado / Excede" */
+        .app-dark .bg-orange-50.border-orange-200 {
+            background-color: rgba(194, 65, 12, 0.12) !important;
+            border-color: rgba(194, 65, 12, 0.35) !important;
+        }
+        .app-dark .text-orange-700 {
+            color: #fb923c !important;
+        }
+        /* Labels de métodos de pago */
+        .app-dark .text-gray-700 {
+            color: var(--app-dark-text-soft) !important;
+        }
+        /* Texto "Total a Cobrar" encabezado gris */
+        .app-dark .bg-gray-50.rounded-xl {
+            background-color: var(--app-dark-surface) !important;
+        }
+        .app-dark .bg-gray-50.rounded-xl .text-gray-400 {
+            color: var(--app-dark-muted) !important;
+        }
+
+        /* =====================================================
+           PAQUETE 1 — slots de Hawaiana/Pepperoni
+           ===================================================== */
+        .app-dark .bg-gray-100.border.border-gray-200.rounded {
+            background-color: var(--app-dark-surface) !important;
+            border-color: var(--app-dark-border) !important;
+        }
+
     </style>
 </head>
 
