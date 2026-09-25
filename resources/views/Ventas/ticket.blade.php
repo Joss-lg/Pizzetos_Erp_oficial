@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket #{{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}</title>
+    <title>Ticket #{{ str_pad($venta->id_venta, STR_PAD_LEFT) }}</title>
     <style>
         /* ============================================================
            ESTILOS DE PANTALLA — animación de impresora térmica
@@ -251,7 +251,7 @@
         ============================================================ */
         @media print {
             @page {
-                margin: 0;   /* elimina encabezado y pie del navegador */
+                margin: 0;
                 size: 80mm auto;
             }
 
@@ -259,6 +259,7 @@
                 background: white;
                 display: block;
                 padding: 0;
+                margin: 0;
                 min-height: auto;
             }
 
@@ -267,17 +268,17 @@
             .print-btn { display: none !important; }
 
             .paper-wrap {
-                width: 230px;
-                height: auto !important;   /* anuncia la altura completa */
+                width: 100%;
+                height: auto !important;
                 box-shadow: none;
                 border-radius: 0;
-                margin: 0 auto;
+                margin: 0;
             }
 
             .paper-wrap::before { display: none; }
 
             .ticket-inner {
-                padding: 10px;
+                padding: 4px 6px;
             }
         }
     </style>
@@ -292,7 +293,7 @@
             </div>
             <div class="printer-folio">
                 <div class="printer-folio-label">Folio</div>
-                <div class="printer-folio-num">#{{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}</div>
+                <div class="printer-folio-num">#{{ str_pad($venta->id_venta, STR_PAD_LEFT) }}</div>
             </div>
         </div>
 
@@ -340,7 +341,7 @@
                 <img src="{{ asset('pizzetos.png') }}" alt="Pizzetos Logo" class="ticket-logo">
                 <div style="font-size: 12px;">TICKET DE VENTA</div>
                 <div class="font-bold mt-1" style="font-size: 16px;">
-                    FOLIO: {{ str_pad($venta->id_venta, 5, '0', STR_PAD_LEFT) }}
+                    FOLIO: {{ str_pad($venta->id_venta, STR_PAD_LEFT) }}
                 </div>
                 <div style="font-size: 12px;">{{ \Carbon\Carbon::parse($venta->fecha_hora)->format('d/m/Y h:i A') }}</div>
                 <div class="font-bold text-lg mt-1 mb-1 py-1"
