@@ -27,13 +27,93 @@
 .pos-product-card {
     transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease, background-color 170ms ease;
     will-change: transform;
+    border-radius: 20px !important;
 }
 .pos-product-card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.10) !important;
 }
 .pos-product-card:active {
     transform: translateY(1px) scale(0.985);
 }
+/* Botón + circular en las cards */
+.pos-add-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px; font-weight: 900; line-height: 1;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.pos-add-btn:active { transform: scale(0.88); }
+/* Chip de acceso rápido */
+.pos-quick-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 800;
+    white-space: nowrap;
+    transition: transform 130ms ease, filter 130ms ease, box-shadow 130ms ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.pos-quick-chip:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 4px 14px rgba(0,0,0,0.14); }
+.pos-quick-chip:active { transform: scale(0.96); filter: brightness(0.97); }
+/* Tab de categoría estilo pill */
+.pos-cat-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 800;
+    white-space: nowrap;
+    border: 1.5px solid transparent;
+    transition: all 140ms ease;
+}
+.pos-cat-pill-inactive {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+.pos-cat-pill-inactive:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+.pos-cat-pill-active {
+    background: #fd7e14;
+    color: #fff;
+    border-color: #fd7e14;
+    box-shadow: 0 4px 14px rgba(253,126,20,0.30);
+}
+.pos-cat-pill-active-mariscos { background: #0ea5e9 !important; border-color: #0ea5e9 !important; box-shadow: 0 4px 14px rgba(14,165,233,0.28) !important; }
+.pos-cat-pill-active-bebidas  { background: #17a2b8 !important; border-color: #17a2b8 !important; box-shadow: 0 4px 14px rgba(23,162,184,0.28) !important; }
+.pos-cat-pill-active-snack    { background: #6366f1 !important; border-color: #6366f1 !important; box-shadow: 0 4px 14px rgba(99,102,241,0.28) !important; }
+/* Dark mode para pills */
+.app-dark .pos-cat-pill-inactive { background: #1e293b !important; color: #94a3b8 !important; border-color: #334155 !important; }
+.app-dark .pos-cat-pill-inactive:hover { background: #334155 !important; color: #e2e8f0 !important; }
+/* Buscador mejorado */
+.pos-search-wrap {
+    position: relative;
+}
+.pos-search-input {
+    width: 100%;
+    padding: 9px 36px 9px 36px;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 150ms, box-shadow 150ms;
+}
+.pos-search-input:focus {
+    border-color: #fd7e14;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(253,126,20,0.10);
+}
+.pos-search-input::placeholder { color: #94a3b8; font-weight: 500; }
+.app-dark .pos-search-input { background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+.app-dark .pos-search-input:focus { border-color: #fd7e14 !important; background: #0f172a !important; }
+/* Card price tag */
+.pos-price-tag { font-size: 17px; font-weight: 900; line-height: 1; color: #1e293b; }
 .pos-choice-card {
     transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
     will-change: transform;
@@ -144,32 +224,41 @@
     border-color: #fd7e14 !important;
 }
 .app-dark .pos-options-modal-panel {
-    background-color: #0b1220 !important;
-    border: 1px solid #f59e0b !important;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 158, 11, 0.16) !important;
+    background-color: #111c2b !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55) !important;
 }
 .app-dark .pos-options-modal-header {
-    background-color: #182235 !important;
-    border-color: #f59e0b !important;
+    background-color: transparent !important;
+    border-color: rgba(255,255,255,0.07) !important;
 }
 .app-dark .pos-options-modal-title {
-    color: #ffffff !important;
+    color: #f1f5f9 !important;
 }
 .app-dark .pos-options-modal-body {
-    background-color: #0f172a !important;
+    background-color: transparent !important;
 }
 .app-dark .pos-size-option {
-    background-color: #182235 !important;
-    border-color: #334155 !important;
+    background-color: #1e2d3d !important;
+    border-color: rgba(148,163,184,0.14) !important;
 }
 .app-dark .pos-size-option:hover {
-    background-color: #24324a !important;
+    background-color: #243447 !important;
     border-color: #fd7e14 !important;
-    box-shadow: 0 10px 24px rgba(253, 126, 20, 0.18) !important;
+    box-shadow: 0 6px 18px rgba(253,126,20,0.15) !important;
 }
 .app-dark .pos-size-option span:first-child {
-    color: #f8fafc !important;
+    color: #f1f5f9 !important;
 }
+/* Botón X del modal en dark */
+.app-dark .pos-options-modal-panel .bg-slate-100,
+.app-dark .rounded-\[2rem\] .bg-slate-100 {
+    background-color: #1e2d3d !important;
+    border-color: #334155 !important;
+}
+.app-dark .rounded-\[2rem\] .text-slate-400 { color: #94a3b8 !important; }
+.app-dark .rounded-\[2rem\] .text-slate-800 { color: #f1f5f9 !important; }
+.app-dark .rounded-\[2rem\] .border-slate-100 { border-color: rgba(255,255,255,0.07) !important; }
 .pos-cart-flyer {
     position: fixed;
     left: 0;
@@ -189,15 +278,32 @@
     text-overflow: ellipsis;
     will-change: transform, opacity;
 }
-@media (prefers-reduced-motion: reduce) {
-    .pos-pressable,
-    .pos-product-card,
-    .pos-choice-card {
-        transition: none !important;
-    }
-    .pos-pressable:hover,
-    .pos-product-card:hover,
-    .pos-choice-card:hover,
+/* Dark mode cards nuevas */
+.app-dark .pos-product-card {
+    background-color: #1e2d3d !important;
+    border-color: rgba(148,163,184,0.12) !important;
+}
+.app-dark .pos-product-card:hover {
+    background-color: #243447 !important;
+    border-color: rgba(148,163,184,0.22) !important;
+}
+/* Precio visible en dark */
+.app-dark .pos-product-card .pos-price-tag { color: #e2e8f0 !important; }
+/* Acento violeta en dark */
+.app-dark .pos-product-card .bg-violet-400 { background-color: #7c3aed !important; }
+/* Etiquetas de acción */
+.app-dark .pos-product-card .text-amber-500 { color: #fbbf24 !important; }
+.app-dark .pos-product-card .text-cyan-600  { color: #22d3ee !important; }
+/* Botones + en dark */
+.app-dark .pos-add-btn.bg-violet-500 { background-color: #7c3aed !important; }
+.app-dark .pos-add-btn.bg-violet-600 { background-color: #6d28d9 !important; }
+/* Contenedor buscador+categorías */
+.app-dark .bg-white.rounded-2xl,
+.app-dark .rounded-2xl.bg-white { background-color: #111c2b !important; border-color: #1e2d3d !important; }
+/* Chip grupo paquetes en dark */
+.app-dark .bg-amber-50 { background-color: #1c1409 !important; }
+.app-dark .border-amber-200\/70 { border-color: #78350f44 !important; }
+.app-dark .text-amber-600 { color: #fbbf24 !important; }
     .pos-pressable:active,
     .pos-product-card:active,
     .pos-choice-card:active {
@@ -481,79 +587,131 @@
             
             <div class="lg:col-span-8 flex flex-col gap-2 lg:h-full lg:min-h-0">
 
-                <div class="flex flex-row gap-2 overflow-x-auto w-full mb-4 pb-2" style="scrollbar-width: thin;">
-                    <button @click="abrirPaquete(1)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 1</button>
-                    <button @click="abrirPaquete(2)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 2</button>
-                    <button @click="abrirPaquete(3)" class="pos-pressable whitespace-nowrap bg-[#ffc107] text-[#212529] px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Paquete 3</button>
-
-                    <button @click="abrirMagnoGeneral(); openExtras = false" class="pos-pressable pos-magno-action whitespace-nowrap bg-[#343a40] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Magno</button>
-                    
-                    <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'bg-[#fd7e14] shadow-inner' : 'bg-[#fd7e14] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Rectangular</button>
-                    
-                    <button @click="abrirBarraGeneral()" :class="modalBarra ? 'bg-[#17a2b8] shadow-inner' : 'bg-[#17a2b8] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Barra</button>
-
-                    <button @click="abrirModalIngredientes()" class="pos-pressable whitespace-nowrap bg-[#fd7e14] text-white px-3 py-1.5 rounded-md text-[12px] font-bold shadow-sm hover:brightness-95 transition-colors">Por Ingrediente</button>
-
-                    <button @click="modalMitades = true; mitSel = []; mitTam = null; showIngs = false; tempIngs = [];" :class="modalMitades ? 'bg-[#dc3545] shadow-inner' : 'bg-[#dc3545] shadow-sm hover:brightness-95'" class="pos-pressable whitespace-nowrap text-white px-3 py-1.5 rounded-md text-[12px] font-bold transition-colors">Mitad y Mitad</button>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-1.5 flex flex-col xl:flex-row justify-between items-center gap-2 shrink-0">
-                    <div class="flex flex-wrap gap-1 items-center w-full xl:w-auto">
-              <button @click="cat = 12; view = 'pizzas'" :class="cat === 12 ? 'pos-category-tab-active bg-[#fd7e14] text-white shadow-sm' : 'pos-category-tab bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Pizzas</button>
-                        <button @click="cat = 2; view = 'pizzas'" :class="cat === 2 ? 'pos-category-tab-active bg-[#fd7e14] text-white shadow-sm' : 'pos-category-tab bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors">Mariscos</button>
-
-                        <div class="relative">
-                            <button @click="openExtras = !openExtras" :class="dbCategoriasExtras.map(c=>c.id_cat).includes(cat) || cat === 1 ? 'pos-category-tab-active bg-[#adb5bd] text-white shadow-sm' : 'pos-category-tab bg-[#e9ecef] text-[#495057] hover:bg-[#dee2e6]'" class="pos-pressable px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors flex items-center gap-1">
-                                Snacks <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </button>
-                            <div x-show="openExtras" @click.away="openExtras = false" x-cloak class="pos-category-menu absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto">
-                                <template x-for="catEx in dbCategoriasExtras" :key="catEx.id_cat">
-                                    <button @click="cat = parseInt(catEx.id_cat); view = 'otros'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50" x-text="catEx.descripcion"></button>
-                                </template>
-                                <button @click="cat = 1; view = 'bebidas'; openExtras = false;" class="w-full text-left px-3 py-2 text-[11px] font-bold text-[#495057] hover:bg-gray-50 border-t border-gray-100">Refrescos</button>
-                            </div>
-                        </div>
+                {{-- ── Accesos Rápidos ── --}}
+                <div class="flex flex-row gap-2 overflow-x-auto w-full pb-1 mb-1" style="scrollbar-width:none;">
+                    {{-- Paquetes: grupo visual --}}
+                    <div class="flex gap-1.5 items-center bg-amber-50 border border-amber-200/70 rounded-full px-2 py-1 shrink-0">
+                        <span class="text-[10px] font-black text-amber-600 uppercase tracking-wider pl-1 pr-0.5">Paq.</span>
+                        <button @click="abrirPaquete(1)" class="pos-quick-chip bg-[#ffc107] text-[#1a1100]">1</button>
+                        <button @click="abrirPaquete(2)" class="pos-quick-chip bg-[#ffc107] text-[#1a1100]">2</button>
+                        <button @click="abrirPaquete(3)" class="pos-quick-chip bg-[#ffc107] text-[#1a1100]">3</button>
                     </div>
 
-                    <div class="relative w-full xl:w-[180px]">
-                        <span class="absolute inset-y-0 left-0 pl-2 flex items-center text-gray-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <button @click="abrirMagnoGeneral(); openExtras = false" class="pos-quick-chip pos-magno-action bg-[#1e293b] text-white">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/></svg>
+                        Magno
+                    </button>
+
+                    <button @click="abrirRectangularGeneral()" :class="modalRectangular ? 'ring-2 ring-[#fd7e14] ring-offset-1' : ''" class="pos-quick-chip bg-[#fd7e14] text-white">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" stroke-width="2"/></svg>
+                        Rectangular
+                    </button>
+
+                    <button @click="abrirBarraGeneral()" :class="modalBarra ? 'ring-2 ring-[#17a2b8] ring-offset-1' : ''" class="pos-quick-chip bg-[#17a2b8] text-white">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        Barra
+                    </button>
+
+                    <button @click="abrirModalIngredientes()" class="pos-quick-chip bg-[#fd7e14] text-white">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Por Ing.
+                    </button>
+
+                    <button @click="modalMitades = true; mitSel = []; mitTam = null; showIngs = false; tempIngs = [];"
+                            :class="modalMitades ? 'ring-2 ring-[#dc3545] ring-offset-1' : ''" class="pos-quick-chip bg-[#dc3545] text-white">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18"/></svg>
+                        Mitad y Mitad
+                    </button>
+                </div>
+
+                {{-- ── Buscador + Categorías ── --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-3 flex flex-col gap-3 shrink-0">
+
+                    {{-- Buscador --}}
+                    <div class="pos-search-wrap">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </span>
-                        <input type="text" x-model="search" placeholder="Buscar..." class="w-full pl-7 pr-2 py-1 border border-gray-200 rounded-md text-[11px] focus:outline-none focus:border-[#fd7e14]">
+                        <input type="text" x-model="search" placeholder="Buscar producto..." class="pos-search-input">
+                        <button x-show="search.length > 0" @click="search = ''" x-cloak
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    {{-- Pills de categoría --}}
+                    <div class="flex gap-1.5 overflow-x-auto pb-0.5" style="scrollbar-width:none;">
+                        <button @click="cat = 12; view = 'pizzas'"
+                                :class="cat === 12 ? 'pos-cat-pill pos-cat-pill-active' : 'pos-cat-pill pos-cat-pill-inactive'">
+                            🍕 Pizzas
+                        </button>
+                        <button @click="cat = 2; view = 'pizzas'"
+                                :class="cat === 2 ? 'pos-cat-pill pos-cat-pill-active pos-cat-pill-active-mariscos' : 'pos-cat-pill pos-cat-pill-inactive'">
+                            🦐 Mariscos
+                        </button>
+
+                        <template x-for="catEx in dbCategoriasExtras" :key="catEx.id_cat">
+                            <button @click="cat = parseInt(catEx.id_cat); view = 'otros'; openExtras = false;"
+                                    :class="cat === parseInt(catEx.id_cat) ? 'pos-cat-pill pos-cat-pill-active pos-cat-pill-active-snack' : 'pos-cat-pill pos-cat-pill-inactive'"
+                                    x-text="getCatIcon(catEx.descripcion)">
+                            </button>
+                        </template>
+
+                        <button @click="cat = 1; view = 'bebidas'"
+                                :class="cat === 1 ? 'pos-cat-pill pos-cat-pill-active pos-cat-pill-active-bebidas' : 'pos-cat-pill pos-cat-pill-inactive'">
+                            🥤 Bebidas
+                        </button>
                     </div>
                 </div>
 
 
                 <div class="max-lg:h-auto lg:flex-1 overflow-y-auto scrollbar-hide pb-6 pt-1">
 
-                    <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2">
+                    {{-- PIZZAS --}}
+                    <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-1">
                         <template x-for="p in getListaTamanos()" :key="p.nombre">
-                            <button @click="abrirOpciones(p)" class="pos-product-card pos-product-card-pizza bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#ffc107] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#ffc107] transition-all group">
-                                <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
-                                <span class="text-[#fd7e14] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
-                                    Opciones <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                                </span>
+                            <button @click="abrirOpciones(p)"
+                                    class="pos-product-card bg-white border border-amber-200/60 p-4 flex flex-col justify-between text-left min-h-[110px] shadow-sm hover:border-amber-400 group">
+                                {{-- Acento color pizza --}}
+                                <div class="w-8 h-1 rounded-full bg-[#ffc107] mb-3 group-hover:w-10 transition-all duration-200"></div>
+                                <span class="font-black text-[#212529] text-[14px] sm:text-[15px] leading-tight uppercase pr-1" x-text="p.nombre"></span>
+                                <div class="mt-auto pt-3 flex items-center justify-between">
+                                    <span class="text-[11px] font-black text-amber-500 uppercase tracking-wide">Ver opciones</span>
+                                    <span class="pos-add-btn bg-[#ffc107] text-[#1a1100] shadow-sm group-hover:shadow-md">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                                    </span>
+                                </div>
                             </button>
                         </template>
                     </div>
 
-                    <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-2" x-cloak>
+                    {{-- BEBIDAS --}}
+                    <div x-show="view === 'bebidas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-1" x-cloak>
                         <template x-for="b in getListaBebidas()" :key="'beb_'+b.nombre">
-                            <button @click="abrirBebida(b)" class="pos-product-card pos-product-card-drink bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-[#17a2b8] p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-[#17a2b8] transition-all group">
-                                <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="b.nombre"></span>
-                                <span class="text-[#17a2b8] text-[12px] font-black flex items-center gap-1 mt-3 group-hover:translate-x-1 transition-transform">
-                                    Elegir tamaño <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                                </span>
+                            <button @click="abrirBebida(b)"
+                                    class="pos-product-card bg-white border border-cyan-200/60 p-4 flex flex-col justify-between text-left min-h-[110px] shadow-sm hover:border-cyan-400 group">
+                                <div class="w-8 h-1 rounded-full bg-[#17a2b8] mb-3 group-hover:w-10 transition-all duration-200"></div>
+                                <span class="font-black text-[#212529] text-[14px] sm:text-[15px] leading-tight uppercase pr-1" x-text="b.nombre"></span>
+                                <div class="mt-auto pt-3 flex items-center justify-between">
+                                    <span class="text-[11px] font-black text-cyan-600 uppercase tracking-wide">Elegir tamaño</span>
+                                    <span class="pos-add-btn bg-[#17a2b8] text-white shadow-sm group-hover:shadow-md">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                                    </span>
+                                </div>
                             </button>
                         </template>
                     </div>
 
-                    <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start mt-1 pr-2" x-cloak>
+                    {{-- DIRECTOS (Snacks, hamburguesas, alitas, etc.) --}}
+                    <div x-show="view === 'otros'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-1" x-cloak>
                         <template x-for="p in getListaDirectos()" :key="p.id">
-                            <button @click="addDirecto(p, $event)" class="pos-product-card pos-product-card-direct bg-white rounded-xl shadow-sm border border-gray-200 border-l-[5px] border-l-blue-400 p-4 flex flex-col justify-between items-start text-left min-h-[95px] hover:shadow-md hover:border-blue-400 transition-all group">
-                                <span class="font-bold text-[#212529] text-[15px] leading-tight w-full" x-text="p.nombre"></span>
-                                <div class="flex items-center gap-1 mt-3">
-                                    <span class="text-blue-600 text-[14px] font-black group-hover:scale-110 transition-transform origin-left" x-text="'$' + parseFloat(p.precio).toFixed(2)"></span>
+                            <button @click="addDirecto(p, $event)"
+                                    class="pos-product-card bg-white border border-violet-200/60 p-4 flex flex-col justify-between text-left min-h-[110px] shadow-sm hover:border-violet-400 group">
+                                <div class="w-8 h-1 rounded-full bg-violet-400 mb-3 group-hover:w-10 transition-all duration-200"></div>
+                                <span class="font-black text-[#212529] text-[14px] sm:text-[15px] leading-tight uppercase pr-1" x-text="p.nombre"></span>
+                                <div class="mt-auto pt-3 flex items-center justify-between">
+                                    <span class="pos-price-tag" x-text="'$' + parseFloat(p.precio).toFixed(2)"></span>
+                                    <span class="pos-add-btn bg-violet-500 text-white shadow-sm group-hover:shadow-md group-hover:bg-violet-600">+</span>
                                 </div>
                             </button>
                         </template>
@@ -564,10 +722,15 @@
 
             <div x-ref="cartPanel" class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col lg:h-full lg:min-h-0 max-lg:mt-4 pb-20 lg:pb-0">
 
-                <div class="p-5 pb-4 border-b border-gray-100 flex justify-between items-end shrink-0">
+                <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
                     <div>
-                        <h2 class="text-[20px] font-black text-[#212529] leading-none" x-text="id_venta_edit ? 'Editando #' + id_venta_edit : 'Pedido Actual'"></h2>
-                        <p x-show="cartGroups.length === 0" class="text-[#6c757d] text-[13px] mt-1.5">Sin productos en el carrito</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-0.5">Mesa / Orden</p>
+                        <h2 class="text-[22px] font-black text-[#212529] leading-none" x-text="id_venta_edit ? 'Editando #' + id_venta_edit : 'Pedido Actual'"></h2>
+                        <p x-show="cartGroups.length === 0" class="text-[#6c757d] text-[12px] mt-1">Sin productos aún</p>
+                    </div>
+                    <div x-show="cartGroups.length > 0" x-cloak
+                         class="w-9 h-9 rounded-full bg-[#fd7e14] text-white flex items-center justify-center font-black text-[13px] shadow-sm">
+                        <span x-text="cart.reduce((s,i) => s + i.qty, 0)"></span>
                     </div>
                 </div>
 
@@ -688,7 +851,7 @@
 
 
                 <div
-                    class="p-4 border-t border-gray-200 bg-white lg:rounded-b-xl shadow-[0_-4px_14px_-1px_rgba(0,0,0,0.16)] shrink-0 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:w-full max-lg:z-40 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] max-lg:rounded-t-[18px] max-lg:transition-transform max-lg:duration-300 max-lg:ease-out"
+                    class="p-4 border-t border-gray-100 bg-white lg:rounded-b-xl shadow-[0_-4px_14px_-1px_rgba(0,0,0,0.16)] shrink-0 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:w-full max-lg:z-40 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] max-lg:rounded-t-[18px] max-lg:transition-transform max-lg:duration-300 max-lg:ease-out"
                     :class="mobilePayOpen ? 'max-lg:translate-y-0' : 'max-lg:translate-y-[calc(100%-76px)]'"
                     @touchstart.passive="mobilePayTouchStartY = $event.touches[0].clientY"
                     @touchend.passive="let mobilePayDiff = mobilePayTouchStartY - $event.changedTouches[0].clientY; if (mobilePayDiff > 35) mobilePayOpen = true; if (mobilePayDiff < -35) { mobilePayOpen = false; openServicio = false; }"
@@ -697,43 +860,53 @@
                         <span class="w-12 h-1.5 rounded-full bg-gray-300"></span>
                     </button>
 
-                    <div x-ref="payTarget" class="flex justify-between items-center font-black text-[#212529] mb-3 max-lg:min-h-[36px]" @click="mobilePayOpen = true">
-
-                        <span class="text-[16px]">Total:</span>
-                        <span x-text="'$' + getGranTotal().toFixed(2)" class="text-[26px]"></span>
+                    {{-- Total --}}
+                    <div x-ref="payTarget" class="flex justify-between items-center mb-3 max-lg:min-h-[36px]" @click="mobilePayOpen = true">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 leading-none mb-0.5">Total a cobrar</p>
+                            <span class="text-[16px] font-black text-[#212529]">Total</span>
+                        </div>
+                        <span x-text="'$' + getGranTotal().toFixed(2)" class="text-[30px] font-black text-[#212529] leading-none"></span>
                     </div>
 
-                    <button @click="modalComentarios = true" class="w-full bg-[#f8f9fa] border border-gray-200 hover:bg-[#e9ecef] text-[#212529] py-2.5 rounded-[6px] font-bold text-[14px] flex justify-center items-center gap-2 mb-3 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    {{-- Botón comentarios --}}
+                    <button @click="modalComentarios = true"
+                            class="w-full bg-[#f8f9fa] border border-gray-200 hover:bg-[#e9ecef] text-[#495057] py-2.5 rounded-xl font-bold text-[13px] flex justify-center items-center gap-2 mb-3 transition-colors">
+                        <svg class="w-4 h-4 text-[#6c757d]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         Agregar comentarios
                     </button>
 
+                    {{-- Inputs mesa / nombre --}}
                     <div class="mb-3 h-10 flex gap-2" x-show="servicio === 1 || servicio === 2" x-cloak>
-                        <input type="number" x-show="servicio === 1" x-model="mesa" placeholder="Mesa #" class="w-1/3 h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
-                        <input type="text" x-model="nombreClienteMesa" :class="servicio === 1 ? 'w-2/3' : 'w-full'" placeholder="Nombre del cliente *" class="h-full bg-white border border-gray-300 rounded-[6px] py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
+                        <input type="number" x-show="servicio === 1" x-model="mesa" placeholder="Mesa #" class="w-1/3 h-full bg-white border border-gray-300 rounded-xl py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
+                        <input type="text" x-model="nombreClienteMesa" :class="servicio === 1 ? 'w-2/3' : 'w-full'" placeholder="Nombre del cliente *" class="h-full bg-white border border-gray-300 rounded-xl py-2 px-3 text-[14px] font-bold focus:outline-none focus:border-[#fd7e14] shadow-sm">
                     </div>
 
-                    <div class="flex h-[45px] relative">
-                        <button @click="openServicio = !openServicio" class="w-[45%] h-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold text-[14px] flex justify-between items-center px-4 rounded-l-[6px] border-r border-[#e36b0c] transition-colors shadow-sm">
+                    {{-- Selector servicio + Enviar Orden --}}
+                    <div class="flex h-[50px] relative gap-2">
+                        {{-- Botón selector --}}
+                        <button @click="openServicio = !openServicio"
+                                class="h-full bg-[#fd7e14] hover:bg-[#e36b0c] text-white font-bold text-[13px] flex justify-between items-center px-4 rounded-xl border-none transition-colors shadow-sm w-[46%] shrink-0">
                             <div class="flex items-center gap-2">
                                 <svg x-show="servicio === 3" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                                 <svg x-show="servicio === 1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <svg x-show="servicio === 2" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                {{-- ÍCONO PARA PEDIDO ESPECIAL --}}
                                 <svg x-show="servicio === 4" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 <span x-text="nomServicio()"></span>
                             </div>
-                            <svg class="w-3.5 h-3.5 transition-transform" :class="openServicio ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-3.5 h-3.5 transition-transform shrink-0" :class="openServicio ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
-                        
-                        <div x-show="openServicio" @click.away="openServicio = false" x-cloak class="absolute bottom-full left-0 w-[240px] mb-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 py-1">
+
+                        {{-- Dropdown servicio --}}
+                        <div x-show="openServicio" @click.away="openServicio = false" x-cloak
+                             class="absolute bottom-full left-0 w-[240px] mb-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 py-1 overflow-hidden">
                             <button @click="servicio = 3; openServicio = false" class="w-full text-left px-5 py-3 text-[14px] flex items-center gap-3 transition-colors border-b border-gray-100" :class="servicio === 3 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                                 A Domicilio
                             </button>
                             <button @click="servicio = 1; openServicio = false" class="w-full text-left px-5 py-3 text-[14px] flex items-center gap-3 transition-colors border-b border-gray-100" :class="servicio === 1 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Comer Aqui
+                                Comer Aquí
                             </button>
                             <button @click="servicio = 2; openServicio = false" class="w-full text-left px-5 py-3 text-[14px] flex items-center gap-3 transition-colors border-b border-gray-100" :class="servicio === 2 ? 'text-[#fd7e14] font-black bg-orange-50' : 'text-[#495057] font-bold hover:bg-gray-50'">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
@@ -745,7 +918,15 @@
                             </button>
                         </div>
 
-                        <button @click="procesarOrden()" :disabled="cart.length === 0" :class="cart.length === 0 ? 'bg-[#fd7e14]/60 text-white cursor-not-allowed' : (servicio === 4 ? 'bg-[#17a2b8] hover:bg-[#138496] text-white' : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white')" class="flex-1 font-black text-[15px] rounded-r-[6px] transition-colors shadow-sm">
+                        {{-- Botón Enviar Orden --}}
+                        <button @click="procesarOrden()"
+                                :disabled="cart.length === 0"
+                                :class="cart.length === 0
+                                    ? 'bg-[#fd7e14]/40 text-white cursor-not-allowed'
+                                    : (servicio === 4
+                                        ? 'bg-[#17a2b8] hover:bg-[#138496] text-white shadow-md shadow-cyan-500/20'
+                                        : 'bg-[#fd7e14] hover:bg-[#e36b0c] text-white shadow-md shadow-orange-500/20')"
+                                class="flex-1 h-full font-black text-[15px] rounded-xl transition-all active:scale-[0.98]">
                             <span x-text="id_venta_edit ? 'Guardar Cambios' : (servicio === 4 ? 'Programar Especial' : 'Enviar Orden')"></span>
                         </button>
                     </div>
@@ -780,16 +961,22 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 translate-y-8"
              class="pos-modal-overlay fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="pos-modal-panel pos-options-modal-panel bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalOpc = false">
-                <div class="pos-options-modal-header p-5 border-b border-gray-100 flex justify-between items-center">
-                    <h2 class="pos-options-modal-title text-[18px] font-bold text-[#212529]" x-text="opcItem?.nombre"></h2>
-                    <button @click="modalOpc = false" class="pos-pressable text-gray-400 hover:text-black font-bold text-xl">&times;</button>
+            <div class="pos-modal-panel pos-options-modal-panel bg-white rounded-[2rem] shadow-2xl w-full max-w-sm flex flex-col overflow-hidden" @click.away="modalOpc = false">
+                {{-- Header estilo Mr. Feg --}}
+                <div class="pos-options-modal-header px-6 pt-6 pb-4 border-b border-slate-100 flex justify-between items-start">
+                    <div>
+                        <h2 class="pos-options-modal-title text-xl font-black text-slate-800 tracking-tight" x-text="opcItem?.nombre"></h2>
+                        <p class="text-[10px] font-black text-[#fd7e14] uppercase tracking-widest mt-0.5">Selecciona el tamaño</p>
+                    </div>
+                    <button @click="modalOpc = false" class="pos-pressable w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-500 border border-slate-200 transition-all ml-3 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
-                <div class="pos-options-modal-body p-5 bg-[#f8f9fa] space-y-3 max-h-[50vh] overflow-y-auto scrollbar-hide">
+                <div class="pos-options-modal-body p-5 space-y-2.5 max-h-[60vh] overflow-y-auto scrollbar-hide">
                     <template x-for="t in opcItem?.tamanos" :key="t.id">
-                        <button @click="addOpc(t, $event)" class="pos-choice-card pos-size-option w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#fd7e14] hover:shadow-sm transition-all">
-                            <span class="font-bold text-[#212529] text-[14px]" x-text="cleanSize(t.tamano)"></span>
-                            <span class="font-black text-[#28a745] text-[15px]" x-text="'$' + parseFloat(t.precio).toFixed(2)"></span>
+                        <button @click="addOpc(t, $event)" class="pos-choice-card pos-size-option w-full flex justify-between items-center bg-white border border-slate-200 rounded-2xl px-5 py-4 hover:border-[#fd7e14] hover:ring-2 hover:ring-[#fd7e14]/20 hover:shadow-sm transition-all active:scale-[0.98] outline-none">
+                            <span class="font-bold text-slate-800 text-[15px]" x-text="cleanSize(t.tamano)"></span>
+                            <span class="font-black text-[#fd7e14] text-[16px]" x-text="'$' + parseFloat(t.precio).toFixed(2)"></span>
                         </button>
                     </template>
                 </div>
@@ -804,16 +991,21 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 translate-y-8"
              class="pos-modal-overlay fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="pos-modal-panel bg-white rounded-xl shadow-2xl w-[350px] flex flex-col overflow-hidden" @click.away="modalBebida = false">
-                <div class="bg-[#17a2b8] p-5 flex justify-between items-center text-white">
-                    <h2 class="text-[18px] font-bold" x-text="bebidaItem?.nombre"></h2>
-                    <button @click="modalBebida = false" class="pos-pressable text-white hover:text-gray-200 font-bold text-xl">&times;</button>
+            <div class="pos-modal-panel bg-white rounded-[2rem] shadow-2xl w-full max-w-sm flex flex-col overflow-hidden" @click.away="modalBebida = false">
+                <div class="px-6 pt-6 pb-4 border-b border-slate-100 flex justify-between items-start">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800 tracking-tight" x-text="bebidaItem?.nombre"></h2>
+                        <p class="text-[10px] font-black text-[#17a2b8] uppercase tracking-widest mt-0.5">Selecciona el tamaño</p>
+                    </div>
+                    <button @click="modalBebida = false" class="pos-pressable w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-500 border border-slate-200 transition-all ml-3 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
-                <div class="p-5 bg-[#f8f9fa] space-y-3 max-h-[50vh] overflow-y-auto scrollbar-hide">
+                <div class="p-5 space-y-2.5 max-h-[60vh] overflow-y-auto scrollbar-hide">
                     <template x-for="opc in bebidaItem?.opciones" :key="opc.id">
-                        <button @click="addBebida(opc, $event)" class="pos-choice-card w-full flex justify-between items-center bg-white border border-gray-200 rounded-[8px] p-4 hover:border-[#17a2b8] hover:shadow-sm transition-all">
-                            <span class="font-bold text-[#212529] text-[14px]" x-text="opc.tamano"></span>
-                            <span class="font-black text-[#17a2b8] text-[15px]" x-text="'$' + parseFloat(opc.precio).toFixed(2)"></span>
+                        <button @click="addBebida(opc, $event)" class="pos-choice-card w-full flex justify-between items-center bg-white border border-slate-200 rounded-2xl px-5 py-4 hover:border-[#17a2b8] hover:ring-2 hover:ring-[#17a2b8]/20 hover:shadow-sm transition-all active:scale-[0.98] outline-none">
+                            <span class="font-bold text-slate-800 text-[15px]" x-text="opc.tamano"></span>
+                            <span class="font-black text-[#17a2b8] text-[16px]" x-text="'$' + parseFloat(opc.precio).toFixed(2)"></span>
                         </button>
                     </template>
                 </div>
@@ -2027,6 +2219,43 @@
                         this.espData.hora = fParts[1] ? fParts[1].substring(0, 5) : '';
                         this.espData.modo = this.pespecialPrevio.id_dir ? 'domicilio' : 'recoger';
                     }
+                },
+
+                // Mapa de nombre de categoría → emoji
+                getCatIcon(nombre) {
+                    const n = (nombre || '').toLowerCase().trim();
+                    const mapa = {
+                        'alitas':         '🍗 Alitas',
+                        'ord. alitas':    '🍗 Alitas',
+                        'hamburguesas':   '🍔 Hamburguesas',
+                        'hamburguesa':    '🍔 Hamburguesas',
+                        'costillas':      '🥩 Costillas',
+                        'ord. costillas': '🥩 Costillas',
+                        'papas':          '🍟 Papas',
+                        'ord. papas':     '🍟 Papas',
+                        'spaguetty':      '🍝 Spaguetty',
+                        'spaghetti':      '🍝 Spaguetty',
+                        'espagueti':      '🍝 Espagueti',
+                        'especialidades': '⭐ Especialidades',
+                        'mariscos':       '🦐 Mariscos',
+                        'bebidas':        '🥤 Bebidas',
+                        'refrescos':      '🥤 Refrescos',
+                        'pizzas':         '🍕 Pizzas',
+                        'rectangular':    '🍕 Rectangular',
+                        'barra':          '🍕 Barra',
+                        'magno':          '🍕 Magno',
+                        'boneless':       '🍗 Boneless',
+                        'snacks':         '🍿 Snacks',
+                        'postres':        '🍰 Postres',
+                        'ensaladas':      '🥗 Ensaladas',
+                    };
+                    // Buscar coincidencia exacta primero, luego parcial
+                    if (mapa[n]) return mapa[n];
+                    for (const [key, val] of Object.entries(mapa)) {
+                        if (n.includes(key) || key.includes(n)) return val;
+                    }
+                    // Si no hay coincidencia, devolver con emoji genérico
+                    return '🍽️ ' + nombre;
                 },
 
                 getListaTamanos() {
