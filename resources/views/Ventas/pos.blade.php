@@ -86,8 +86,8 @@
 .pos-cat-pill-active-bebidas  { background: #17a2b8 !important; border-color: #17a2b8 !important; box-shadow: 0 4px 14px rgba(23,162,184,0.28) !important; }
 .pos-cat-pill-active-snack    { background: #6366f1 !important; border-color: #6366f1 !important; box-shadow: 0 4px 14px rgba(99,102,241,0.28) !important; }
 /* Dark mode para pills */
-.app-dark .pos-cat-pill-inactive { background: #1e293b !important; color: #94a3b8 !important; border-color: #334155 !important; }
-.app-dark .pos-cat-pill-inactive:hover { background: #334155 !important; color: #e2e8f0 !important; }
+.app-dark .pos-cat-pill-inactive { background: rgba(255,255,255,0.07) !important; color: #94a3b8 !important; border-color: rgba(255,255,255,0.1) !important; }
+.app-dark .pos-cat-pill-inactive:hover { background: rgba(255,255,255,0.13) !important; color: #e2e8f0 !important; border-color: rgba(255,255,255,0.18) !important; }
 /* Buscador mejorado */
 .pos-search-wrap {
     position: relative;
@@ -280,12 +280,14 @@
 }
 /* Dark mode cards nuevas */
 .app-dark .pos-product-card {
-    background-color: #1e2d3d !important;
-    border-color: rgba(148,163,184,0.12) !important;
+    background-color: rgba(255,255,255,0.055) !important;
+    border-color: rgba(255,255,255,0.09) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25) !important;
 }
 .app-dark .pos-product-card:hover {
-    background-color: #243447 !important;
-    border-color: rgba(148,163,184,0.22) !important;
+    background-color: rgba(255,255,255,0.1) !important;
+    border-color: rgba(255,255,255,0.18) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
 }
 /* Precio visible en dark */
 .app-dark .pos-product-card .pos-price-tag { color: #e2e8f0 !important; }
@@ -301,8 +303,9 @@
 .app-dark .bg-white.rounded-2xl,
 .app-dark .rounded-2xl.bg-white { background-color: #111c2b !important; border-color: #1e2d3d !important; }
 /* Chip grupo paquetes en dark */
-.app-dark .bg-amber-50 { background-color: #1c1409 !important; }
-.app-dark .border-amber-200\/70 { border-color: #78350f44 !important; }
+.app-dark .pos-paq-group { background: rgba(255,193,7,0.14) !important; border-color: rgba(255,193,7,0.35) !important; }
+.app-dark .bg-amber-50 { background-color: rgba(255,193,7,0.14) !important; }
+.app-dark .border-amber-200\/70 { border-color: rgba(255,193,7,0.35) !important; }
 .app-dark .text-amber-600 { color: #fbbf24 !important; }
     .pos-pressable:active,
     .pos-product-card:active,
@@ -310,6 +313,27 @@
         transform: none !important;
         filter: none !important;
     }
+}
+
+/* ── Redesign 3.0: two-tone POS layout ── */
+/* Carrito: dark mode elevación */
+.app-dark .pos-cart-panel {
+    background: var(--app-dark-surface-soft, #182235) !important;
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+/* Área de búsqueda/filtros */
+.pos-search-section {
+    background: #ffffff;
+    border-color: rgba(226,232,240,0.6);
+}
+.app-dark .pos-search-section {
+    background: rgba(255,255,255,0.045) !important;
+    border-color: rgba(255,255,255,0.09) !important;
+}
+/* Área interior del carrito (bg-[#f8f9fa]) */
+.app-dark .pos-cart-items-bg {
+    background: rgba(0,0,0,0.15) !important;
 }
 
 
@@ -533,6 +557,130 @@
 
 }
 
+/* ── Dark mode: fix Tailwind hover bg on labels (todos los modales) ── */
+/* hover:bg-gray-50 → casi blanco en dark */
+.app-dark label.hover\:bg-gray-50:hover {
+    background-color: rgba(255,255,255,0.09) !important;
+    border-color: rgba(255,255,255,0.15) !important;
+}
+/* hover:bg-orange-50 → casi blanco en dark */
+.app-dark label.hover\:bg-orange-50:hover {
+    background-color: rgba(253,126,20,0.14) !important;
+}
+/* hover:bg-gray-200 en botones discount cuando inactive */
+.app-dark .pos-discount-toggle button.hover\:bg-gray-200:hover {
+    background-color: rgba(255,255,255,0.12) !important;
+}
+
+/* ── Modal cobrar: dark mode fixes ── */
+/* Ingredient grid container */
+.app-dark .pos-modal-ing-grid {
+    background: rgba(0,0,0,0.25) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+}
+/* Ingredient row hover: override hover:bg-orange-50 (#fff7ed) */
+.app-dark .pos-ing-label:hover {
+    background: rgba(253,126,20,0.14) !important;
+}
+.app-dark .pos-ing-label span { color: #cbd5e1 !important; }
+
+/* Discount toggle container */
+.app-dark .pos-discount-toggle {
+    background: rgba(0,0,0,0.25) !important;
+}
+.app-dark .pos-discount-toggle button {
+    color: #94a3b8 !important;
+}
+/* Active colored buttons stay as-is; inactive hover */
+
+/* Payment cards — selectable */
+.pos-pago-card {
+    border: 1.5px solid rgba(226,232,240,0.5);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.18s;
+    background: white;
+}
+.pos-pago-card:hover { border-color: rgba(40,167,69,0.35); }
+.pos-pago-card-on {
+    border-color: #28a745 !important;
+    background: rgba(40,167,69,0.05) !important;
+    box-shadow: 0 0 0 3px rgba(40,167,69,0.08) !important;
+}
+.app-dark .pos-pago-card {
+    background: rgba(255,255,255,0.05) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+}
+.app-dark .pos-pago-card:hover { border-color: rgba(40,167,69,0.45) !important; }
+.app-dark .pos-pago-card-on {
+    border-color: #28a745 !important;
+    background: rgba(40,167,69,0.14) !important;
+    box-shadow: 0 0 0 3px rgba(40,167,69,0.14) !important;
+}
+/* Icon badge */
+.pos-pago-icon-wrap {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+.pos-pago-green  { background: linear-gradient(135deg, #28a745, #20c997); }
+.pos-pago-cyan   { background: linear-gradient(135deg, #17a2b8, #0dcaf0); }
+.pos-pago-purple { background: linear-gradient(135deg, #6f42c1, #9d6fe8); }
+/* Label */
+.pos-pago-label { font-size: 14px; font-weight: 700; color: #374151; }
+.app-dark .pos-pago-label { color: #e2e8f0 !important; }
+/* Circle checkmark */
+.pos-pago-check-circle {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(203,213,225,0.6);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+}
+.pos-pago-check-on { background: #28a745 !important; border-color: #28a745 !important; }
+.app-dark .pos-pago-check-circle { border-color: rgba(255,255,255,0.22); }
+/* Inputs inside cards */
+.pos-pago-input {
+    border: 1px solid rgba(226,232,240,0.6);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    background: rgba(255,255,255,0.8);
+    color: #374151;
+    width: 100%;
+}
+.pos-pago-input:focus { border-color: #28a745; box-shadow: 0 0 0 2px rgba(40,167,69,0.12); }
+.app-dark .pos-pago-input {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.15) !important;
+    color: #f1f5f9 !important;
+}
+.app-dark .pos-pago-input::placeholder { color: #64748b !important; }
+.app-dark .pos-pago-input:focus { border-color: #28a745 !important; }
+
+/* Modal payment footer */
+.app-dark .pos-modal-pago-footer {
+    background: rgba(0,0,0,0.2) !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+/* Volver button dark mode */
+.app-dark .pos-btn-secondary {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.14) !important;
+    color: #94a3b8 !important;
+}
+.app-dark .pos-btn-secondary:hover {
+    background: rgba(255,255,255,0.14) !important;
+    color: #e2e8f0 !important;
+}
+/* Disabled confirm button dark mode */
+.app-dark button.bg-\[\#ced4da\] {
+    background: rgba(255,255,255,0.08) !important;
+    color: #4a5568 !important;
+}
+
 </style>
 
 @if(!$cajaAbierta)
@@ -583,14 +731,14 @@
 
     <div class="w-full min-h-[calc(100dvh-95px)] lg:h-[calc(100vh-95px)] bg-[#f8f9fa] font-sans text-[#212529] flex flex-col max-lg:overflow-y-auto lg:overflow-hidden" x-data="posApp()">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:h-full lg:min-h-0 p-2 lg:p-0">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 lg:h-full lg:min-h-0 p-3 lg:p-4">
             
-            <div class="lg:col-span-8 flex flex-col gap-2 lg:h-full lg:min-h-0">
+            <div class="lg:col-span-8 flex flex-col gap-3 lg:h-full lg:min-h-0 py-1 lg:py-2 px-1">
 
                 {{-- ── Accesos Rápidos ── --}}
-                <div class="flex flex-row gap-2 overflow-x-auto w-full pb-1 mb-1" style="scrollbar-width:none;">
+                <div class="flex flex-row gap-2 overflow-x-auto w-full pb-0.5" style="scrollbar-width:none;">
                     {{-- Paquetes: grupo visual --}}
-                    <div class="flex gap-1.5 items-center bg-amber-50 border border-amber-200/70 rounded-full px-2 py-1 shrink-0">
+                    <div class="pos-paq-group flex gap-1.5 items-center bg-amber-50 border border-amber-200/70 rounded-full px-2 py-1 shrink-0">
                         <span class="text-[10px] font-black text-amber-600 uppercase tracking-wider pl-1 pr-0.5">Paq.</span>
                         <button @click="abrirPaquete(1)" class="pos-quick-chip bg-[#ffc107] text-[#1a1100]">1</button>
                         <button @click="abrirPaquete(2)" class="pos-quick-chip bg-[#ffc107] text-[#1a1100]">2</button>
@@ -625,7 +773,7 @@
                 </div>
 
                 {{-- ── Buscador + Categorías ── --}}
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-3 flex flex-col gap-3 shrink-0">
+                <div class="pos-search-section rounded-2xl border border-slate-200/50 p-3 flex flex-col gap-3 shrink-0">
 
                     {{-- Buscador --}}
                     <div class="pos-search-wrap">
@@ -665,7 +813,7 @@
                 </div>
 
 
-                <div class="max-lg:h-auto lg:flex-1 overflow-y-auto scrollbar-hide pb-6 pt-1">
+                <div class="max-lg:h-auto lg:flex-1 overflow-y-auto scrollbar-hide pb-6 pt-2">
 
                     {{-- PIZZAS --}}
                     <div x-show="view === 'pizzas'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 content-start pr-1">
@@ -720,7 +868,8 @@
             </div>
 
 
-            <div x-ref="cartPanel" class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col lg:h-full lg:min-h-0 max-lg:mt-4 pb-20 lg:pb-0">
+            <div x-ref="cartPanel" class="pos-cart-panel lg:col-span-4 bg-white rounded-3xl shadow-xl border border-gray-100/80 flex flex-col lg:h-full lg:min-h-0 max-lg:mt-4 pb-20 lg:pb-0 overflow-hidden">
+                <div class="h-1.5 bg-gradient-to-r from-[#fd7e14] to-[#ffc107] shrink-0"></div>
 
                 <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
                     <div>
@@ -735,7 +884,7 @@
                 </div>
 
 
-                <div class="max-lg:max-h-[50vh] lg:flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-hide bg-[#f8f9fa]">
+                <div class="pos-cart-items-bg max-lg:max-h-[50vh] lg:flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-hide bg-[#f8f9fa]">
 
                     <template x-for="(group, gIdx) in cartGroups" :key="group.id_grupo">
                         <div>
@@ -851,7 +1000,7 @@
 
 
                 <div
-                    class="p-4 border-t border-gray-100 bg-white lg:rounded-b-xl shadow-[0_-4px_14px_-1px_rgba(0,0,0,0.16)] shrink-0 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:w-full max-lg:z-40 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] max-lg:rounded-t-[18px] max-lg:transition-transform max-lg:duration-300 max-lg:ease-out"
+                    class="p-4 border-t border-gray-100 bg-white lg:rounded-b-3xl shadow-[0_-4px_14px_-1px_rgba(0,0,0,0.16)] shrink-0 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:w-full max-lg:z-40 max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))] max-lg:rounded-t-[18px] max-lg:transition-transform max-lg:duration-300 max-lg:ease-out"
                     :class="mobilePayOpen ? 'max-lg:translate-y-0' : 'max-lg:translate-y-[calc(100%-76px)]'"
                     @touchstart.passive="mobilePayTouchStartY = $event.touches[0].clientY"
                     @touchend.passive="let mobilePayDiff = mobilePayTouchStartY - $event.changedTouches[0].clientY; if (mobilePayDiff > 35) mobilePayOpen = true; if (mobilePayDiff < -35) { mobilePayOpen = false; openServicio = false; }"
@@ -1681,9 +1830,9 @@
                         <input type="text" x-model="searchIng" placeholder="Buscar ingrediente..." class="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-[8px] text-[13px] font-medium focus:outline-none focus:border-[#fd7e14]">
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-[8px] p-4 shadow-sm min-h-[150px] max-h-[220px] overflow-y-auto scrollbar-hide">
+                    <div class="pos-modal-ing-grid grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-[8px] p-4 shadow-sm min-h-[150px] max-h-[220px] overflow-y-auto scrollbar-hide">
                         <template x-for="ing in getIngredientesFiltrados()" :key="ing.id_ingrediente">
-                            <label class="flex items-center gap-2 cursor-pointer text-[13px] text-[#495057] font-medium p-1.5 hover:bg-orange-50 rounded transition-colors">
+                            <label class="pos-ing-label flex items-center gap-2 cursor-pointer text-[13px] text-[#495057] font-medium p-1.5 hover:bg-orange-50 rounded transition-colors">
                                 <template x-if="ingModo === 'completa'">
                                     <input type="checkbox" :value="ing.ingrediente" x-model="ingSel" class="rounded border-gray-300 text-[#fd7e14] focus:ring-[#fd7e14] w-4 h-4">
                                 </template>
@@ -2073,46 +2222,67 @@
                         <span class="text-lg font-black text-green-800" x-text="'$' + total_pagado_previamente.toFixed(2)"></span>
                     </div>
 
-                    <div class="flex gap-2 bg-gray-100 p-1.5 rounded-lg">
-                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-white shadow text-black' : 'text-gray-500 hover:bg-gray-200'" class="flex-1 py-1.5 rounded font-bold text-[11px] transition-all">Sin Desc.</button>
-                        <button @click="pedirCortesia(40)" :class="cortesia === 40 ? 'bg-white shadow text-black' : 'text-gray-500 hover:bg-gray-200'" class="flex-1 py-1.5 rounded font-bold text-[11px] transition-all">40% Empl.</button>
-                        <button @click="pedirCortesia(100)" :class="cortesia === 100 ? 'bg-white shadow text-black' : 'text-gray-500 hover:bg-gray-200'" class="flex-1 py-1.5 rounded font-bold text-[11px] transition-all">100% Cort.</button>
+                    <div class="pos-discount-toggle flex gap-2 bg-gray-100 p-1.5 rounded-lg">
+                        <button @click="cortesia = 0; autoFillAfterCortesia()" :class="cortesia === 0 ? 'bg-slate-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'" class="flex-1 py-2 rounded-lg font-black text-[11px] tracking-wide transition-all">Sin Desc.</button>
+                        <button @click="pedirCortesia(40)" :class="cortesia === 40 ? 'bg-blue-600 text-white shadow-sm shadow-blue-900/40' : 'text-gray-400 hover:text-gray-200'" class="flex-1 py-2 rounded-lg font-black text-[11px] tracking-wide transition-all">40% Empl.</button>
+                        <button @click="pedirCortesia(100)" :class="cortesia === 100 ? 'bg-red-600 text-white shadow-sm shadow-red-900/40' : 'text-gray-400 hover:text-gray-200'" class="flex-1 py-2 rounded-lg font-black text-[11px] tracking-wide transition-all">100% Cort.</button>
                     </div>
 
                     <div x-show="cortesia !== 100" class="space-y-3 pt-2">
                         <label class="block text-[11px] font-black text-gray-600 uppercase mb-2">Métodos de Pago</label>
                         
-                        <div class="flex items-center gap-3">
-                            <label class="flex items-center gap-2 w-24 cursor-pointer">
-                                <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="w-4 h-4 text-[#28a745] border-gray-300 rounded focus:ring-[#28a745]">
-                                <span class="text-[12px] font-bold text-gray-700">Efectivo</span>
-                            </label>
-                            <div class="flex-1 flex gap-2" x-show="pagos.efectivo.activo" x-transition>
-                                <input type="number" step="0.1" min="0" x-model.number="pagos.efectivo.monto" placeholder="Monto" class="w-1/2 border border-gray-300 rounded py-2 px-3 text-sm focus:border-[#28a745] outline-none">
-                                <input type="number" step="0.1" min="0" x-model.number="pagos.efectivo.entregado" placeholder="Recibido" class="w-1/2 border border-gray-300 rounded py-2 px-3 text-sm focus:border-[#28a745] outline-none">
+                        {{-- Efectivo --}}
+                        <label class="pos-pago-card block cursor-pointer select-none" :class="pagos.efectivo.activo ? 'pos-pago-card-on' : ''">
+                            <input type="checkbox" x-model="pagos.efectivo.activo" @change="autoFillPago('efectivo')" class="sr-only">
+                            <div class="flex items-center gap-3 p-3.5">
+                                <div class="pos-pago-icon-wrap pos-pago-green shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                </div>
+                                <span class="pos-pago-label flex-1">Efectivo</span>
+                                <div class="pos-pago-check-circle" :class="pagos.efectivo.activo ? 'pos-pago-check-on' : ''">
+                                    <svg x-show="pagos.efectivo.activo" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
                             </div>
-                        </div>
+                            <div x-show="pagos.efectivo.activo" x-transition class="px-3.5 pb-3.5 flex gap-2">
+                                <input type="number" step="0.1" min="0" x-model.number="pagos.efectivo.monto" placeholder="Monto $" class="pos-pago-input w-1/2">
+                                <input type="number" step="0.1" min="0" x-model.number="pagos.efectivo.entregado" placeholder="Recibido $" class="pos-pago-input w-1/2">
+                            </div>
+                        </label>
 
-                        <div class="flex items-center gap-3">
-                            <label class="flex items-center gap-2 w-24 cursor-pointer">
-                                <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="w-4 h-4 text-[#28a745] border-gray-300 rounded focus:ring-[#28a745]">
-                                <span class="text-[12px] font-bold text-gray-700">Tarjeta</span>
-                            </label>
-                            <div class="flex-1" x-show="pagos.tarjeta.activo" x-transition>
-                                <input type="number" step="0.1" min="0" x-model.number="pagos.tarjeta.monto" placeholder="Monto" class="w-full border border-gray-300 rounded py-2 px-3 text-sm focus:border-[#28a745] outline-none">
+                        {{-- Tarjeta --}}
+                        <label class="pos-pago-card block cursor-pointer select-none" :class="pagos.tarjeta.activo ? 'pos-pago-card-on' : ''">
+                            <input type="checkbox" x-model="pagos.tarjeta.activo" @change="autoFillPago('tarjeta')" class="sr-only">
+                            <div class="flex items-center gap-3 p-3.5">
+                                <div class="pos-pago-icon-wrap pos-pago-cyan shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                                </div>
+                                <span class="pos-pago-label flex-1">Tarjeta</span>
+                                <div class="pos-pago-check-circle" :class="pagos.tarjeta.activo ? 'pos-pago-check-on' : ''">
+                                    <svg x-show="pagos.tarjeta.activo" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
                             </div>
-                        </div>
+                            <div x-show="pagos.tarjeta.activo" x-transition class="px-3.5 pb-3.5">
+                                <input type="number" step="0.1" min="0" x-model.number="pagos.tarjeta.monto" placeholder="Monto $" class="pos-pago-input w-full">
+                            </div>
+                        </label>
 
-                        <div class="flex items-center gap-3">
-                            <label class="flex items-center gap-2 w-24 cursor-pointer">
-                                <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="w-4 h-4 text-[#28a745] border-gray-300 rounded focus:ring-[#28a745]">
-                                <span class="text-[12px] font-bold text-gray-700">Transf.</span>
-                            </label>
-                            <div class="flex-1 flex gap-2" x-show="pagos.transferencia.activo" x-transition>
-                                <input type="number" step="0.1" min="0" x-model.number="pagos.transferencia.monto" placeholder="Monto" class="w-1/2 border border-gray-300 rounded py-2 px-3 text-sm focus:border-[#28a745] outline-none">
-                                <input type="text" x-model="pagos.transferencia.referencia" placeholder="Ref." class="w-1/2 border border-gray-300 rounded py-2 px-3 text-sm focus:border-[#28a745] outline-none">
+                        {{-- Transferencia --}}
+                        <label class="pos-pago-card block cursor-pointer select-none" :class="pagos.transferencia.activo ? 'pos-pago-card-on' : ''">
+                            <input type="checkbox" x-model="pagos.transferencia.activo" @change="autoFillPago('transferencia')" class="sr-only">
+                            <div class="flex items-center gap-3 p-3.5">
+                                <div class="pos-pago-icon-wrap pos-pago-purple shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                </div>
+                                <span class="pos-pago-label flex-1">Transferencia</span>
+                                <div class="pos-pago-check-circle" :class="pagos.transferencia.activo ? 'pos-pago-check-on' : ''">
+                                    <svg x-show="pagos.transferencia.activo" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
                             </div>
-                        </div>
+                            <div x-show="pagos.transferencia.activo" x-transition class="px-3.5 pb-3.5 flex gap-2">
+                                <input type="number" step="0.1" min="0" x-model.number="pagos.transferencia.monto" placeholder="Monto $" class="pos-pago-input w-1/2">
+                                <input type="text" x-model="pagos.transferencia.referencia" placeholder="Referencia" class="pos-pago-input w-1/2">
+                            </div>
+                        </label>
                     </div>
 
                     <div x-show="cortesia !== 100" class="mt-4 p-3 rounded-xl border flex justify-between items-center transition-colors" :class="faltaPagar() === 0 ? 'bg-green-50 border-green-200' : (faltaPagar() < 0 ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200')">
@@ -2121,9 +2291,9 @@
                     </div>
                 </div>
 
-                <div class="p-5 bg-gray-50 border-t border-gray-100 flex gap-3">
-                    <button @click="modalPago = false; if(servicio === 3) abrirModalCliente(false, true);" class="flex-1 font-bold text-gray-500 bg-white border border-gray-200 rounded-xl py-3">Volver</button>
-                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="!pagosValidos() || isProcessing ? 'bg-[#ced4da] text-gray-500' : 'bg-[#28a745] hover:bg-[#218838] text-white shadow-md'" class="flex-1 font-black rounded-xl py-3 uppercase italic disabled:opacity-50 transition-colors">
+                <div class="pos-modal-pago-footer p-5 bg-gray-50 border-t border-gray-100 flex gap-3">
+                    <button @click="modalPago = false; if(servicio === 3) abrirModalCliente(false, true);" class="pos-btn-secondary flex-1 font-bold text-gray-500 bg-white border border-gray-200 rounded-xl py-3 transition-colors">Volver</button>
+                    <button @click="procesarOrdenFinal(false)" :disabled="!pagosValidos() || isProcessing" :class="!pagosValidos() || isProcessing ? 'bg-[#ced4da] text-gray-500' : 'bg-[#28a745] hover:bg-[#218838] text-white shadow-lg shadow-green-900/30'" class="flex-2 font-black rounded-xl py-3.5 uppercase italic disabled:opacity-50 transition-all text-[13px] tracking-wide">
                         <span x-show="!isProcessing">Confirmar Pago</span>
                         <span x-show="isProcessing">Procesando...</span>
                     </button>
