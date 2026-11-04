@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mesas', [MesasController::class, 'index'])->name('mesas.index');
     Route::get('/mesas/estado', [MesasController::class, 'getEstado'])->name('mesas.estado');
     Route::get('/mesas/detalle/{id_venta}', [MesasController::class, 'getDetalle'])->name('mesas.detalle');
+    Route::post('/mesas/cerrar-anteriores', [MesasController::class, 'cerrarAnteriores'])->name('mesas.cerrar-anteriores');
 
     // --- PUNTO DE VENTA (POS) ---
     Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos')

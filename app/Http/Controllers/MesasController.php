@@ -59,6 +59,37 @@ class MesasController extends Controller
         ]);
     }
 
+    // Manual: cierra mesas abiertas de días anteriores
+    public function cerrarAnteriores()
+    {
+        $hoy = \Carbon\Carbon::today()->toDateString();
+
+        $count = \Illuminate\Support\Facades\DB::table('Venta')
+            ->where('status', 0)
+            ->where('tipo_servicio', 1)
+            ->where('id_suc', $this->id_sucursal)
+            ->whereNotNull('mesa')
+            ->whereRaw('DATE(fecha_hora) < ?', [$hoy])
+            ->count();
+
+        if ($count === 0) {
+            return response()->json(['success' => true, 'cerradas' => 0, 'message' => 'No hay mesas de días anteriores.']);
+        }
+
+        \Illuminate\Support\Facades\DB::table('Venta')
+            ->where('status', 0)
+            ->where('tipo_servicio', 1)
+            ->where('id_suc', $this->id_sucursal)
+            ->whereNotNull('mesa')
+            ->whereRaw('DATE(fecha_hora) < ?', [$hoy])
+            ->update([
+                'status'      => 1,
+                'comentarios' => \Illuminate\Support\Facades\DB::raw("TRIM(BOTH ' | ' FROM CONCAT(COALESCE(comentarios,''), ' | CIERRE MANUAL " . now()->format('d/m/Y H:i') . "'))"),
+            ]);
+
+        return response()->json(['success' => true, 'cerradas' => $count]);
+    }
+
     private function getMesasOcupadas(): array
     {
         $ventas = DB::table('Venta')

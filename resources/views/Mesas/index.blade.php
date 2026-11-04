@@ -153,7 +153,27 @@ html:not(.app-dark) .cm-empty    { color: #9ca3af !important; }
             <button @click="refrescar()" class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors" title="Actualizar">
                 <svg class="w-4 h-4 text-gray-500" :class="cargando ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
+            <button @click="confirmarCierreAnteriores()"
+                    :disabled="cierreLoading"
+                    class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[11px] uppercase tracking-wide transition-colors disabled:opacity-50"
+                    title="Cerrar mesas abiertas de días anteriores">
+                <svg class="w-3.5 h-3.5 shrink-0" :class="cierreLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                <span x-text="cierreLoading ? 'Cerrando...' : 'Cerrar anteriores'"></span>
+            </button>
         </div>
+    </div>
+
+    {{-- Toast notificación cierre --}}
+    <div x-show="cierreToast" x-cloak x-transition
+         :class="cierreToastType === 'success' ? 'bg-green-600 text-white' : (cierreToastType === 'info' ? 'bg-blue-600 text-white' : 'bg-red-600 text-white')"
+         class="fixed top-5 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-2xl shadow-xl font-bold text-sm flex items-center gap-2">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <template x-if="cierreToastType === 'success'"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></template>
+            <template x-if="cierreToastType !== 'success'"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></template>
+        </svg>
+        <span x-text="cierreToast"></span>
     </div>
 
     {{-- Mapa --}}
@@ -473,6 +493,9 @@ function mesasApp() {
         cargando: false,
         cargandoItems: false,
         esAdmin: @json($esAdmin),
+        cierreLoading: false,
+        cierreToast: '',
+        cierreToastType: 'success',
 
         // Cobro
         cobrarLoading: false,
@@ -657,6 +680,40 @@ function mesasApp() {
                 this.cobrarError = 'Error de conexión. Intenta de nuevo.';
             }
             this.cobrarLoading = false;
+        },
+
+        confirmarCierreAnteriores() {
+            if (!confirm('¿Cerrar todas las mesas abiertas de días anteriores?\n\nEsta acción marcará esas ventas como cerradas.')) return;
+            this.ejecutarCierreAnteriores();
+        },
+
+        async ejecutarCierreAnteriores() {
+            this.cierreLoading = true;
+            try {
+                const r = await fetch('/mesas/cerrar-anteriores', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                });
+                const data = await r.json();
+                if (data.success) {
+                    if (data.cerradas === 0) {
+                        this.cierreToast = 'No hay mesas de días anteriores por cerrar.';
+                        this.cierreToastType = 'info';
+                    } else {
+                        this.cierreToast = `${data.cerradas} mesa${data.cerradas > 1 ? 's' : ''} cerrada${data.cerradas > 1 ? 's' : ''} correctamente.`;
+                        this.cierreToastType = 'success';
+                        await this.refrescar();
+                    }
+                } else {
+                    this.cierreToast = 'Ocurrió un error. Intenta de nuevo.';
+                    this.cierreToastType = 'error';
+                }
+            } catch(e) {
+                this.cierreToast = 'Error de conexión.';
+                this.cierreToastType = 'error';
+            }
+            this.cierreLoading = false;
+            setTimeout(() => { this.cierreToast = ''; }, 3500);
         },
 
         cerrarModal() {
