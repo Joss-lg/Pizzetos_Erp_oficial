@@ -1,51 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
+    /* ── Corte Mensual – dark mode ── */
     html.app-dark .corte-action-detail {
         background-color: #1d4ed8 !important;
         border: 1px solid #60a5fa !important;
         color: #ffffff !important;
         box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22) !important;
     }
-
     html.app-dark .corte-action-detail:hover {
         background-color: #2563eb !important;
         border-color: #93c5fd !important;
         color: #ffffff !important;
     }
+    html.app-dark .corte-payment-card { background-color: #24324a !important; box-shadow: 0 12px 28px rgba(0,0,0,.22) !important; }
+    html.app-dark .corte-payment-card-green { border-color: #4ade80 !important; }
+    html.app-dark .corte-payment-card-blue  { border-color: #60a5fa !important; }
+    html.app-dark .corte-payment-card-purple{ border-color: #c084fc !important; }
+    html.app-dark .corte-payment-card-green,html.app-dark .corte-payment-card-green * { color:#4ade80 !important; }
+    html.app-dark .corte-payment-card-blue, html.app-dark .corte-payment-card-blue  * { color:#60a5fa !important; }
+    html.app-dark .corte-payment-card-purple,html.app-dark .corte-payment-card-purple * { color:#c084fc !important; }
 
-    html.app-dark .corte-payment-card {
-        background-color: #24324a !important;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22) !important;
+    /* ── Calendario – base ── */
+    .cal-day {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 54px;
+        padding: 6px;
+        border-radius: 10px;
+        border: 1px solid rgba(226,232,240,0.5);
+        background: transparent;
+        transition: all .15s;
+        cursor: pointer;
+        text-align: left;
     }
+    @media (min-width: 768px) {
+        .cal-day { min-height: 92px; padding: 10px 12px; border-radius: 14px; }
+    }
+    .cal-day:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .cal-day:active { transform: scale(.97); }
+    .cal-day.has-data { border-color: rgba(74,222,128,.35); background: rgba(74,222,128,.04); }
+    .cal-day.has-data:hover { background: rgba(74,222,128,.09); }
+    .cal-day.is-today { box-shadow: 0 0 0 2px #f59e0b, 0 0 0 4px rgba(245,158,11,.2) !important; }
 
-    html.app-dark .corte-payment-card-green {
-        border-color: #4ade80 !important;
-    }
+    /* color bar mobile */
+    .cal-day .cal-bar { display:flex; position:absolute; bottom:0; left:0; right:0; height:3px; border-radius:0 0 10px 10px; overflow:hidden; }
+    @media(min-width:768px){ .cal-day .cal-bar { display:none; } }
 
-    html.app-dark .corte-payment-card-blue {
-        border-color: #60a5fa !important;
-    }
+    /* desktop data */
+    .cal-day .cal-desktop { display:none; }
+    @media(min-width:768px){ .cal-day .cal-desktop { display:flex; flex-direction:column; gap:1px; margin-top:auto; } }
 
-    html.app-dark .corte-payment-card-purple {
-        border-color: #c084fc !important;
-    }
-
-    html.app-dark .corte-payment-card-green,
-    html.app-dark .corte-payment-card-green * {
-        color: #4ade80 !important;
-    }
-
-    html.app-dark .corte-payment-card-blue,
-    html.app-dark .corte-payment-card-blue * {
-        color: #60a5fa !important;
-    }
-
-    html.app-dark .corte-payment-card-purple,
-    html.app-dark .corte-payment-card-purple * {
-        color: #c084fc !important;
-    }
+    /* ── Dark mode calendar ── */
+    html.app-dark .cal-day { border-color: rgba(255,255,255,.08); }
+    html.app-dark .cal-day.has-data { border-color: rgba(74,222,128,.22) !important; background: rgba(74,222,128,.06) !important; }
+    html.app-dark .cal-day.has-data:hover { background: rgba(74,222,128,.12) !important; }
+    html.app-dark .cal-day:hover { box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+    html.app-dark .cal-day-num-active { color: #94a3b8 !important; }
+    html.app-dark .cal-day-num-empty  { color: rgba(255,255,255,.12) !important; }
+    html.app-dark .cal-income { color: #4ade80 !important; }
+    html.app-dark .cal-expense{ color: #f87171 !important; }
 </style>
 
 <div x-data="modalDetalleDia()" class="max-w-[1600px] mx-auto relative">
@@ -116,48 +133,97 @@
         </div>
     </div>
 
+    {{-- ── Calendario mensual ── --}}
+    @php
+        $primerDiaSemana = (int) date('w', strtotime($mesSeleccionado . '-01')); // 0=Dom
+        $offsetCal = ($primerDiaSemana + 6) % 7;   // lunes = columna 0
+        $hoyStr = date('Y-m-d');
+    @endphp
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-6 border-b border-gray-50">
-            <h3 class="text-lg font-bold text-gray-800">Desglose Diario por Método de Pago</h3>
+
+        {{-- Header --}}
+        <div class="px-5 py-4 border-b border-gray-50 flex flex-wrap justify-between items-center gap-2">
+            <div>
+                <h3 class="text-base font-black text-gray-800 tracking-tight">Calendario de Actividad</h3>
+                <p class="text-[11px] text-gray-400 mt-0.5">Toca un día para ver el detalle completo</p>
+            </div>
+            <div class="flex items-center gap-3 text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+                <span class="flex items-center gap-1.5"><span class="inline-block w-2.5 h-2.5 rounded-full bg-green-400"></span>Efectivo</span>
+                <span class="flex items-center gap-1.5"><span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-400"></span>Tarjeta</span>
+                <span class="flex items-center gap-1.5"><span class="inline-block w-2.5 h-2.5 rounded-full bg-purple-400"></span>Transf.</span>
+            </div>
         </div>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="text-gray-400 uppercase text-[10px] tracking-widest font-bold border-b border-gray-100">
-                        <th class="px-6 py-4 font-semibold">Fecha</th>
-                        <th class="px-6 py-4 font-semibold text-center">Efectivo</th>
-                        <th class="px-6 py-4 font-semibold text-center">Tarjeta</th>
-                        <th class="px-6 py-4 font-semibold text-center">Transferencia</th>
-                        <th class="px-6 py-4 font-semibold text-center">Total Ingresos</th>
-                        <th class="px-6 py-4 font-semibold text-center">Gastos</th>
-                        <th class="px-6 py-4 font-semibold text-center">Balance</th>
-                        <th class="px-6 py-4 font-semibold text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50 text-sm">
-                    @foreach($desgloseDiario as $dia)
-                        @php
-                            $totalIngresoDia = $dia['efectivo'] + $dia['tarjeta'] + $dia['transferencia'];
-                            $balanceDia = $totalIngresoDia - $dia['gastos'];
-                        @endphp
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-gray-600 whitespace-nowrap">{{ $dia['fecha_format'] }}</td>
-                            <td class="px-6 py-4 text-center text-gray-500">${{ number_format($dia['efectivo'], 2) }}</td>
-                            <td class="px-6 py-4 text-center text-blue-500 font-medium">${{ number_format($dia['tarjeta'], 2) }}</td>
-                            <td class="px-6 py-4 text-center text-purple-500 font-medium">${{ number_format($dia['transferencia'], 2) }}</td>
-                            <td class="px-6 py-4 text-center text-green-500 font-medium">${{ number_format($totalIngresoDia, 2) }}</td>
-                            <td class="px-6 py-4 text-center text-red-500 font-medium">${{ number_format($dia['gastos'], 2) }}</td>
-                            <td class="px-6 py-4 text-center {{ $balanceDia >= 0 ? 'text-blue-600' : 'text-red-600' }} font-bold">${{ number_format($balanceDia, 2) }}</td>
-                            <td class="px-6 py-4 text-center">
-                                <button type="button" @click="abrirModal('{{ $dia['fecha_db'] }}', '{{ $dia['fecha_format'] }}')" class="corte-action-detail p-2.5 bg-blue-50/50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full transition-all inline-flex justify-center items-center group shadow-sm hover:shadow-md" title="Ver detalle del día">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+
+        <div class="p-3 md:p-5">
+
+            {{-- Cabecera días de semana --}}
+            <div class="grid grid-cols-7 gap-1 mb-1">
+                @foreach(['L','M','X','J','V','S','D'] as $letra)
+                    <div class="text-center text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest py-1.5">{{ $letra }}</div>
+                @endforeach
+            </div>
+
+            {{-- Grid del calendario --}}
+            <div class="grid grid-cols-7 gap-1 md:gap-1.5">
+
+                {{-- Celdas vacías de offset --}}
+                @for($i = 0; $i < $offsetCal; $i++)
+                    <div style="min-height:54px"></div>
+                @endfor
+
+                {{-- Un botón-celda por día --}}
+                @foreach($desgloseDiario as $dia)
+                    @php
+                        $totalDia   = $dia['efectivo'] + $dia['tarjeta'] + $dia['transferencia'];
+                        $balanceDia = $totalDia - $dia['gastos'];
+                        $tieneData  = $totalDia > 0 || $dia['gastos'] > 0;
+                        $esHoy      = ($hoyStr === $dia['fecha_db']);
+                        // Formato compacto para desktop
+                        $fmtTotal   = $totalDia >= 1000
+                            ? '$' . number_format($totalDia / 1000, 1) . 'k'
+                            : '$' . number_format($totalDia, 0);
+                        $fmtGasto   = $dia['gastos'] >= 1000
+                            ? '-$' . number_format($dia['gastos'] / 1000, 1) . 'k'
+                            : '-$' . number_format($dia['gastos'], 0);
+                    @endphp
+
+                    <button type="button"
+                        @click="abrirModal('{{ $dia['fecha_db'] }}', '{{ $dia['fecha_format'] }}')"
+                        class="cal-day {{ $tieneData ? 'has-data' : '' }} {{ $esHoy ? 'is-today' : '' }}"
+                        title="{{ $dia['fecha_format'] }}"
+                    >
+                        {{-- Número del día --}}
+                        <span class="text-[11px] md:text-[13px] font-black leading-none
+                            {{ $esHoy ? 'text-amber-500' : ($tieneData ? 'cal-day-num-active text-gray-700' : 'cal-day-num-empty text-gray-300') }}">
+                            {{ $dia['dia'] }}
+                        </span>
+
+                        @if($tieneData)
+                            {{-- Barra de colores — mobile --}}
+                            <div class="cal-bar">
+                                @if($dia['efectivo'] > 0)<span class="flex-1" style="background:#4ade80"></span>@endif
+                                @if($dia['tarjeta'] > 0)<span class="flex-1" style="background:#60a5fa"></span>@endif
+                                @if($dia['transferencia'] > 0)<span class="flex-1" style="background:#c084fc"></span>@endif
+                            </div>
+
+                            {{-- Datos — desktop --}}
+                            <div class="cal-desktop">
+                                <span class="text-[11px] font-black cal-income text-green-600 leading-none">{{ $fmtTotal }}</span>
+                                @if($dia['gastos'] > 0)
+                                    <span class="text-[9px] font-semibold cal-expense text-red-400 leading-none">{{ $fmtGasto }}</span>
+                                @endif
+                                <div class="flex gap-0.5 mt-1">
+                                    @if($dia['efectivo'] > 0)<span class="inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>@endif
+                                    @if($dia['tarjeta'] > 0)<span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-400"></span>@endif
+                                    @if($dia['transferencia'] > 0)<span class="inline-block w-1.5 h-1.5 rounded-full bg-purple-400"></span>@endif
+                                </div>
+                            </div>
+                        @endif
+                    </button>
+                @endforeach
+
+            </div>{{-- /grid --}}
         </div>
     </div>
 

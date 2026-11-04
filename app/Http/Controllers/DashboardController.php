@@ -20,6 +20,20 @@ class DashboardController extends Controller
 
         // 2. SI LA CAJA ESTÁ CERRADA: MANDAMOS PUROS CEROS
         if (!$cajaAbierta) {
+            // Top pizzas all-time (shown even with caja closed)
+            $topPizzasCerrada = DB::table('DetalleVenta')
+                ->join('Venta', 'DetalleVenta.id_venta', '=', 'Venta.id_venta')
+                ->join('Pizzas', 'DetalleVenta.id_pizza', '=', 'Pizzas.id_pizza')
+                ->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')
+                ->where('Venta.id_suc', $id_sucursal)
+                ->where('Venta.status', 1)
+                ->whereNotNull('DetalleVenta.id_pizza')
+                ->select('Especialidades.nombre', DB::raw('SUM(DetalleVenta.cantidad) as total'))
+                ->groupBy('Especialidades.id_esp', 'Especialidades.nombre')
+                ->orderByDesc('total')
+                ->limit(5)
+                ->get();
+
             $data = [
                 'ventasHoy' => 0,
                 'numVentas' => 0,
@@ -28,7 +42,9 @@ class DashboardController extends Controller
                 'efectivoVentas' => 0,
                 'tarjetasHoy' => 0,
                 'transferenciasHoy' => 0,
-                'cajaAbierta' => false // Bandera para la vista
+                'cajaAbierta' => false,
+                'topPizzas' => $topPizzasCerrada,
+                'topProductos' => collect(),
             ];
 
             if ($request->ajax()) {
@@ -84,6 +100,72 @@ class DashboardController extends Controller
         // Ya no tomamos en cuenta el monto inicial aquí.
         $efectivoCaja = $efectivoVentas - $gastosHoy;
 
+        // E. Top pizzas all-time (por especialidad)
+        $topPizzas = DB::table('DetalleVenta')
+            ->join('Venta', 'DetalleVenta.id_venta', '=', 'Venta.id_venta')
+            ->join('Pizzas', 'DetalleVenta.id_pizza', '=', 'Pizzas.id_pizza')
+            ->join('Especialidades', 'Pizzas.id_esp', '=', 'Especialidades.id_esp')
+            ->where('Venta.id_suc', $id_sucursal)
+            ->where('Venta.status', 1)
+            ->whereNotNull('DetalleVenta.id_pizza')
+            ->select('Especialidades.nombre', DB::raw('SUM(DetalleVenta.cantidad) as total'))
+            ->groupBy('Especialidades.id_esp', 'Especialidades.nombre')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        // F. Top productos all-time (todas las categorías)
+        $productQueries = [
+            DB::table('DetalleVenta as dv')
+                ->join('Venta as v', 'dv.id_venta', '=', 'v.id_venta')
+                ->join('Pizzas as p', 'dv.id_pizza', '=', 'p.id_pizza')
+                ->join('Especialidades as e', 'p.id_esp', '=', 'e.id_esp')
+                ->where('v.id_suc', $id_sucursal)->where('v.status', 1)->whereNotNull('dv.id_pizza')
+                ->select('e.nombre', DB::raw('SUM(dv.cantidad) as total'), DB::raw('"Pizza" as categoria'))
+                ->groupBy('e.id_esp', 'e.nombre'),
+
+            DB::table('DetalleVenta as dv')
+                ->join('Venta as v', 'dv.id_venta', '=', 'v.id_venta')
+                ->join('Hamburguesas as h', 'dv.id_hamb', '=', 'h.id_hamb')
+                ->where('v.id_suc', $id_sucursal)->where('v.status', 1)->whereNotNull('dv.id_hamb')
+                ->select('h.paquete as nombre', DB::raw('SUM(dv.cantidad) as total'), DB::raw('"Hamburguesa" as categoria'))
+                ->groupBy('h.id_hamb', 'h.paquete'),
+
+            DB::table('DetalleVenta as dv')
+                ->join('Venta as v', 'dv.id_venta', '=', 'v.id_venta')
+                ->join('Alitas as a', 'dv.id_alis', '=', 'a.id_alis')
+                ->where('v.id_suc', $id_sucursal)->where('v.status', 1)->whereNotNull('dv.id_alis')
+                ->select('a.orden as nombre', DB::raw('SUM(dv.cantidad) as total'), DB::raw('"Alitas" as categoria'))
+                ->groupBy('a.id_alis', 'a.orden'),
+
+            DB::table('DetalleVenta as dv')
+                ->join('Venta as v', 'dv.id_venta', '=', 'v.id_venta')
+                ->join('Costillas as c', 'dv.id_cos', '=', 'c.id_cos')
+                ->where('v.id_suc', $id_sucursal)->where('v.status', 1)->whereNotNull('dv.id_cos')
+                ->select('c.orden as nombre', DB::raw('SUM(dv.cantidad) as total'), DB::raw('"Costillas" as categoria'))
+                ->groupBy('c.id_cos', 'c.orden'),
+
+            DB::table('DetalleVenta as dv')
+                ->join('Venta as v', 'dv.id_venta', '=', 'v.id_venta')
+                ->join('Spaguetty as s', 'dv.id_spag', '=', 's.id_spag')
+                ->where('v.id_suc', $id_sucursal)->where('v.status', 1)->whereNotNull('dv.id_spag')
+                ->select('s.orden as nombre', DB::raw('SUM(dv.cantidad) as total'), DB::raw('"Spaguetti" as categoria'))
+                ->groupBy('s.id_spag', 's.orden'),
+
+            DB::table('DetalleVenta as dv')
+                ->join('Venta as v', 'dv.id_venta', '=', 'v.id_venta')
+                ->join('OrdenDePapas as p', 'dv.id_papa', '=', 'p.id_papa')
+                ->where('v.id_suc', $id_sucursal)->where('v.status', 1)->whereNotNull('dv.id_papa')
+                ->select('p.orden as nombre', DB::raw('SUM(dv.cantidad) as total'), DB::raw('"Papas" as categoria'))
+                ->groupBy('p.id_papa', 'p.orden'),
+        ];
+
+        $topProductos = collect();
+        foreach ($productQueries as $q) {
+            $topProductos = $topProductos->merge($q->get());
+        }
+        $topProductos = $topProductos->sortByDesc('total')->take(8)->values();
+
         $data = [
             'ventasHoy' => $ventasHoy,
             'numVentas' => $numVentas,
@@ -92,7 +174,9 @@ class DashboardController extends Controller
             'efectivoVentas' => $efectivoVentas,
             'tarjetasHoy' => $tarjetasHoy,
             'transferenciasHoy' => $transferenciasHoy,
-            'cajaAbierta' => true
+            'cajaAbierta' => true,
+            'topPizzas' => $topPizzas,
+            'topProductos' => $topProductos,
         ];
 
         if ($request->ajax()) {

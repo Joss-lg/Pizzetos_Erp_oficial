@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
     .app-dark .dashboard-board {
         background: #182235 !important;
@@ -38,6 +39,30 @@
         background: linear-gradient(135deg, #6d28d9, #7c3aed) !important;
         box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18) !important;
     }
+
+    /* ── Top productos ── */
+    .dash-rank-card { background:#fff; border-radius:2.5rem; padding:2rem; border:1px solid rgba(226,232,240,.8); box-shadow:0 2px 8px rgba(0,0,0,.04); }
+    .app-dark .dash-rank-card { background:#182235!important; border-color:#2f3c53!important; }
+
+    .dash-pizza-spotlight { background:linear-gradient(135deg,#fd7e14,#ffc107); border-radius:1.5rem; padding:1.25rem 1.5rem; color:#fff; }
+
+    .dash-rank-bar-track { height:6px; border-radius:999px; background:rgba(226,232,240,.6); overflow:hidden; }
+    .app-dark .dash-rank-bar-track { background:rgba(255,255,255,.08)!important; }
+    .dash-rank-bar-fill { height:100%; border-radius:999px; transition:width .4s; }
+
+    .dash-cat-badge { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:999px; }
+    .dash-cat-pizza        { background:rgba(253,126,20,.14); color:#ea580c; }
+    .dash-cat-hamburguesa  { background:rgba(239,68,68,.12);  color:#dc2626; }
+    .dash-cat-alitas       { background:rgba(245,158,11,.14); color:#d97706; }
+    .dash-cat-costillas    { background:rgba(239,68,68,.12);  color:#dc2626; }
+    .dash-cat-spaguetti    { background:rgba(99,102,241,.12); color:#4f46e5; }
+    .dash-cat-papas        { background:rgba(234,179,8,.14);  color:#ca8a04; }
+    .app-dark .dash-cat-pizza       { background:rgba(253,126,20,.18)!important; color:#fb923c!important; }
+    .app-dark .dash-cat-hamburguesa { background:rgba(239,68,68,.18)!important;  color:#f87171!important; }
+    .app-dark .dash-cat-alitas      { background:rgba(245,158,11,.18)!important; color:#fbbf24!important; }
+    .app-dark .dash-cat-costillas   { background:rgba(239,68,68,.18)!important;  color:#f87171!important; }
+    .app-dark .dash-cat-spaguetti   { background:rgba(99,102,241,.18)!important; color:#818cf8!important; }
+    .app-dark .dash-cat-papas       { background:rgba(234,179,8,.18)!important;  color:#fde047!important; }
 </style>
 <div class="max-w-7xl mx-auto space-y-6 pb-12">
     
@@ -93,45 +118,6 @@
         {{-- GRID PRINCIPAL --}}
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
             
-            {{-- CARD: BALANCE EFECTIVO --}}
-            <div class="md:col-span-8 bg-white rounded-[3.5rem] p-10 border-4 border-amber-400/20 relative overflow-hidden shadow-sm dashboard-board">
-                <div class="absolute top-0 right-0 p-12 opacity-[0.03] rotate-12">
-                    <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
-                </div>
-                
-                <div class="relative z-10 flex flex-col h-full justify-between">
-                    <div>
-                        <span class="text-slate-400 font-black text-[10px] uppercase tracking-[0.4em] italic mb-2 block">Balance Efectivo en Caja</span>
-                        <h2 class="text-7xl font-black text-slate-900 italic tracking-tighter leading-none">
-                            ${{ number_format($efectivoCaja, 2) }}
-                        </h2>
-                    </div>
-                    
-                    <div class="mt-12 flex items-center gap-6">
-                        <div class="bg-emerald-50 p-5 rounded-[2rem] border border-emerald-100 dashboard-chip-green">
-                            <span class="block text-[9px] font-black text-emerald-600 uppercase italic mb-1">Entradas</span>
-                            <span class="text-2xl font-black text-slate-800 italic">${{ number_format($efectivoVentas, 2) }}</span>
-                        </div>
-                        <div class="text-slate-300 font-black text-2xl italic">-</div>
-                        <div class="bg-red-50 p-5 rounded-[2rem] border border-red-100 dashboard-chip-red">
-                            <span class="block text-[9px] font-black text-red-500 uppercase italic mb-1">Salidas</span>
-                            <span class="text-2xl font-black text-slate-800 italic">-${{ number_format($gastosHoy, 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- CARD: VENTA BRUTA --}}
-            <div class="md:col-span-4 bg-white rounded-[3.5rem] p-10 border border-slate-100 shadow-sm flex flex-col justify-center text-center dashboard-board">
-                <span class="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em] mb-4">Venta Total Bruta</span>
-                <h2 class="text-5xl font-black text-slate-900 italic tracking-tighter leading-none mb-6">
-                    ${{ number_format($ventasHoy, 2) }}
-                </h2>
-                <div class="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
-                    <div class="h-full bg-amber-400" style="width: 100%"></div>
-                </div>
-            </div>
-
             {{-- MÉTODOS DE PAGO --}}
             <div class="md:col-span-4 bg-emerald-500 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 flex items-center justify-between group transition-all hover:-translate-y-1 dashboard-pay-efectivo">
                 <div>
@@ -164,6 +150,126 @@
             </div>
 
         </div>
+
+        {{-- ── RANKINGS ── --}}
+        @php
+            $maxPizza   = $topPizzas->max('total') ?: 1;
+            $maxProd    = $topProductos->max('total') ?: 1;
+            $catClasses = [
+                'Pizza'       => 'dash-cat-pizza',
+                'Hamburguesa' => 'dash-cat-hamburguesa',
+                'Alitas'      => 'dash-cat-alitas',
+                'Costillas'   => 'dash-cat-costillas',
+                'Spaguetti'   => 'dash-cat-spaguetti',
+                'Papas'       => 'dash-cat-papas',
+            ];
+            $catColors = [
+                'Pizza'       => '#fd7e14',
+                'Hamburguesa' => '#ef4444',
+                'Alitas'      => '#f59e0b',
+                'Costillas'   => '#ef4444',
+                'Spaguetti'   => '#6366f1',
+                'Papas'       => '#eab308',
+            ];
+        @endphp
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {{-- TOP PIZZAS --}}
+            <div class="dash-rank-card">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#fd7e14] to-[#ffc107] flex items-center justify-center shadow-md text-xl shrink-0">🍕</div>
+                    <div>
+                        <h3 class="text-[13px] font-black text-slate-900 italic uppercase tracking-tight leading-none">Pizzas más vendidas</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Histórico — todas las ventas</p>
+                    </div>
+                </div>
+
+                @if($topPizzas->isEmpty())
+                    <div class="flex flex-col items-center py-8 gap-2 text-slate-400">
+                        <span class="text-4xl opacity-30">🍕</span>
+                        <p class="text-xs font-bold italic">Sin datos aún</p>
+                    </div>
+                @else
+                    {{-- Spotlight #1 --}}
+                    @php $p1 = $topPizzas->first(); @endphp
+                    <div class="dash-pizza-spotlight flex items-center justify-between mb-4">
+                        <div>
+                            <span class="text-[9px] font-black uppercase tracking-widest opacity-80 block mb-0.5">🥇 La más vendida</span>
+                            <h4 class="text-xl font-black italic tracking-tight leading-none">{{ $p1->nombre }}</h4>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-3xl font-black italic leading-none">{{ $p1->total }}</span>
+                            <span class="text-[10px] font-bold opacity-80 block">unidades</span>
+                        </div>
+                    </div>
+
+                    {{-- Ranks 2-5 --}}
+                    <div class="space-y-3">
+                        @foreach($topPizzas->skip(1) as $i => $p)
+                            @php $pct = round(($p->total / $maxPizza) * 100); @endphp
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] font-black text-slate-400 w-4 text-center">{{ $i + 2 }}</span>
+                                        <span class="text-[13px] font-bold text-slate-800 italic truncate max-w-[180px]">{{ $p->nombre }}</span>
+                                    </div>
+                                    <span class="text-[12px] font-black text-slate-600 italic shrink-0">{{ $p->total }}</span>
+                                </div>
+                                <div class="dash-rank-bar-track ml-6">
+                                    <div class="dash-rank-bar-fill bg-gradient-to-r from-[#fd7e14] to-[#ffc107]" style="width:{{ $pct }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            {{-- TOP PRODUCTOS (todas las categorías) --}}
+            <div class="dash-rank-card">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-md text-xl shrink-0">🏆</div>
+                    <div>
+                        <h3 class="text-[13px] font-black text-slate-900 italic uppercase tracking-tight leading-none">Top productos</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Todas las categorías — histórico</p>
+                    </div>
+                </div>
+
+                @if($topProductos->isEmpty())
+                    <div class="flex flex-col items-center py-8 gap-2 text-slate-400">
+                        <span class="text-4xl opacity-30">📊</span>
+                        <p class="text-xs font-bold italic">Sin datos aún</p>
+                    </div>
+                @else
+                    <div class="space-y-3">
+                        @foreach($topProductos as $i => $prod)
+                            @php
+                                $pct      = round(($prod->total / $maxProd) * 100);
+                                $catKey   = $prod->categoria ?? 'Pizza';
+                                $badgeCls = $catClasses[$catKey] ?? 'dash-cat-pizza';
+                                $barColor = $catColors[$catKey] ?? '#fd7e14';
+                                $medals   = ['🥇','🥈','🥉'];
+                            @endphp
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="text-[13px] shrink-0">{{ $medals[$i] ?? ($i+1) . '.' }}</span>
+                                        <span class="text-[13px] font-bold text-slate-800 italic truncate">{{ $prod->nombre }}</span>
+                                        <span class="dash-cat-badge {{ $badgeCls }} shrink-0">{{ $catKey }}</span>
+                                    </div>
+                                    <span class="text-[12px] font-black text-slate-600 italic shrink-0 ml-2">{{ $prod->total }}</span>
+                                </div>
+                                <div class="dash-rank-bar-track">
+                                    <div class="dash-rank-bar-fill" style="width:{{ $pct }}%; background:{{ $barColor }}"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+        </div>{{-- /rankings --}}
+
     @endif
 </div>
 @endsection
