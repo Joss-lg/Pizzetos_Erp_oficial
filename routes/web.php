@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\MesasController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\CorteController;
 use App\Http\Controllers\PizzaController;
@@ -70,6 +71,11 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 // =====================================================================
 Route::middleware(['auth'])->group(function () {
     
+    // --- MESAS ---
+    Route::get('/mesas', [MesasController::class, 'index'])->name('mesas.index');
+    Route::get('/mesas/estado', [MesasController::class, 'getEstado'])->name('mesas.estado');
+    Route::get('/mesas/detalle/{id_venta}', [MesasController::class, 'getDetalle'])->name('mesas.detalle');
+
     // --- PUNTO DE VENTA (POS) ---
     Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos')
         ->middleware('permiso:pos,mostrar');

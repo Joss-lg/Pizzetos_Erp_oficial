@@ -198,7 +198,8 @@ class PuntoVentaController extends Controller
             'magno_precio' => $magno_precio, 'precios_orilla' => $this->getPreciosOrilla(),
             'venta_edit' => $venta_edit, 'cart_preloaded' => $cart_preloaded,
             'pagos_edit' => $pagos_edit, 'domicilio_edit' => $domicilio_edit,
-            'pespecial_edit' => $pespecial_edit
+            'pespecial_edit' => $pespecial_edit,
+            'from' => request()->get('from', '')
         ]);
     }
 

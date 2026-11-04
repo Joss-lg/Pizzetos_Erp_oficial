@@ -3647,7 +3647,11 @@ procesarOrdenFinal(esAbierta = false) {
             window.open(urlTicket, 'TicketPizzetos', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`); 
             
             if(this.id_venta_edit) {
-                setTimeout(() => { window.location.href = "{{ route('ventas.resume') }}"; }, 1500);
+                @php $fromParam = $from ?? ''; @endphp
+                const redirectUrl = '{{ $fromParam }}' === 'mesas'
+                    ? '{{ route("mesas.index") }}'
+                    : '{{ route("ventas.resume") }}';
+                setTimeout(() => { window.location.href = redirectUrl; }, 1500);
             } else {
                 this.isProcessing = false;
             }
