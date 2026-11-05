@@ -703,6 +703,7 @@
                     <p :class="sidebarExpanded ? 'block' : 'block lg:hidden'" class="px-3 pt-2 pb-1.5 text-[9px] font-black text-black/35 uppercase tracking-[0.25em]">Operación</p>
                     <div :class="sidebarExpanded ? 'hidden' : 'hidden lg:block'" class="h-px w-6 bg-black/10 mx-auto my-3"></div>
 
+                    @if(Auth::user()->id_ca != 3)
                     {{-- INICIO --}}
                     <a href="{{ route('dashboard') }}" @click="handleSidebarNavigation($event)"
                        class="{{ $navItem(request()->routeIs('dashboard')) }}"
@@ -741,11 +742,13 @@
                         <span :class="sidebarExpanded ? 'block' : 'block lg:hidden'" class="text-[13px] font-black uppercase italic tracking-tight whitespace-nowrap">Mesas</span>
                     </a>
 
+                    @endif {{-- fin bloque no-repartidor --}}
+
                     {{-- REPARTIDOR --}}
-                    <a href="{{ route('ventas.pedidos') }}" @click="handleSidebarNavigation($event)"
-                       class="{{ $navItem(request()->routeIs('ventas.pedidos')) }}"
+                    <a href="{{ route('repartidor.index') }}" @click="handleSidebarNavigation($event)"
+                       class="{{ $navItem(request()->routeIs('repartidor.*')) }}"
                        :class="sidebarExpanded ? 'gap-3 justify-start' : 'justify-start lg:justify-center'">
-                        <div class="{{ $iconWrap(request()->routeIs('ventas.pedidos')) }}">
+                        <div class="{{ $iconWrap(request()->routeIs('repartidor.*')) }}">
                             {{-- Moto / scooter de delivery --}}
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M19 7c0-1.1-.9-2-2-2h-3l2 4h3c1.1 0 2-.9 2-2zM4.5 11H2v2h2.09A5.004 5.004 0 002 17c0 2.76 2.24 5 5 5s5-2.24 5-5c0-.34-.04-.67-.1-1H14v-1.5l-1-3H9.5L8 11H4.5zm2.5 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm10-1c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0-6c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2v-2z"/>
@@ -754,6 +757,7 @@
                         <span :class="sidebarExpanded ? 'block' : 'block lg:hidden'" class="text-[13px] font-black uppercase italic tracking-tight whitespace-nowrap">Repartidor</span>
                     </a>
 
+                    @if(Auth::user()->id_ca != 3)
                     {{-- ESPECIALES --}}
                     <a href="{{ route('especiales.index') }}" @click="handleSidebarNavigation($event)"
                        class="{{ $navItem(request()->routeIs('especiales.*')) }}"
@@ -816,6 +820,8 @@
                         </div>
                         <span :class="sidebarExpanded ? 'block' : 'block lg:hidden'" class="text-[13px] font-black uppercase italic tracking-tight whitespace-nowrap">Clientes</span>
                     </a>
+
+                    @endif {{-- fin bloque no-repartidor 2 --}}
 
                     {{-- SECCIÓN DE ADMINISTRACIÓN RESTRINGIDA --}}
                     @if(Auth::user()->id_ca == 1)

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MesasController;
+use App\Http\Controllers\RepartidorController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\CorteController;
 use App\Http\Controllers\PizzaController;
@@ -76,6 +77,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mesas/estado', [MesasController::class, 'getEstado'])->name('mesas.estado');
     Route::get('/mesas/detalle/{id_venta}', [MesasController::class, 'getDetalle'])->name('mesas.detalle');
     Route::post('/mesas/cerrar-anteriores', [MesasController::class, 'cerrarAnteriores'])->name('mesas.cerrar-anteriores');
+
+    // Repartidor
+    Route::get('/repartidor',               [RepartidorController::class, 'index'])->name('repartidor.index');
+    Route::get('/repartidor/estado',         [RepartidorController::class, 'getEstado'])->name('repartidor.estado');
+    Route::post('/repartidor/asignar',       [RepartidorController::class, 'asignar'])->name('repartidor.asignar');
+    Route::post('/repartidor/tomar',         [RepartidorController::class, 'tomar'])->name('repartidor.tomar');
+    Route::post('/repartidor/salir',         [RepartidorController::class, 'salir'])->name('repartidor.salir');
+    Route::post('/repartidor/entregar',      [RepartidorController::class, 'entregar'])->name('repartidor.entregar');
+    Route::post('/repartidor/reasignar',     [RepartidorController::class, 'reasignar'])->name('repartidor.reasignar');
 
     // --- PUNTO DE VENTA (POS) ---
     Route::get('/venta/pos', [PuntoVentaController::class, 'index'])->name('ventas.pos')

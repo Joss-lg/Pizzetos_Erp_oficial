@@ -30,6 +30,11 @@ class LoginController extends Controller
             }
 
             // Para no-admins: redirigir al primer módulo que tengan habilitado
+            // Repartidor: acceso directo a su módulo
+            if ($user->id_ca == 3) {
+                return redirect()->intended('repartidor');
+            }
+
             if ($user->tienePermiso('flujo_caja', 'mostrar')) {
                 return redirect()->intended('venta/flujo-caja');
             }
